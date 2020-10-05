@@ -88,7 +88,7 @@ type CocosBuildOption struct {
 const COCOS_WIN_BUILDER = "CocosCreator/CocosCreator.exe"
 const COCOS_MAC_BUILDER = "/Applications/CocosCreator.app/Contents/MacOS/CocosCreator"
 
-func BuildCocos(conf *CocosBuildOption) error {
+func BuildCocos(conf *CocosBuildOption,writer io.Writer) error {
 	var builderStr string
 	if runtime.GOOS == "darwin" {
 		builderStr = COCOS_MAC_BUILDER
@@ -124,6 +124,7 @@ func BuildCocos(conf *CocosBuildOption) error {
 			break
 		}
 		log.Warnf(line)
+		writer.Write([]byte(line))
 	}
 	cmd.Wait()
 	return nil
