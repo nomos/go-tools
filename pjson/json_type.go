@@ -2,6 +2,7 @@ package pjson
 
 import (
 	"github.com/nomos/go-lokas/util/log"
+	"github.com/ying32/govcl/vcl"
 	"strconv"
 	"strings"
 )
@@ -35,21 +36,25 @@ func init(){
 	name_map[Boolean] = "Boolean"
 }
 
-func (this Type) Name()string{
-	return  name_map[this]
+func (this Type) String()string{
+	ret,ok:=name_map[this]
+	if ok {
+		return ret
+	}
+	return "Unknown"
 }
 
 func (this Type) Default()string {
 	if this == Object||this == Array {
-		log.Panic("call default string with "+this.Name())
+		log.Panic("call default string with "+this.String())
 	}
 	return default_map[this]
 }
 
 func(this Type) CheckValue(s string)(string,bool) {
 	if this == Object||this == Array {
-		log.Panic("check value with "+this.Name())
-	}
+		log.Panic("check value with "+this.String())
+	}vcl.NewPopupMenu(mainForm)
 	switch this {
 	case Null:
 		s = strings.TrimSpace(s)

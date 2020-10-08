@@ -1,0 +1,16 @@
+{
+  "Map": {
+    "aaa": 1,
+    "bbb": 33.4323,
+    "ccc": true,
+    "ddd": null,
+    "eee": "asdf"
+  },
+  "Array": [
+    true,
+    3344,
+    "DASDAS",
+    [3344,55123],
+    {"ddddd": 33,"ffff": true}
+  ]
+}
