@@ -368,4 +368,5 @@ func (this *Schema) ChangeType(t Type)bool {
 	}
 	this.Type = t
 	this.Value = t.Default()
+	return true
 }
