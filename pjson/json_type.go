@@ -2,7 +2,6 @@ package pjson
 
 import (
 	"github.com/nomos/go-lokas/util/log"
-	"github.com/ying32/govcl/vcl"
 	"strconv"
 	"strings"
 )
@@ -54,7 +53,7 @@ func (this Type) Default()string {
 func(this Type) CheckValue(s string)(string,bool) {
 	if this == Object||this == Array {
 		log.Panic("check value with "+this.String())
-	}vcl.NewPopupMenu(mainForm)
+	}
 	switch this {
 	case Null:
 		s = strings.TrimSpace(s)

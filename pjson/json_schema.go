@@ -1,8 +1,12 @@
 package pjson
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
+	"github.com/iancoleman/orderedmap"
 	"github.com/nomos/go-lokas/util"
+	"github.com/nomos/go-lokas/util/log"
 	"math"
 	"reflect"
 	"strconv"
@@ -37,6 +41,8 @@ func (this *Schema) typeof(d interface{}) Type {
 		return Null
 	}
 	switch reflect.TypeOf(d).Kind().String() {
+	case "ptr","struct":
+		return Object
 	case "map":
 		return Object
 	case "slice":
@@ -65,10 +71,13 @@ func (this *Schema) Unmarshal(key string,index int, d interface{}) (*Schema, err
 	this.Type = t
 	switch t {
 	case Object:
-		d1 := d.(map[string]interface{})
-		for k, v := range d1 {
+		d1:=d.(orderedmap.OrderedMap)
+		for _,k:=range d1.Keys() {
 			schema:=this.AppendChild()
-			schema.Unmarshal(k,-1,v)
+			v,ok:=d1.Get(k)
+			if ok {
+				schema.Unmarshal(k,-1,v)
+			}
 		}
 		break
 	case Array:
@@ -170,6 +179,62 @@ func (this *Schema) ToLineString()string {
 		return ret+`"`+this.Value+`"`
 	default:
 		return ret+this.Value
+	}
+}
+
+
+func (this *Schema) ToObj()interface{} {
+	switch this.Type {
+	case Object:
+		ret:=orderedmap.New()
+		for _,container:=range this.Container {
+			ret.Set(container.Key,container.ToObj())
+		}
+		return ret
+	case Array:
+		ret:=make([]interface{},0)
+		for _,container:=range this.Container {
+			ret = append(ret, container.ToObj())
+		}
+		return ret
+	case String:
+		return this.Value
+	case Number:
+		ret,err:= strconv.ParseFloat(this.Value,64)
+		if err != nil {
+			log.Error(err.Error())
+			return nil
+		}
+		return ret
+	case Boolean:
+		if this.Value == "true" {
+			return true
+		} else {
+			return false
+		}
+	case Null:
+		return nil
+	}
+	return nil
+}
+
+func (this *Schema) ToString(format bool)string {
+	switch this.Type {
+	case Object,Array:
+		ret,err:=json.Marshal(this.ToObj())
+		if err != nil {
+			log.Error(err.Error())
+			return ""
+		}
+		if format {
+			var str bytes.Buffer
+			_ = json.Indent(&str, ret, "", "    ")
+			return str.String()
+		} else {
+			return string(ret)
+		}
+	default:
+		return this.Value
 	}
 }
 
