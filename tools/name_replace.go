@@ -28,6 +28,7 @@ func FileNameReplace(dir string,pattern interface{},replacer string)(map[string]
 		} else {
 			exportStr = strings.Replace(fileName,patternString,replacer,-1)
 		}
+		exportStr = strings.ToLower(exportStr)
 		ret[filePath] = exportStr
 		return false
 	},false)
