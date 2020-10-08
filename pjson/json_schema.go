@@ -162,7 +162,6 @@ func (this *Schema) GetRootTree()[]int {
 	return ret1
 }
 
-
 func (this *Schema) ToLineString()string {
 	ret:=""
 	if this.Index!= -1 {
@@ -184,7 +183,6 @@ func (this *Schema) ToLineString()string {
 		return ret+this.Value
 	}
 }
-
 
 func (this *Schema) ToObj()interface{} {
 	switch this.Type {
@@ -357,4 +355,17 @@ func (this *Schema) insert(pos int,s *Schema) {
 	}
 	this.Container = newC
 	s.parent = this
+}
+
+func (this *Schema) ChangeType(t Type)bool {
+	if this.Type == t {
+		return false
+	}
+	if this.Type == Object || this.Type == Array {
+		if len(this.Container)>0 {
+			return false
+		}
+	}
+	this.Type = t
+	this.Value = t.Default()
 }
