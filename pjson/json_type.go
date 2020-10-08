@@ -25,7 +25,7 @@ func init(){
 	default_map[Object] = ""
 	default_map[Array] = ""
 	default_map[String] = ""
-	default_map[Number] = "NaN"
+	default_map[Number] = "0"
 	default_map[Boolean] = "false"
 	name_map[Null] = "Null"
 	name_map[Object] = "Object"
@@ -33,6 +33,26 @@ func init(){
 	name_map[String] = "String"
 	name_map[Number] = "Number"
 	name_map[Boolean] = "Boolean"
+}
+func (this Type) IsValue()bool{
+	return this == Number||this==String||this==Boolean||this==Null
+}
+
+func GetTypeByString(s string)Type {
+	for k,v:=range name_map {
+		if v == s {
+			return k
+		}
+	}
+	log.Panic("unknown type")
+	return -1
+}
+
+func (this Type) CreateDefaultSchema()*Schema {
+	ret:=NewSchema()
+	ret.Type = this
+	ret.Value = this.Default()
+	return ret
 }
 
 func (this Type) String()string{
@@ -44,9 +64,6 @@ func (this Type) String()string{
 }
 
 func (this Type) Default()string {
-	if this == Object||this == Array {
-		log.Panic("call default string with "+this.String())
-	}
 	return default_map[this]
 }
 
@@ -69,13 +86,14 @@ func(this Type) CheckValue(s string)(string,bool) {
 		if s == "NaN"||s == "nan" {
 			return "NaN",true
 		}
-		_,err:=strconv.Atoi(s)
+		_,err:=strconv.ParseFloat(s,64)
 		if err!= nil {
 			return "",false
 		}
 		return s,true
 	case Boolean:
 		s = strings.TrimSpace(s)
+		log.Warnf("check bool",s)
 		if s=="True"||s=="TRUE"||s=="true" {
 			return "true",true
 		}

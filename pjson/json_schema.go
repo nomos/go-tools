@@ -14,7 +14,6 @@ import (
 
 type Schema struct {
 	Type      Type
-	Name      string
 	Index     int
 	innerIndex int
 	Key       string
@@ -26,7 +25,6 @@ type Schema struct {
 func NewSchema() *Schema {
 	return &Schema{
 		Type:      0,
-		Name:      "",
 		Index:     -1,
 		innerIndex: -1,
 		Key:       "",
@@ -113,6 +111,7 @@ func (this *Schema) Unmarshal(key string,index int, d interface{}) (*Schema, err
 func (this *Schema) AddChild(s *Schema)*Schema {
 	s.parent = this
 	this.Container = append(this.Container, s)
+	s.innerIndex = len(this.Container)-1
 	return s
 }
 
@@ -120,6 +119,7 @@ func (this *Schema) AppendChild()*Schema {
 	s:=NewSchema()
 	s.parent = this
 	this.Container = append(this.Container, s)
+	s.innerIndex = len(this.Container)-1
 	return s
 }
 
@@ -149,6 +149,9 @@ func (this *Schema) GetRootTree()[]int {
 		if root.Parent()==nil {
 			break
 		}
+		if root.innerIndex== -1 {
+			return make([]int,0)
+		}
 		ret = append(ret, root.innerIndex)
 		root = root.Parent()
 	}
@@ -156,7 +159,7 @@ func (this *Schema) GetRootTree()[]int {
 	for i:=len(ret)-1;i>=0;i-- {
 		ret1 = append(ret1, ret[i])
 	}
-	return ret
+	return ret1
 }
 
 
@@ -218,6 +221,60 @@ func (this *Schema) ToObj()interface{} {
 	return nil
 }
 
+func (this *Schema) ToKeyString()string {
+	if this.Index!= -1 {
+		return "[item"+strconv.Itoa(this.Index)+"]"
+	}
+	return this.Key
+}
+
+func (this *Schema) ToValueString()string {
+	switch this.Type {
+	case Object:
+		return "[object]"
+	case Array:
+		return "[array]"
+	default:
+		return this.Value
+	}
+}
+
+func (this *Schema) Clone()*Schema {
+	return this.clone(true)
+}
+
+func (this *Schema) clone(root bool)*Schema {
+	schema:=NewSchema()
+	schema.Type = this.Type
+	schema.Value = this.Value
+	schema.Key = this.Key
+	schema.parent = nil
+	if !root {
+		schema.Index = schema.Index
+		schema.innerIndex = schema.innerIndex
+	} else {
+		schema.Index = -1
+		schema.innerIndex = -1
+	}
+	for _,s:=range this.Container{
+		s1:=s.clone(false)
+		schema.AddChild(s1)
+	}
+	return schema
+}
+
+func (this *Schema) IsRoot()bool {
+	return this.parent== nil
+}
+
+func (this *Schema) IsObjectElem()bool {
+	return !this.IsRoot()&&this.Index == -1
+}
+
+func (this *Schema) IsArrayElem()bool {
+	return !this.IsRoot()&&this.Index != -1
+}
+
 func (this *Schema) ToString(format bool)string {
 	switch this.Type {
 	case Object,Array:
@@ -247,6 +304,10 @@ func (this *Schema) Detach(s *Schema)*Schema {
 			continue
 		}
 		newContainer = append(newContainer, v)
+		v.innerIndex = len(newContainer)-1
+		if this.Type == Array {
+			v.Index = v.innerIndex
+		}
 	}
 	this.Container = newContainer
 	if index!= -1 {
@@ -257,4 +318,43 @@ func (this *Schema) Detach(s *Schema)*Schema {
 		this.innerIndex = -1
 	}
 	return this
+}
+
+func (this *Schema) Insert(s *Schema)*Schema {
+	parent:=this
+	index:=0
+	if this.Type.IsValue() {
+		parent = this.parent
+		index = this.innerIndex+1
+	}
+	if parent.Type == Array {
+		s.Key = ""
+	}
+	parent.insert(index,s)
+	return s
+}
+
+func (this *Schema) insert(pos int,s *Schema) {
+	newC := make([]*Schema,0)
+	for _,v:=range this.Container[0:pos] {
+		newC = append(newC, v)
+		v.innerIndex = len(newC)-1
+		if this.Type == Array {
+			v.Index = v.innerIndex
+		}
+	}
+	newC = append(newC,s)
+	s.innerIndex = len(newC)-1
+	if this.Type == Array {
+		s.Index = s.innerIndex
+	}
+	for _,v:=range this.Container[pos:] {
+		newC = append(newC, v)
+		v.innerIndex = len(newC)-1
+		if this.Type == Array {
+			v.Index = v.innerIndex
+		}
+	}
+	this.Container = newC
+	s.parent = this
 }
