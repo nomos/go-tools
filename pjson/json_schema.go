@@ -221,7 +221,7 @@ func (this *Schema) ToObj()interface{} {
 
 func (this *Schema) ToKeyString()string {
 	if this.Index!= -1 {
-		return "[item"+strconv.Itoa(this.Index)+"]"
+		return "["+strconv.Itoa(this.Index)+"]"
 	}
 	return this.Key
 }
@@ -369,4 +369,104 @@ func (this *Schema) ChangeType(t Type)bool {
 	this.Type = t
 	this.Value = t.Default()
 	return true
+}
+
+func (this *Schema) TrySetKey(s string) bool {
+	if this.IsRoot()||(this.parent!=nil&&this.parent.Type==Array) {
+		return false
+	}
+	this.Key = s
+	return true
+}
+
+func (this *Schema) TrySetValue(s string) bool {
+	switch this.Type {
+	case Object,Array:
+		return false
+	default:
+		s,ok:=this.Type.CheckValue(s)
+		if ok {
+			this.Value = s
+			return true
+		}
+	}
+	return false
+}
+
+func (this *Schema) MoveUp()bool {
+	if this.parent==nil {
+		return false
+	}
+	if this.innerIndex == 0 {
+		return false
+	}
+	this.parent.moveUp(this)
+	return true
+}
+
+func (this *Schema) moveUp(s *Schema){
+	innerIndex := s.innerIndex
+	newContainer:=make([]*Schema,0)
+	for _,v:=range this.Container[0:innerIndex-1] {
+		newContainer = append(newContainer, v)
+		v.innerIndex = len(newContainer) -1
+		if this.Type == Array {
+			v.Index = v.innerIndex
+		}
+	}
+	newContainer = append(newContainer,s)
+	s.innerIndex = len(newContainer) -1
+	if this.Type == Array {
+		s.Index = s.innerIndex
+	}
+	for _,v:=range this.Container[innerIndex-1:] {
+		if v == s {
+			continue
+		}
+		newContainer = append(newContainer, v)
+		v.innerIndex = len(newContainer) -1
+		if this.Type == Array {
+			v.Index = v.innerIndex
+		}
+	}
+	this.Container = newContainer
+}
+
+func (this *Schema) MoveDown()bool {
+	if this.parent==nil {
+		return false
+	}
+	if this.innerIndex == len(this.parent.Container)-1 {
+		return false
+	}
+	this.parent.moveDown(this)
+	return true
+}
+
+func (this *Schema) moveDown(s *Schema){
+	innerIndex := s.innerIndex
+	newContainer:=make([]*Schema,0)
+	for _,v:=range this.Container[0:innerIndex+2] {
+		if v == s {
+			continue
+		}
+		newContainer = append(newContainer, v)
+		v.innerIndex = len(newContainer) -1
+		if this.Type == Array {
+			v.Index = v.innerIndex
+		}
+	}
+	newContainer = append(newContainer,s)
+	s.innerIndex = len(newContainer) -1
+	if this.Type == Array {
+		s.Index = s.innerIndex
+	}
+	for _,v:=range this.Container[innerIndex+2:] {
+		newContainer = append(newContainer, v)
+		v.innerIndex = len(newContainer) -1
+		if this.Type == Array {
+			v.Index = v.innerIndex
+		}
+	}
+	this.Container = newContainer
 }
