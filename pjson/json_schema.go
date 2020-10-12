@@ -6,7 +6,7 @@ import (
 	"errors"
 	"github.com/iancoleman/orderedmap"
 	"github.com/nomos/go-lokas/util"
-	"github.com/nomos/go-lokas/util/log"
+	"github.com/nomos/go-log/log"
 	"math"
 	"reflect"
 	"strconv"

@@ -3,7 +3,7 @@ package crypto
 import (
 	"github.com/HuobiRDCenter/huobi_Golang/config"
 	"github.com/HuobiRDCenter/huobi_Golang/pkg/client"
-	"github.com/nomos/go-lokas/util/log"
+	"github.com/nomos/go-log/log"
 	"time"
 )
 
