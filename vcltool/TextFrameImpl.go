@@ -17,7 +17,7 @@ type TTextFrameFields struct {
 
 func (this *TTextFrame) OnCreate() {
 	this.msgChan = make(chan string, 200)
-	this.ticker = time.NewTicker(time.Millisecond)
+	this.ticker = time.NewTicker(100*time.Millisecond)
 	this.update()
 }
 
@@ -29,10 +29,10 @@ func (this *TTextFrame) SetOnChange(bindFunc onChangeFunc) {
 	})
 }
 
-func (this *TTextFrame) SetColorRed(){
+func (this *TTextFrame) SetColorRed() {
 	this.Memo.Font().SetColor(colors.ClRed)
 }
-func (this *TTextFrame) SetColorDefault(){
+func (this *TTextFrame) SetColorDefault() {
 	this.Memo.Font().SetColor(colors.ClSysDefault)
 }
 
@@ -70,22 +70,20 @@ func (this *TTextFrame) update() {
 		for {
 			select {
 			case <-this.ticker.C:
-				vcl.ThreadSync(func() {
-					count := 1
-				loop:
-					for {
-						count++
-						select {
-						case msg := <-this.msgChan:
-							this.write(msg)
-						default:
-							break loop
-						}
-						if count > 10 {
-							break loop
-						}
+				count := 1
+			loop:
+				for {
+					count++
+					select {
+					case msg := <-this.msgChan:
+						this.write(msg)
+					default:
+						break loop
 					}
-				})
+					if count > 10 {
+						break loop
+					}
+				}
 			}
 		}
 	}()

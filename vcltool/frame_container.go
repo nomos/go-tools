@@ -9,10 +9,13 @@ import (
 type IConfigAble interface {
 	SetConfig(config *util.AppConfig)
 	Config()*util.AppConfig
+	SetSheetName(s string)
+	SheetName()string
 }
 
 type ConfigAble struct {
 	conf *util.AppConfig
+	sheetName string
 }
 
 func (this *ConfigAble) SetConfig(config *util.AppConfig) {
@@ -23,10 +26,17 @@ func (this *ConfigAble) Config()*util.AppConfig{
 	return this.conf
 }
 
+func (this *ConfigAble) SetSheetName(s string ){
+	this.sheetName = s
+}
+
+func (this *ConfigAble) SheetName()string {
+	return this.sheetName
+}
+
 type IFrame interface {
 	IConfigAble
 	Name()string
-	SheetName()string
 	OnCreate()
 	OnDestroy()
 	SetParent(vcl.IWinControl)
@@ -58,7 +68,11 @@ func (this *FrameContainer) OnCreate(){
 	this.pageControl.SetOnChanging(func(sender vcl.IObject, allowChange *bool) {
 		go func() {
 			vcl.ThreadSync(func() {
-				sheet:=vcl.AsTabSheet(this.pageControl.Controls(this.pageControl.ActivePageIndex()))
+				control:=this.pageControl.Controls(this.pageControl.ActivePageIndex())
+				if control == nil {
+					return
+				}
+				sheet:=vcl.AsTabSheet(control)
 				if sheet==nil {
 					return
 				}
@@ -88,28 +102,29 @@ func (this *FrameContainer) GetIFrame(s string)IFrame{
 }
 
 
-func (this *FrameContainer) AddIFrame(frame IFrame,conf... *util.AppConfig)IFrame{
+func (this *FrameContainer) AddIFrame(name string,frame IFrame,conf... *util.AppConfig)IFrame{
 	if len(conf)>0 {
 		frame.SetConfig(conf[0])
 	}
-	this.iframes[frame.SheetName()] = frame
+	frame.SetSheetName(name)
+	this.iframes[name] = frame
 	sheet:=vcl.NewTabSheet(this.component)
 	sheet.SetParent(this.pageControl)
 	sheet.SetName(frame.Name()+"Sheet")
-	sheet.SetCaption(frame.SheetName())
+	sheet.SetCaption(name)
 	sheet.SetAlign(types.AlClient)
 	frame.SetParent(sheet)
 	frame.OnCreate()
 	return frame
 }
 
-func (this *FrameContainer) AddWebView(sheetName string,url string) {
-	this.urls[sheetName+"Sheet"] = url
+func (this *FrameContainer) AddWebView(name string,url string) {
+	this.urls[name+"Sheet"] = url
 	sheet:=vcl.NewTabSheet(this.component)
 	sheet.SetParent(this.pageControl)
-	sheet.SetName(sheetName+"Sheet")
-	sheet.SetCaption(sheetName)
+	sheet.SetName(name+"Sheet")
+	sheet.SetCaption(name)
 	sheet.SetAlign(types.AlClient)
-	this.webviewFrame.SetUrl(sheetName+"Sheet",url)
+	this.webviewFrame.SetUrl(name+"Sheet",url)
 }
 

@@ -51,10 +51,6 @@ func (this *TJsonEditFrame) OnCreate() {
 	this.initFileActions()
 }
 
-func (this *TJsonEditFrame) SheetName()string{
-	return "Json"
-}
-
 func (this *TJsonEditFrame) OnDestroy() {
 }
 
@@ -109,7 +105,10 @@ func (this *TJsonEditFrame) initTreeOps (){
 				vcl.ThreadSync(func() {
 					log.Warnf("SetOnEdited")
 					this.SetSelectSchema(schema)
-					this.GetNodeBySchema(schema).SetText(schema.ToLineString())
+					node:=this.GetNodeBySchema(schema)
+					if node!=nil {
+						node.SetText(schema.ToLineString())
+					}
 				})
 			}()
 		}

@@ -30,10 +30,6 @@ func (this *TWebViewFrame) SetUrl(s string,url string) {
 	this.webviews[s].Hide()
 }
 
-func (this *TWebViewFrame) SheetName()string {
-	return this.name
-}
-
 func (this *TWebViewFrame) Navigate(s string){
 	if this.curWebview!=nil {
 		this.curWebview.Hide()

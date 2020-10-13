@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="11"/>
     <BuildModes Active="Default"/>
-    <Units Count="7">
+    <Units Count="8">
       <Unit0>
         <Filename Value="vcltool.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -74,6 +74,16 @@
         <CursorPos X="-1" Y="-1"/>
         <UsageCount Value="20"/>
       </Unit6>
+      <Unit7>
+        <Filename Value="chart_frame.pas"/>
+        <IsPartOfProject Value="True"/>
+        <HasResources Value="True"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="20"/>
+      </Unit7>
     </Units>
     <JumpHistory HistoryIndex="-1"/>
     <RunParams>

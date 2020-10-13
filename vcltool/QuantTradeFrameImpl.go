@@ -14,10 +14,6 @@ type TQuantTradeFrameFields struct {
 	chartFrame *TChartFrame
 }
 
-func (this *TQuantTradeFrame) SheetName()string{
-	return "Chart"
-}
-
 func (this *TQuantTradeFrame) OnCreate(){
 	this.chartFrame = NewChartFrame(this)
 	this.chartFrame.SetParent(this.MainChartPanel)
