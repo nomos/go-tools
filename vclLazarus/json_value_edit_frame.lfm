@@ -1,0 +1,130 @@
+object JsonValueEditFrame: TJsonValueEditFrame
+  Left = 516
+  Height = 112
+  Top = 467
+  Width = 311
+  Align = alClient
+  ClientHeight = 112
+  ClientWidth = 311
+  Color = clBackground
+  LCLVersion = '2.0.10.0'
+  object Panel3: TPanel
+    Left = 0
+    Height = 64
+    Top = 48
+    Width = 311
+    Align = alClient
+    BevelColor = clBackground
+    BevelOuter = bvNone
+    ClientHeight = 64
+    ClientWidth = 311
+    Constraints.MinHeight = 64
+    Constraints.MinWidth = 300
+    TabOrder = 0
+    object ValueEdit: TMemo
+      Left = 70
+      Height = 24
+      Top = 20
+      Width = 221
+      Align = alClient
+      BorderSpacing.Left = 70
+      BorderSpacing.Top = 20
+      BorderSpacing.Right = 20
+      BorderSpacing.Bottom = 20
+      Font.CharSet = ANSI_CHARSET
+      Font.Height = -13
+      Font.Name = 'Sarasa Mono TC'
+      Lines.Strings = (      )
+      ParentFont = False
+      ScrollBars = ssAutoBoth
+      TabOrder = 0
+    end
+    object Label2: TLabel
+      Left = 24
+      Height = 16
+      Top = 16
+      Width = 39
+      Caption = 'Value:'
+      Font.CharSet = ANSI_CHARSET
+      Font.Height = -13
+      Font.Name = 'Sarasa Mono TC'
+      ParentColor = False
+      ParentFont = False
+    end
+    object FormatCheck: TCheckBox
+      Left = 8
+      Height = 18
+      Top = 40
+      Width = 61
+      Caption = 'format'
+      Font.CharSet = ANSI_CHARSET
+      Font.Height = -13
+      Font.Name = 'Sarasa Mono TC'
+      ParentFont = False
+      TabOrder = 1
+    end
+  end
+  object Panel2: TPanel
+    Left = 0
+    Height = 48
+    Top = 0
+    Width = 311
+    Align = alTop
+    BevelColor = clBackground
+    BevelOuter = bvNone
+    ClientHeight = 48
+    ClientWidth = 311
+    Constraints.MaxHeight = 48
+    Constraints.MinHeight = 48
+    TabOrder = 1
+    object Label1: TLabel
+      Left = 24
+      Height = 16
+      Top = 16
+      Width = 26
+      Caption = 'Key:'
+      ParentColor = False
+    end
+    object KeyEdit: TEdit
+      Left = 165
+      Height = 23
+      Top = 15
+      Width = 126
+      Align = alClient
+      BorderSpacing.Left = 165
+      BorderSpacing.Top = 15
+      BorderSpacing.Right = 20
+      BorderSpacing.Bottom = 10
+      TabOrder = 0
+    end
+    object TypeList: TComboBox
+      Left = 70
+      Height = 20
+      Top = 16
+      Width = 96
+      AutoSize = False
+      Constraints.MaxHeight = 24
+      Constraints.MinHeight = 24
+      DoubleBuffered = True
+      Font.CharSet = ANSI_CHARSET
+      Font.Height = -13
+      Font.Name = 'Sarasa Mono TC'
+      ItemHeight = 19
+      ItemIndex = 1
+      Items.Strings = (
+        'Object'
+        'Array'
+        'String'
+        'Number'
+        'Boolean'
+        'Null'
+      )
+      OnChange = TypeListChange
+      ParentDoubleBuffered = False
+      ParentFont = False
+      ParentShowHint = False
+      TabOrder = 1
+      Text = 'Array'
+    end
+  end
+end

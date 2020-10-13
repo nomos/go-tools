@@ -1,0 +1,28 @@
+object TextFrame: TTextFrame
+  Left = 0
+  Height = 766
+  Top = 0
+  Width = 886
+  Align = alClient
+  ClientHeight = 766
+  ClientWidth = 886
+  Color = clBackground
+  ParentColor = False
+  TabOrder = 0
+  DesignLeft = 665
+  DesignTop = 259
+  object Memo: TMemo
+    Left = 0
+    Height = 766
+    Top = 0
+    Width = 886
+    Align = alClient
+    Font.CharSet = ANSI_CHARSET
+    Font.Height = -13
+    Font.Name = 'Sarasa Mono TC'
+    Lines.Strings = (    )
+    ParentFont = False
+    ScrollBars = ssAutoBoth
+    TabOrder = 0
+  end
+end

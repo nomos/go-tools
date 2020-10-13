@@ -1,0 +1,20 @@
+object WebViewFrame: TWebViewFrame
+  Left = 0
+  Height = 412
+  Top = 0
+  Width = 569
+  Align = alClient
+  ClientHeight = 412
+  ClientWidth = 569
+  TabOrder = 0
+  DesignLeft = 489
+  DesignTop = 371
+  object Main: TPanel
+    Left = 0
+    Height = 412
+    Top = 0
+    Width = 569
+    Align = alClient
+    TabOrder = 0
+  end
+end
