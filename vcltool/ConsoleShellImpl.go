@@ -101,20 +101,15 @@ func (this *TConsoleShell) SendCmd(s string){
 		this.cachedText = append(this.cachedText, s)
 		this.cachedIndex = len(this.cachedText)-1
 	}
-	arr:=strings.Split(s," ")
 	if this.ssh.IsConnect() {
 		go this.ssh.RunCmd(s).Await()
 	} else {
-		if len(arr)==1 {
-			go this.ssh.RunShellCmd(arr[0]).Await()
-		} else if len(arr)>1 {
-			go this.ssh.RunShellCmd(arr[0],arr[1:]...).Await()
-		}
+		go this.ssh.RunShellCmd(s).Await()
 	}
 }
 
-func (this *TConsoleShell) ExecShellCmd(s string,args... string)*promise.Promise{
-	return this.ssh.NewShellSession().Run(s,args...)
+func (this *TConsoleShell) ExecShellCmd(s string)*promise.Promise{
+	return this.ssh.NewShellSession().Run(s)
 }
 
 func (this *TConsoleShell) ExecCmd(s string)*promise.Promise {
