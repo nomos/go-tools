@@ -1,0 +1,63 @@
+object FormListFrame: TFormListFrame
+  Left = 0
+  Height = 492
+  Top = 0
+  Width = 940
+  ClientHeight = 492
+  ClientWidth = 940
+  TabOrder = 0
+  DesignLeft = 521
+  DesignTop = 410
+  object TopPanel: TPanel
+    Left = 0
+    Height = 58
+    Top = 0
+    Width = 940
+    Align = alTop
+    BevelColor = clNone
+    BevelOuter = bvNone
+    TabOrder = 0
+  end
+  object BottomPanel: TPanel
+    Left = 0
+    Height = 45
+    Top = 447
+    Width = 940
+    Align = alBottom
+    BevelColor = clNone
+    BevelOuter = bvNone
+    TabOrder = 1
+  end
+  object Splitter1: TSplitter
+    Cursor = crVSplit
+    Left = 0
+    Height = 6
+    Top = 58
+    Width = 940
+    Align = alTop
+    Constraints.MaxHeight = 6
+    Constraints.MinHeight = 6
+    ResizeAnchor = akTop
+  end
+  object MainPanel: TPanel
+    Left = 0
+    Height = 383
+    Top = 64
+    Width = 940
+    Align = alClient
+    BevelColor = clNone
+    BevelOuter = bvNone
+    ClientHeight = 383
+    ClientWidth = 940
+    TabOrder = 3
+    object ListView1: TListView
+      Left = 0
+      Height = 383
+      Top = 0
+      Width = 940
+      Align = alClient
+      Columns = <>
+      TabOrder = 0
+    end
+  end
+end

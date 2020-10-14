@@ -30,7 +30,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="7">
+    <Units Count="11">
       <Unit0>
         <Filename Value="vcltool.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -60,13 +60,40 @@
       <Unit5>
         <Filename Value="console_shell_frame.pas"/>
         <IsPartOfProject Value="True"/>
+        <ComponentName Value="ConsoleShell"/>
         <HasResources Value="True"/>
+        <ResourceBaseClass Value="Frame"/>
       </Unit5>
       <Unit6>
         <Filename Value="quant_trade_frame.pas"/>
         <IsPartOfProject Value="True"/>
         <HasResources Value="True"/>
       </Unit6>
+      <Unit7>
+        <Filename Value="chart_frame.pas"/>
+        <IsPartOfProject Value="True"/>
+        <HasResources Value="True"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="auto_deploy_frame.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="AutoDeploy"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Frame"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="deploy_frame.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="DeployFrame"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Frame"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="form_list_frame.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FormListFrame"/>
+        <ResourceBaseClass Value="Frame"/>
+      </Unit10>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

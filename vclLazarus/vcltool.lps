@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="11"/>
     <BuildModes Active="Default"/>
-    <Units Count="8">
+    <Units Count="11">
       <Unit0>
         <Filename Value="vcltool.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -11,7 +11,7 @@
         <WindowIndex Value="-1"/>
         <TopLine Value="-1"/>
         <CursorPos X="-1" Y="-1"/>
-        <UsageCount Value="35"/>
+        <UsageCount Value="46"/>
       </Unit0>
       <Unit1>
         <Filename Value="json_edit_frame.pas"/>
@@ -19,9 +19,8 @@
         <ComponentName Value="JsonEditFrame"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
-        <UsageCount Value="35"/>
+        <UsageCount Value="46"/>
         <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
       </Unit1>
       <Unit2>
         <Filename Value="json_value_edit_frame.pas"/>
@@ -31,7 +30,7 @@
         <WindowIndex Value="-1"/>
         <TopLine Value="-1"/>
         <CursorPos X="-1" Y="-1"/>
-        <UsageCount Value="35"/>
+        <UsageCount Value="46"/>
       </Unit2>
       <Unit3>
         <Filename Value="text_frame.pas"/>
@@ -41,7 +40,7 @@
         <WindowIndex Value="-1"/>
         <TopLine Value="-1"/>
         <CursorPos X="-1" Y="-1"/>
-        <UsageCount Value="35"/>
+        <UsageCount Value="46"/>
       </Unit3>
       <Unit4>
         <Filename Value="web_view_frame.pas"/>
@@ -51,7 +50,7 @@
         <WindowIndex Value="-1"/>
         <TopLine Value="-1"/>
         <CursorPos X="-1" Y="-1"/>
-        <UsageCount Value="35"/>
+        <UsageCount Value="46"/>
       </Unit4>
       <Unit5>
         <Filename Value="console_shell_frame.pas"/>
@@ -59,11 +58,9 @@
         <ComponentName Value="ConsoleShell"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <UsageCount Value="35"/>
+        <UsageCount Value="46"/>
         <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
       </Unit5>
       <Unit6>
         <Filename Value="quant_trade_frame.pas"/>
@@ -73,23 +70,173 @@
         <WindowIndex Value="-1"/>
         <TopLine Value="-1"/>
         <CursorPos X="-1" Y="-1"/>
-        <UsageCount Value="35"/>
+        <UsageCount Value="46"/>
       </Unit6>
       <Unit7>
         <Filename Value="chart_frame.pas"/>
         <IsPartOfProject Value="True"/>
         <HasResources Value="True"/>
-        <EditorIndex Value="-1"/>
-        <WindowIndex Value="-1"/>
-        <TopLine Value="-1"/>
-        <CursorPos X="-1" Y="-1"/>
-        <UsageCount Value="35"/>
+        <EditorIndex Value="4"/>
+        <UsageCount Value="46"/>
+        <Loaded Value="True"/>
       </Unit7>
+      <Unit8>
+        <Filename Value="auto_deploy_frame.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="AutoDeploy"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Frame"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="48"/>
+        <CursorPos X="88" Y="53"/>
+        <UsageCount Value="31"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="deploy_frame.pas"/>
+        <ComponentName Value="DeployFrame"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Frame"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="29"/>
+        <CursorPos X="3" Y="56"/>
+        <UsageCount Value="30"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="form_list_frame.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FormListFrame"/>
+        <ResourceBaseClass Value="Frame"/>
+        <EditorIndex Value="3"/>
+        <UsageCount Value="28"/>
+        <Loaded Value="True"/>
+      </Unit10>
     </Units>
-    <JumpHistory Count="1">
+    <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
-        <Filename Value="console_shell_frame.pas"/>
+        <Filename Value="deploy_frame.pas"/>
+        <Caret Line="56" Column="3" TopLine="29"/>
       </Position1>
+      <Position2>
+        <Filename Value="deploy_frame.pas"/>
+        <Caret Line="55" Column="3" TopLine="28"/>
+      </Position2>
+      <Position3>
+        <Filename Value="deploy_frame.pas"/>
+        <Caret Line="54" Column="3" TopLine="27"/>
+      </Position3>
+      <Position4>
+        <Filename Value="deploy_frame.pas"/>
+        <Caret Line="53" Column="3" TopLine="26"/>
+      </Position4>
+      <Position5>
+        <Filename Value="deploy_frame.pas"/>
+        <Caret Line="54" Column="3" TopLine="27"/>
+      </Position5>
+      <Position6>
+        <Filename Value="deploy_frame.pas"/>
+        <Caret Line="55" Column="3" TopLine="28"/>
+      </Position6>
+      <Position7>
+        <Filename Value="deploy_frame.pas"/>
+        <Caret Line="54" Column="3" TopLine="27"/>
+      </Position7>
+      <Position8>
+        <Filename Value="deploy_frame.pas"/>
+        <Caret Line="55" Column="3" TopLine="28"/>
+      </Position8>
+      <Position9>
+        <Filename Value="deploy_frame.pas"/>
+        <Caret Line="54" Column="3" TopLine="27"/>
+      </Position9>
+      <Position10>
+        <Filename Value="deploy_frame.pas"/>
+        <Caret Line="55" Column="3" TopLine="28"/>
+      </Position10>
+      <Position11>
+        <Filename Value="deploy_frame.pas"/>
+        <Caret Line="54" Column="3" TopLine="27"/>
+      </Position11>
+      <Position12>
+        <Filename Value="deploy_frame.pas"/>
+        <Caret Line="55" Column="3" TopLine="28"/>
+      </Position12>
+      <Position13>
+        <Filename Value="deploy_frame.pas"/>
+        <Caret Line="54" Column="3" TopLine="27"/>
+      </Position13>
+      <Position14>
+        <Filename Value="deploy_frame.pas"/>
+        <Caret Line="53" Column="3" TopLine="26"/>
+      </Position14>
+      <Position15>
+        <Filename Value="deploy_frame.pas"/>
+        <Caret Line="52" Column="3" TopLine="25"/>
+      </Position15>
+      <Position16>
+        <Filename Value="deploy_frame.pas"/>
+        <Caret Line="51" Column="3" TopLine="24"/>
+      </Position16>
+      <Position17>
+        <Filename Value="deploy_frame.pas"/>
+        <Caret Line="52" Column="3" TopLine="25"/>
+      </Position17>
+      <Position18>
+        <Filename Value="deploy_frame.pas"/>
+        <Caret Line="53" Column="3" TopLine="26"/>
+      </Position18>
+      <Position19>
+        <Filename Value="deploy_frame.pas"/>
+        <Caret Line="52" Column="3" TopLine="25"/>
+      </Position19>
+      <Position20>
+        <Filename Value="deploy_frame.pas"/>
+        <Caret Line="51" Column="3" TopLine="24"/>
+      </Position20>
+      <Position21>
+        <Filename Value="deploy_frame.pas"/>
+        <Caret Line="52" Column="3" TopLine="25"/>
+      </Position21>
+      <Position22>
+        <Filename Value="deploy_frame.pas"/>
+        <Caret Line="53" Column="3" TopLine="26"/>
+      </Position22>
+      <Position23>
+        <Filename Value="deploy_frame.pas"/>
+        <Caret Line="54" Column="3" TopLine="27"/>
+      </Position23>
+      <Position24>
+        <Filename Value="deploy_frame.pas"/>
+        <Caret Line="55" Column="3" TopLine="28"/>
+      </Position24>
+      <Position25>
+        <Filename Value="deploy_frame.pas"/>
+        <Caret Line="54" Column="3" TopLine="27"/>
+      </Position25>
+      <Position26>
+        <Filename Value="deploy_frame.pas"/>
+        <Caret Line="55" Column="3" TopLine="28"/>
+      </Position26>
+      <Position27>
+        <Filename Value="auto_deploy_frame.pas"/>
+        <Caret Line="29" Column="88" TopLine="26"/>
+      </Position27>
+      <Position28>
+        <Filename Value="auto_deploy_frame.pas"/>
+        <Caret Line="28" Column="88" TopLine="25"/>
+      </Position28>
+      <Position29>
+        <Filename Value="auto_deploy_frame.pas"/>
+        <Caret Line="29" Column="88" TopLine="26"/>
+      </Position29>
+      <Position30>
+        <Filename Value="auto_deploy_frame.pas"/>
+        <Caret Line="53" Column="88" TopLine="48"/>
+      </Position30>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>

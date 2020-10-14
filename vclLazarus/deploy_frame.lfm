@@ -1,0 +1,342 @@
+object DeployFrame: TDeployFrame
+  Left = 0
+  Height = 449
+  Top = 0
+  Width = 874
+  Align = alClient
+  ClientHeight = 449
+  ClientWidth = 874
+  TabOrder = 0
+  DesignLeft = 774
+  DesignTop = 498
+  object ContextPanel: TPanel
+    Left = 0
+    Height = 417
+    Top = 32
+    Width = 218
+    Align = alLeft
+    ClientHeight = 417
+    ClientWidth = 218
+    TabOrder = 0
+    object ContextPageControl: TPageControl
+      Left = 1
+      Height = 295
+      Top = 121
+      Width = 216
+      ActivePage = DeployContext
+      Align = alClient
+      TabIndex = 1
+      TabOrder = 0
+      object GlobalSheet: TTabSheet
+        Caption = '全局变量'
+        ClientHeight = 265
+        ClientWidth = 210
+        object GlobalContext: TListView
+          Left = 0
+          Height = 250
+          Top = 0
+          Width = 210
+          Align = alClient
+          AutoWidthLastColumn = True
+          BorderSpacing.Bottom = 15
+          Columns = <          
+            item
+              AutoSize = True
+              Caption = 'Key'
+              Width = 86
+            end          
+            item
+              Caption = 'Value'
+              Width = 122
+            end>
+          ReadOnly = True
+          RowSelect = True
+          ScrollBars = ssAutoBoth
+          TabOrder = 0
+        end
+      end
+      object DeployContext: TTabSheet
+        Caption = '项目变量'
+        ClientHeight = 265
+        ClientWidth = 210
+        object FileContext: TListView
+          Left = 0
+          Height = 250
+          Top = 0
+          Width = 210
+          Align = alClient
+          AutoWidthLastColumn = True
+          BorderSpacing.Bottom = 15
+          Columns = <          
+            item
+              AutoSize = True
+              Caption = 'Key'
+              Width = 86
+            end          
+            item
+              Caption = 'Value'
+              Width = 122
+            end>
+          ReadOnly = True
+          RowSelect = True
+          ScrollBars = ssAutoBoth
+          TabOrder = 0
+        end
+      end
+    end
+    object Panel2: TPanel
+      Left = 1
+      Height = 120
+      Top = 1
+      Width = 216
+      Align = alTop
+      BevelColor = clNone
+      BevelOuter = bvNone
+      ClientHeight = 120
+      ClientWidth = 216
+      TabOrder = 1
+      object KeyEdit: TEdit
+        Left = 56
+        Height = 22
+        Top = 8
+        Width = 136
+        TabOrder = 0
+      end
+      object KeyLabel: TLabel
+        Left = 16
+        Height = 16
+        Top = 11
+        Width = 26
+        Caption = 'Key:'
+        ParentColor = False
+      end
+      object KeyLabel1: TLabel
+        Left = 16
+        Height = 16
+        Top = 43
+        Width = 37
+        Caption = 'Value:'
+        ParentColor = False
+      end
+      object ValueEdit: TEdit
+        Left = 56
+        Height = 22
+        Top = 40
+        Width = 136
+        TabOrder = 1
+      end
+      object Button1: TButton
+        Left = 120
+        Height = 25
+        Top = 72
+        Width = 75
+        Caption = '删除'
+        TabOrder = 2
+      end
+      object ContextAdd: TButton
+        Left = 24
+        Height = 25
+        Top = 72
+        Width = 75
+        Caption = '新增'
+        TabOrder = 3
+      end
+    end
+  end
+  object Splitter2: TSplitter
+    Left = 218
+    Height = 417
+    Top = 32
+    Width = 6
+    Constraints.MaxWidth = 6
+    Constraints.MinWidth = 6
+  end
+  object TopPanel: TPanel
+    Left = 0
+    Height = 32
+    Top = 0
+    Width = 874
+    Align = alTop
+    ClientHeight = 32
+    ClientWidth = 874
+    TabOrder = 2
+    object FileName: TEdit
+      Left = 64
+      Height = 22
+      Top = 4
+      Width = 96
+      BorderSpacing.Left = 5
+      BorderSpacing.Top = 3
+      BorderSpacing.Bottom = 3
+      TabOrder = 0
+    end
+    object ConfirmNameButton: TSpeedButton
+      Left = 176
+      Height = 22
+      Top = 4
+      Width = 23
+      Color = 7960953
+      Flat = True
+      Glyph.Data = {
+        36040000424D3604000000000000360000002800000010000000100000000100
+        2000000000000004000064000000640000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        000000000000000000000000000000000001007B001D00000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        00000000000000000000000000010D9019A3149927DC0A870F33000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        000000000000000000010D9019A12CBA5AF937C771FF18A031DB0A870F330000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000010D9019A12CBA5AF937C871FF37C871FF37C771FF18A031DB0A87
+        0F33000000000000000000000000000000000000000000000000000000000000
+        00010D9019A32DBC5DF837C871FF2DBC5DF819A133E337C771FF37C771FF179E
+        30DB0A870F330000000000000000000000000000000000000000000000000A8D
+        159B2DBC5DF837C871FF2DBC5DF80D9019A30A890F34179E30DB37C771FF37C7
+        71FF179E30DB0A870F3300000000000000000000000000000000000000000587
+        0A31169D2EDA2EBD5EFA0E901AA6008000020000000005870A31169D2EDA37C7
+        70FF37C771FF18A031DB0A870F33000000000000000000000000000000000000
+        00000A870F330A8D149B000000010000000000000000000000000A870F33179E
+        30DB37C771FF37C771FF179E30DB0A870F330000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000587
+        0A31169D2EDA37C770FF37C771FF18A031DB0A870F3300000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        00000A870F33179E30DB37C771FF2DBC5DF80A8D159B00000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        00000000000005870A31139928DB0E901AA60000000100000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        00000000000000000000007B001D000000010000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000
+      }
+    end
+    object ReverseNameButton: TSpeedButton
+      Left = 208
+      Height = 22
+      Top = 4
+      Width = 23
+      Color = 7960953
+      Flat = True
+      Glyph.Data = {
+        36040000424D3604000000000000360000002800000010000000100000000100
+        2000000000000004000064000000640000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000500B6690500B669000000000000000000000000000000000000
+        0000000000000500B6690500B669000000000000000000000000000000000000
+        00000200B5680C00CFE90D00D0EB0500B66D0000000000000000000000000000
+        00000200B56B0C00CFE90D00D0EB0500B86B0000000000000000000000000000
+        00000200B5680C00CFE91400E6FF0D00D0EB0500B66D00000000000000000200
+        B56B0C00CFE91400E6FF0D00D0EB0500B86B0000000000000000000000000000
+        0000000000000300B7660C00CFE91400E6FF0D00D1EB0500B66D0300B6650C00
+        CFE91400E6FF0D00D1EB0500B66D000000000000000000000000000000000000
+        000000000000000000000500B66C0C00CFEA1400E6FF0C00D0EA0C00D0EA1400
+        E6FF0C00CFEA0500B66C00000000000000000000000000000000000000000000
+        00000000000000000000000000000200B56B0C00D0E81400E6FF1400E6FF0D00
+        D0EB0500B66D0000000000000000000000000000000000000000000000000000
+        00000000000000000000000000000200B56B0C00D0E81400E6FF1400E6FF0D00
+        D0EB0500B66D0000000000000000000000000000000000000000000000000000
+        000000000000000000000500B66C0C00CFEA1400E6FF0C00D0EA0C00D0EA1400
+        E6FF0C00CFEA0500B66C00000000000000000000000000000000000000000000
+        0000000000000300B6650C00CFE91400E6FF0D00D1EB0500B66D0300B7660C00
+        CFE91400E6FF0D00D1EB0500B66D000000000000000000000000000000000000
+        00000200B5680C00CFE91400E6FF0D00D0EB0500B66D00000000000000000200
+        B56B0C00CFE91400E6FF0D00D0EB0500B86B0000000000000000000000000000
+        00000200B5680C00CFE90D00D0EB0500B66D0000000000000000000000000000
+        00000200B56B0C00CFE90D00D0EB0500B86B0000000000000000000000000000
+        0000000000000500B66C0500B66C000000000000000000000000000000000000
+        0000000000000500B6690500B669000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000000000000000
+        0000000000000000000000000000000000000000000000000000
+      }
+    end
+    object SaveButton: TButton
+      Left = 703
+      Height = 30
+      Top = 1
+      Width = 75
+      Align = alRight
+      BorderSpacing.Right = 10
+      Caption = '保存'
+      ModalResult = 11
+      TabOrder = 1
+    end
+    object CloseButton1: TButton
+      Left = 788
+      Height = 30
+      Top = 1
+      Width = 75
+      Align = alRight
+      BorderSpacing.Right = 10
+      Caption = '关闭'
+      ModalResult = 11
+      TabOrder = 2
+    end
+    object Label1: TLabel
+      Left = 16
+      Height = 16
+      Top = 8
+      Width = 40
+      Caption = '项目名'
+      ParentColor = False
+    end
+  end
+  object Panel1: TPanel
+    Left = 224
+    Height = 417
+    Top = 32
+    Width = 650
+    Align = alClient
+    BevelColor = clNone
+    BevelOuter = bvNone
+    ClientHeight = 417
+    ClientWidth = 650
+    ParentColor = False
+    TabOrder = 3
+    object DeployPanel: TPanel
+      Left = 0
+      Height = 417
+      Top = 0
+      Width = 242
+      Align = alLeft
+      ClientHeight = 417
+      ClientWidth = 242
+      TabOrder = 0
+      object ListBox1: TListBox
+        Left = 1
+        Height = 380
+        Top = 21
+        Width = 240
+        Align = alClient
+        BorderSpacing.Top = 20
+        BorderSpacing.Bottom = 15
+        ItemHeight = 0
+        TabOrder = 0
+      end
+    end
+    object ProccedurePanel1: TPanel
+      Left = 248
+      Height = 417
+      Top = 0
+      Width = 402
+      Align = alClient
+      TabOrder = 1
+    end
+    object Splitter1: TSplitter
+      Left = 242
+      Height = 417
+      Top = 0
+      Width = 6
+      Constraints.MaxWidth = 6
+      Constraints.MinWidth = 6
+    end
+  end
+end
