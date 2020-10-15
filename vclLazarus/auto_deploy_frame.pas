@@ -34,10 +34,14 @@ type
     ListBox1: TListBox;
     MainPanel: TPanel;
     NewButton: TSpeedButton;
+    OpenValueFolderButton: TSpeedButton;
     OpenDeployButton: TSpeedButton;
     Panel: TPanel;
     Panel1: TPanel;
     Panel2: TPanel;
+    Panel3: TPanel;
+    Panel4: TPanel;
+    Panel5: TPanel;
     ProccedurePanel1: TPanel;
     ReverseNameButton: TSpeedButton;
     SaveButton: TSpeedButton;

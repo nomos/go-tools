@@ -9,8 +9,8 @@ object AutoDeploy: TAutoDeploy
   Color = 15132390
   ParentColor = False
   TabOrder = 0
-  DesignLeft = 314
-  DesignTop = 169
+  DesignLeft = 596
+  DesignTop = 265
   object TopPanel: TPanel
     Left = 0
     Height = 50
@@ -228,11 +228,11 @@ object AutoDeploy: TAutoDeploy
           TabOrder = 0
           object GlobalSheet: TTabSheet
             Caption = '全局变量'
-            ClientHeight = 265
+            ClientHeight = 176
             ClientWidth = 210
-            object GlobalContext: TListView
+            object GlobalContextList: TListView
               Left = 0
-              Height = 250
+              Height = 161
               Top = 0
               Width = 210
               Align = alClient
@@ -242,11 +242,11 @@ object AutoDeploy: TAutoDeploy
                 item
                   AutoSize = True
                   Caption = 'Key'
-                  Width = 86
+                  Width = 84
                 end              
                 item
                   Caption = 'Value'
-                  Width = 122
+                  Width = 124
                 end>
               ReadOnly = True
               RowSelect = True
@@ -258,7 +258,7 @@ object AutoDeploy: TAutoDeploy
             Caption = '项目变量'
             ClientHeight = 176
             ClientWidth = 210
-            object FileContext: TListView
+            object FileContextList: TListView
               Left = 0
               Height = 161
               Top = 0
@@ -294,43 +294,13 @@ object AutoDeploy: TAutoDeploy
           ClientHeight = 120
           ClientWidth = 216
           TabOrder = 1
-          object KeyEdit: TEdit
-            Left = 56
-            Height = 22
-            Top = 8
-            Width = 136
-            TabOrder = 0
-          end
-          object KeyLabel: TLabel
-            Left = 16
-            Height = 16
-            Top = 11
-            Width = 26
-            Caption = 'Key:'
-            ParentColor = False
-          end
-          object KeyLabel1: TLabel
-            Left = 16
-            Height = 16
-            Top = 43
-            Width = 37
-            Caption = 'Value:'
-            ParentColor = False
-          end
-          object ValueEdit: TEdit
-            Left = 56
-            Height = 22
-            Top = 40
-            Width = 136
-            TabOrder = 1
-          end
           object Button1: TButton
             Left = 120
             Height = 25
             Top = 72
             Width = 75
             Caption = '删除'
-            TabOrder = 2
+            TabOrder = 0
           end
           object ContextAdd: TButton
             Left = 24
@@ -338,7 +308,79 @@ object AutoDeploy: TAutoDeploy
             Top = 72
             Width = 75
             Caption = '新增'
-            TabOrder = 3
+            TabOrder = 1
+          end
+          object Panel3: TPanel
+            Left = 0
+            Height = 72
+            Top = 0
+            Width = 216
+            Align = alTop
+            BevelColor = clNone
+            BevelOuter = bvNone
+            ClientHeight = 72
+            ClientWidth = 216
+            TabOrder = 2
+            object Panel4: TPanel
+              Left = 0
+              Height = 72
+              Top = 0
+              Width = 56
+              Align = alLeft
+              BevelColor = clNone
+              BevelOuter = bvNone
+              ClientHeight = 72
+              ClientWidth = 56
+              TabOrder = 0
+              object KeyLabel: TLabel
+                Left = 16
+                Height = 16
+                Top = 11
+                Width = 26
+                Caption = 'Key:'
+                ParentColor = False
+              end
+              object KeyLabel1: TLabel
+                Left = 16
+                Height = 16
+                Top = 43
+                Width = 37
+                Caption = 'Value:'
+                ParentColor = False
+              end
+            end
+            object Panel5: TPanel
+              Left = 56
+              Height = 72
+              Top = 0
+              Width = 160
+              Align = alClient
+              BevelColor = clNone
+              BevelOuter = bvNone
+              ClientHeight = 72
+              ClientWidth = 160
+              TabOrder = 1
+              object KeyEdit: TEdit
+                Left = 0
+                Height = 22
+                Top = 10
+                Width = 150
+                Align = alTop
+                BorderSpacing.Top = 10
+                BorderSpacing.Right = 10
+                BorderSpacing.Bottom = 10
+                TabOrder = 0
+              end
+              object ValueEdit: TEdit
+                Left = 0
+                Height = 22
+                Top = 42
+                Width = 150
+                Align = alTop
+                BorderSpacing.Right = 10
+                TabOrder = 1
+              end
+            end
           end
         end
       end

@@ -20,9 +20,9 @@ type
     ContextPanel: TPanel;
     DeployContext: TTabSheet;
     DeployPanel: TPanel;
-    FileContext: TListView;
+    FileContextList: TListView;
     FileName: TEdit;
-    GlobalContext: TListView;
+    GlobalContextList: TListView;
     GlobalSheet: TTabSheet;
     ImageList: TImageList;
     KeyEdit: TEdit;
@@ -38,6 +38,9 @@ type
     Panel: TPanel;
     Panel1: TPanel;
     Panel2: TPanel;
+    Panel3: TPanel;
+    Panel4: TPanel;
+    Panel5: TPanel;
     ProccedurePanel1: TPanel;
     ReverseNameButton: TSpeedButton;
     SaveButton: TSpeedButton;

@@ -1,16 +1,13 @@
 object JsonValueEditFrame: TJsonValueEditFrame
-  Left = 0
+  Left = 516
   Height = 112
-  Top = 0
+  Top = 467
   Width = 311
   Align = alClient
   ClientHeight = 112
   ClientWidth = 311
   Color = clBackground
-  ParentColor = False
-  TabOrder = 0
-  DesignLeft = 610
-  DesignTop = 426
+  LCLVersion = '2.0.10.0'
   object Panel3: TPanel
     Left = 0
     Height = 64
@@ -112,7 +109,8 @@ object JsonValueEditFrame: TJsonValueEditFrame
       Font.CharSet = ANSI_CHARSET
       Font.Height = -13
       Font.Name = 'Sarasa Mono TC'
-      ItemHeight = 26
+      ItemHeight = 19
+      ItemIndex = 1
       Items.Strings = (
         'Object'
         'Array'
@@ -125,7 +123,6 @@ object JsonValueEditFrame: TJsonValueEditFrame
       ParentDoubleBuffered = False
       ParentFont = False
       ParentShowHint = False
-      Style = csDropDownList
       TabOrder = 1
       Text = 'Array'
     end

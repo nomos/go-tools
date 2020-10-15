@@ -45,7 +45,9 @@
       <Unit2>
         <Filename Value="json_value_edit_frame.pas"/>
         <IsPartOfProject Value="True"/>
+        <ComponentName Value="JsonValueEditFrame"/>
         <HasResources Value="True"/>
+        <ResourceBaseClass Value="Frame"/>
       </Unit2>
       <Unit3>
         <Filename Value="text_frame.pas"/>

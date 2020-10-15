@@ -17,6 +17,8 @@ type
     Panel1: TPanel;
     SendButton: TButton;
     CmdEdit: TEdit;
+    procedure CmdEditChange(Sender: TObject);
+    procedure SendButtonClick(Sender: TObject);
   private
 
   public
@@ -26,6 +28,18 @@ type
 implementation
 
 {$R *.lfm}
+
+{ TConsoleShell }
+
+procedure TConsoleShell.CmdEditChange(Sender: TObject);
+begin
+
+end;
+
+procedure TConsoleShell.SendButtonClick(Sender: TObject);
+begin
+
+end;
 
 end.
 
