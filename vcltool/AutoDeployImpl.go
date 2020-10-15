@@ -4,6 +4,7 @@
 package vcltool
 
 import (
+	"encoding/json"
 	"github.com/nomos/go-log/log"
 	"github.com/ying32/govcl/vcl"
 )
@@ -22,7 +23,7 @@ type DeployFile struct {
 	Name string
 	FilePath string
 	Procedures []IDeployProcedure
-	Context map[string]interface{}
+	Context map[string]string
 	parent *TAutoDeploy
 	frame *TDeployFrame
 	sheet *vcl.TTabSheet
@@ -44,21 +45,22 @@ type DeployFolder struct {
 //::private::
 type TAutoDeployFields struct {
 	ConfigAble
-	console *TConsoleShell
-	folders []*DeployFolder
-	GlobalContextMap map[string]interface{}
-	file *DeployFile
-	selectItem *vcl.TListItem
+	console       *TConsoleShell
+	folders       []*DeployFolder
+	GlobalContext map[string]string
+	file          *DeployFile
+	selectItem    *vcl.TListItem
 }
 
 func (this *TAutoDeploy) OnCreate(){
-	this.GlobalContextMap = this.conf.GetStringMap("context")
-	if this.GlobalContextMap == nil {
-		this.GlobalContextMap = make(map[string]interface{})
+	this.Panel.Hide()
+	this.GlobalContext = this.conf.GetStringMapString("context")
+	if this.GlobalContext == nil {
+		this.GlobalContext = make(map[string]string)
 		this.conf.Set("context",this.GlobalContext)
 	}
-	this.GlobalContextMap["aaaa"] = "bbbb"
-	this.GlobalContextMap["cccc"] = "dddd"
+	this.GlobalContext["aaaa"] = "bbbb"
+	this.GlobalContext["cccc"] = "dddd"
 	this.console = NewConsoleShell(this)
 	this.console.SetParent(this.BottomPanel)
 	this.console.OnCreate()
@@ -77,12 +79,12 @@ func (this *TAutoDeploy) initMenuActions(){
 }
 
 
-func (this *TAutoDeploy) LoadGlobalContext(context map[string]interface{}) {
+func (this *TAutoDeploy) LoadGlobalContext(context map[string]string) {
 	log.Warnf("LoadGlobalContext",context)
 	for k,v:=range context {
 		log.Warnf("list",k,v)
-		//this.GlobalContext.Items().Add()
-		//listItem:=this.GlobalContext.Items().Add()
+		//this.GlobalContextList.Items().Add()
+		//listItem:=this.GlobalContextList.Items().Add()
 		//listItem.SubItems().Add(k)
 		//listItem.SubItems().Add(v.(string))
 	}
@@ -101,26 +103,26 @@ func (this *TAutoDeploy) initFileActions(){
 
 func (this *TAutoDeploy) initContextActions(){
 	log.Warnf("initContextActions")
-	this.LoadGlobalContext(this.GlobalContextMap)
+	this.LoadGlobalContext(this.GlobalContext)
 	this.ContextAdd.SetOnClick(func(sender vcl.IObject) {
 		this.selectItem = nil
 		if this.ContextPageControl.ActivePageIndex() == 0 {
-			log.Warnf("GlobalContext.Items().Add()")
-			item:=this.GlobalContext.Items().Add()
+			log.Warnf("GlobalContextList.Items().Add()")
+			item:=this.GlobalContextList.Items().Add()
 			item.SetCaption("")
 			item.SubItems().Add("")
 			item.MakeVisible(true)
 			item.SetSelected(true)
 		} else {
-			log.Warnf("GlobalContext.Items().Add()")
-			item:=this.FileContext.Items().Add()
+			log.Warnf("GlobalContextList.Items().Add()")
+			item:=this.FileContextList.Items().Add()
 			item.SetCaption("")
 			item.SubItems().Add("")
 			item.MakeVisible(true)
 			item.SetSelected(true)
 		}
 	})
-	this.GlobalContext.SetOnSelectItem(func(sender vcl.IObject, item *vcl.TListItem, selected bool) {
+	this.GlobalContextList.SetOnSelectItem(func(sender vcl.IObject, item *vcl.TListItem, selected bool) {
 		if selected {
 			log.Warnf("GlobalContext selet",item.Index())
 			this.KeyEdit.SetText(item.Caption())
@@ -131,7 +133,7 @@ func (this *TAutoDeploy) initContextActions(){
 			log.Warnf("GlobalContext unselect",item.Index())
 		}
 	})
-	this.FileContext.SetOnSelectItem(func(sender vcl.IObject, item *vcl.TListItem, selected bool) {
+	this.FileContextList.SetOnSelectItem(func(sender vcl.IObject, item *vcl.TListItem, selected bool) {
 		if selected {
 			log.Warnf("FileContext selet",item.Index())
 			this.KeyEdit.SetText(item.Caption())
@@ -165,13 +167,14 @@ func (this *TAutoDeploy) SaveGlobalContext(){
 	log.Warnf("SaveGlobalContext")
 	if this.IsGlobalContext() {
 		var i int32
-		for i=0;i<this.GlobalContext.Items().Count();i++{
-			item:=this.GlobalContext.Items().Item(i)
-			this.GlobalContextMap = make(map[string]interface{})
-			this.GlobalContextMap[item.Caption()] = item.SubItems().S(0)
+		for i=0;i<this.GlobalContextList.Items().Count();i++{
+			item:=this.GlobalContextList.Items().Item(i)
+			this.GlobalContext = make(map[string]string)
+			this.GlobalContext[item.Caption()] = item.SubItems().S(0)
 		}
-		log.Warnf("setCOntext",this.GlobalContextMap)
-		this.conf.Set("context",this.GlobalContextMap)
+		log.Warnf("setCOntext",this.GlobalContext)
+		jsonstr,_:=json.Marshal(this.GlobalContext)
+		this.conf.Set("context",jsonstr)
 	}
 }
 
@@ -180,14 +183,16 @@ func (this *TAutoDeploy) Save(){
 }
 
 func (this *TAutoDeploy) Close(){
+	this.Panel.Hide()
 }
 
-func (this *TAutoDeploy) SetGlobalContext(context map[string]interface{}){
-	this.GlobalContextMap = context
+func (this *TAutoDeploy) SetGlobalContext(context map[string]string){
+	this.GlobalContext = context
 	this.conf.Set("context",this.GlobalContext)
 }
 
 func (this *TAutoDeploy) NewFile(){
+	this.Panel.Show()
 	this.file=NewDeployFile("未命名",this)
 	this.FileName.SetText("未命名")
 }

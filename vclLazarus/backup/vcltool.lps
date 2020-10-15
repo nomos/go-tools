@@ -96,7 +96,6 @@
       </Unit8>
       <Unit9>
         <Filename Value="deploy_frame.pas"/>
-        <IsPartOfProject Value="True"/>
         <ComponentName Value="DeployFrame"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>

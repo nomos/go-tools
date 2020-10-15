@@ -228,11 +228,11 @@ object AutoDeploy: TAutoDeploy
           TabOrder = 0
           object GlobalSheet: TTabSheet
             Caption = '全局变量'
-            ClientHeight = 265
+            ClientHeight = 176
             ClientWidth = 210
-            object GlobalContext: TListView
+            object GlobalContextList: TListView
               Left = 0
-              Height = 250
+              Height = 161
               Top = 0
               Width = 210
               Align = alClient
@@ -242,11 +242,11 @@ object AutoDeploy: TAutoDeploy
                 item
                   AutoSize = True
                   Caption = 'Key'
-                  Width = 86
+                  Width = 84
                 end              
                 item
                   Caption = 'Value'
-                  Width = 122
+                  Width = 124
                 end>
               ReadOnly = True
               RowSelect = True
@@ -258,7 +258,7 @@ object AutoDeploy: TAutoDeploy
             Caption = '项目变量'
             ClientHeight = 176
             ClientWidth = 210
-            object FileContext: TListView
+            object FileContextList: TListView
               Left = 0
               Height = 161
               Top = 0

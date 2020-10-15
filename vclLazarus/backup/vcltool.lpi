@@ -30,7 +30,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="11">
+    <Units Count="10">
       <Unit0>
         <Filename Value="vcltool.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -82,18 +82,11 @@
         <ResourceBaseClass Value="Frame"/>
       </Unit8>
       <Unit9>
-        <Filename Value="deploy_frame.pas"/>
-        <IsPartOfProject Value="True"/>
-        <ComponentName Value="DeployFrame"/>
-        <HasResources Value="True"/>
-        <ResourceBaseClass Value="Frame"/>
-      </Unit9>
-      <Unit10>
         <Filename Value="form_list_frame.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FormListFrame"/>
         <ResourceBaseClass Value="Frame"/>
-      </Unit10>
+      </Unit9>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
