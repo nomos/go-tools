@@ -22,6 +22,7 @@ func FileNameReplace(dir string,pattern interface{},replacer string)(map[string]
 	}
 	_,err:=util.WalkDirFilesWithFunc(dir, func(filePath string, file os.FileInfo) bool {
 		fileName:=path.Base(filePath)
+		fileDir:=path.Dir(filePath)
 		exportStr:=""
 		if isRegexp {
 			exportStr = patternRegexp.ReplaceAllString(fileName,replacer)
@@ -29,9 +30,9 @@ func FileNameReplace(dir string,pattern interface{},replacer string)(map[string]
 			exportStr = strings.Replace(fileName,patternString,replacer,-1)
 		}
 		exportStr = strings.ToLower(exportStr)
-		ret[filePath] = exportStr
+		ret[filePath] = path.Join(fileDir,exportStr)
 		return false
-	},false)
+	},true)
 	if err != nil {
 		return ret,err
 	}
