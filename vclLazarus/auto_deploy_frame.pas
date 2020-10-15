@@ -12,53 +12,24 @@ type
   { TAutoDeploy }
 
   TAutoDeploy = class(TFrame)
-    Button1: TButton;
-    CloseButton1: TButton;
-    ConfirmNameButton: TSpeedButton;
-    ContextAdd: TButton;
-    ContextPageControl: TPageControl;
-    ContextPanel: TPanel;
-    DeployContext: TTabSheet;
-    DeployPanel: TPanel;
-    FileContextList: TListView;
-    FileName: TEdit;
-    GlobalContextList: TListView;
-    GlobalSheet: TTabSheet;
     ImageList: TImageList;
-    KeyEdit: TEdit;
-    KeyLabel: TLabel;
-    KeyLabel1: TLabel;
-    Label1: TLabel;
     LeftPanel: TPanel;
     BottomPanel: TPanel;
-    ListBox1: TListBox;
     MainPanel: TPanel;
     NewButton: TSpeedButton;
-    OpenValueFolderButton: TSpeedButton;
     OpenDeployButton: TSpeedButton;
+    PageControl: TPageControl;
     Panel: TPanel;
-    Panel1: TPanel;
-    Panel2: TPanel;
-    Panel3: TPanel;
-    Panel4: TPanel;
-    Panel5: TPanel;
-    ProccedurePanel1: TPanel;
-    ReverseNameButton: TSpeedButton;
     SaveButton: TSpeedButton;
-    SaveButton1: TButton;
     SaveToButton: TSpeedButton;
     AddFileButton: TSpeedButton;
     RemoveButton: TSpeedButton;
     NewFolderButton: TSpeedButton;
     EditButton: TSpeedButton;
     Splitter1: TSplitter;
-    Splitter2: TSplitter;
     Splitter3: TSplitter;
-    Splitter4: TSplitter;
     TopPanel: TPanel;
-    TopPanel1: TPanel;
     TreeView1: TTreeView;
-    ValueEdit: TEdit;
     procedure LeftPanelClick(Sender: TObject);
     procedure MainPanelClick(Sender: TObject);
   private

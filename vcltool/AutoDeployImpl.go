@@ -6,6 +6,9 @@ package vcltool
 import (
 	"github.com/nomos/go-log/log"
 	"github.com/ying32/govcl/vcl"
+	"regexp"
+	"strconv"
+	"strings"
 )
 
 type IDeployProcedure struct {
@@ -25,6 +28,7 @@ type DeployFile struct {
 	Context map[string]string
 	parent *TAutoDeploy
 	sheet *vcl.TTabSheet
+	frame *TDeployFrame
 }
 
 func NewDeployFile(s string,parent *TAutoDeploy)*DeployFile {
@@ -34,6 +38,16 @@ func NewDeployFile(s string,parent *TAutoDeploy)*DeployFile {
 		Procedures: make([]IDeployProcedure,0),
 		parent:parent,
 	}
+	sheet:= vcl.NewTabSheet(parent.PageControl)
+	sname:=strings.Replace(s,"未命名","new",-1)
+	sheet.SetName(sname+"Sheet")
+	sheet.SetCaption(s)
+	frame := NewDeployFrame(sheet)
+	frame.SetName(sname)
+	sheet.SetParent(parent.PageControl)
+	ret.frame = frame
+	ret.sheet = sheet
+	ret.frame.file = ret
 	return ret
 }
 
@@ -46,12 +60,12 @@ type TAutoDeployFields struct {
 	console       *TConsoleShell
 	folders       []*DeployFolder
 	GlobalContext map[string]string
+	deployFiles []*DeployFile
 	file          *DeployFile
-	selectItem    *vcl.TListItem
 }
 
 func (this *TAutoDeploy) OnCreate(){
-	this.Panel.Hide()
+	this.deployFiles = make([]*DeployFile,0)
 	this.GlobalContext = this.conf.GetStringMapString("context")
 	if this.GlobalContext == nil {
 		this.GlobalContext = make(map[string]string)
@@ -61,8 +75,10 @@ func (this *TAutoDeploy) OnCreate(){
 	this.console.SetParent(this.BottomPanel)
 	this.console.OnCreate()
 	this.initMenuActions()
-	this.initContextActions()
 	this.initFileActions()
+	this.PageControl.SetOnChange(func(sender vcl.IObject) {
+
+	})
 }
 
 func (this *TAutoDeploy) OnDestroy(){
@@ -75,105 +91,11 @@ func (this *TAutoDeploy) initMenuActions(){
 	})
 }
 
-func (this *TAutoDeploy) LoadGlobalContext(context map[string]string) {
-	log.Warnf("LoadGlobalContext",context)
-	for k,v:=range context {
-		listItem:=this.GlobalContextList.Items().Add()
-		listItem.SetCaption(k)
-		listItem.SubItems().Add(v)
-	}
-}
-
 func (this *TAutoDeploy) initFileActions(){
 	this.SaveButton.SetOnClick(func(sender vcl.IObject) {
 		log.Warnf("Save")
 		this.Save()
 	})
-	this.CloseButton1.SetOnClick(func(sender vcl.IObject) {
-		log.Warnf("Close")
-		this.Close()
-	})
-}
-
-func (this *TAutoDeploy) initContextActions(){
-	log.Warnf("initContextActions")
-	this.LoadGlobalContext(this.GlobalContext)
-	this.ContextAdd.SetOnClick(func(sender vcl.IObject) {
-		this.selectItem = nil
-		if this.ContextPageControl.ActivePageIndex() == 0 {
-			log.Warnf("GlobalContextList.Items().Add()")
-			item:=this.GlobalContextList.Items().Add()
-			item.SetCaption("")
-			item.SubItems().Add("")
-			item.MakeVisible(true)
-			item.SetSelected(true)
-		} else {
-			log.Warnf("GlobalContextList.Items().Add()")
-			item:=this.FileContextList.Items().Add()
-			item.SetCaption("")
-			item.SubItems().Add("")
-			item.MakeVisible(true)
-			item.SetSelected(true)
-		}
-	})
-	this.GlobalContextList.SetOnSelectItem(func(sender vcl.IObject, item *vcl.TListItem, selected bool) {
-		if selected {
-			this.KeyEdit.SetText(item.Caption())
-			this.ValueEdit.SetText(item.SubItems().S(0))
-			this.selectItem = item
-		} else {
-			this.selectItem = nil
-		}
-	})
-	this.FileContextList.SetOnSelectItem(func(sender vcl.IObject, item *vcl.TListItem, selected bool) {
-		if selected {
-			this.KeyEdit.SetText(item.Caption())
-			this.ValueEdit.SetText(item.SubItems().S(0))
-			this.selectItem = item
-		} else {
-			this.selectItem = nil
-		}
-	})
-	this.KeyEdit.SetOnChange(func(sender vcl.IObject) {
-		if this.selectItem!=nil {
-			this.selectItem.SetCaption(this.KeyEdit.Text())
-			this.SaveGlobalContext()
-		}
-	})
-	this.ValueEdit.SetOnChange(func(sender vcl.IObject) {
-		if this.selectItem!=nil {
-			this.selectItem.SubItems().SetS(0,this.ValueEdit.Text())
-			this.SaveGlobalContext()
-
-		}
-	})
-	this.ContextPageControl.SetActivePageIndex(0)
-}
-
-func (this *TAutoDeploy) IsGlobalContext()bool {
-	return this.ContextPageControl.ActivePageIndex()==0
-}
-
-func (this *TAutoDeploy) SaveGlobalContext(){
-	log.Warnf("SaveGlobalContext")
-	if this.IsGlobalContext() {
-		var i int32
-		this.GlobalContext = make(map[string]string)
-		for i=0;i<this.GlobalContextList.Items().Count();i++{
-			item:=this.GlobalContextList.Items().Item(i)
-			this.GlobalContext[item.Caption()] = item.SubItems().S(0)
-		}
-		log.Warnf("setContext",this.GlobalContext)
-		this.conf.Set("context",this.GlobalContext)
-	}
-}
-
-func (this *TAutoDeploy) Save(){
-
-}
-
-func (this *TAutoDeploy) Close(){
-	this.Panel.Hide()
 }
 
 func (this *TAutoDeploy) SetGlobalContext(context map[string]string){
@@ -182,15 +104,31 @@ func (this *TAutoDeploy) SetGlobalContext(context map[string]string){
 }
 
 func (this *TAutoDeploy) NewFile(){
-	this.Panel.Show()
-	this.file=NewDeployFile("未命名",this)
-	this.FileName.SetText("未命名")
-}
-
-func (this *TAutoDeploy) OnLeftPanelClick(sender vcl.IObject) {
+	name:=this.checkFileName("未命名")
+	this.file=NewDeployFile(name,this)
+	this.file.frame.LoadGlobalContext(this.GlobalContext)
 
 }
 
-func (this *TAutoDeploy) CloseFile(file *DeployFile) {
+func (this *TAutoDeploy) checkFileName(s string)string {
+	reg1:=regexp.MustCompile(s+`([0-9]?)`)
+	maxNum:=0
+	duplicate:=false
+	for _,file:=range this.deployFiles {
+		if file.Name==s {
+			num,_:=strconv.Atoi(reg1.ReplaceAllString(file.Name,"$1"))
+			if num>maxNum {
+				maxNum = num
+			}
+			duplicate = true
+		}
+	}
+	if duplicate {
+		return s+strconv.Itoa(maxNum+1)
+	}
+	return s
 }
 
+func (this *TAutoDeploy) Save(){
+
+}

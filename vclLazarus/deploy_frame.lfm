@@ -1,39 +1,89 @@
 object DeployFrame: TDeployFrame
   Left = 0
-  Height = 449
+  Height = 396
   Top = 0
-  Width = 874
+  Width = 787
   Align = alClient
-  ClientHeight = 449
-  ClientWidth = 874
+  ClientHeight = 396
+  ClientWidth = 787
   TabOrder = 0
-  DesignLeft = 774
-  DesignTop = 498
+  DesignLeft = 776
+  DesignTop = 368
+  object Panel1: TPanel
+    Left = 224
+    Height = 364
+    Top = 32
+    Width = 563
+    Align = alClient
+    BevelColor = clNone
+    BevelOuter = bvNone
+    ClientHeight = 364
+    ClientWidth = 563
+    ParentColor = False
+    TabOrder = 0
+    object DeployPanel: TPanel
+      Left = 0
+      Height = 364
+      Top = 0
+      Width = 242
+      Align = alLeft
+      ClientHeight = 364
+      ClientWidth = 242
+      TabOrder = 0
+      object ListBox1: TListBox
+        Left = 1
+        Height = 327
+        Top = 21
+        Width = 240
+        Align = alClient
+        BorderSpacing.Top = 20
+        BorderSpacing.Bottom = 15
+        ItemHeight = 0
+        TabOrder = 0
+      end
+    end
+    object ProccedurePanel1: TPanel
+      Left = 248
+      Height = 364
+      Top = 0
+      Width = 315
+      Align = alClient
+      TabOrder = 1
+    end
+    object Splitter4: TSplitter
+      Left = 242
+      Height = 364
+      Top = 0
+      Width = 6
+      Constraints.MaxWidth = 6
+      Constraints.MinWidth = 6
+    end
+  end
   object ContextPanel: TPanel
     Left = 0
-    Height = 417
+    Height = 364
     Top = 32
     Width = 218
     Align = alLeft
-    ClientHeight = 417
+    ClientHeight = 364
     ClientWidth = 218
-    TabOrder = 0
+    TabOrder = 1
     object ContextPageControl: TPageControl
       Left = 1
-      Height = 295
+      Height = 242
       Top = 121
       Width = 216
-      ActivePage = DeployContext
+      ActivePage = GlobalSheet
       Align = alClient
-      TabIndex = 1
+      TabIndex = 0
       TabOrder = 0
       object GlobalSheet: TTabSheet
         Caption = '全局变量'
-        ClientHeight = 265
+        ClientHeight = 212
         ClientWidth = 210
-        object GlobalContext: TListView
+        object GlobalContextList: TListView
           Left = 0
-          Height = 250
+          Height = 197
           Top = 0
           Width = 210
           Align = alClient
@@ -43,11 +93,11 @@ object DeployFrame: TDeployFrame
             item
               AutoSize = True
               Caption = 'Key'
-              Width = 86
+              Width = 84
             end          
             item
               Caption = 'Value'
-              Width = 122
+              Width = 124
             end>
           ReadOnly = True
           RowSelect = True
@@ -57,11 +107,11 @@ object DeployFrame: TDeployFrame
       end
       object DeployContext: TTabSheet
         Caption = '项目变量'
-        ClientHeight = 265
+        ClientHeight = 176
         ClientWidth = 210
-        object FileContext: TListView
+        object FileContextList: TListView
           Left = 0
-          Height = 250
+          Height = 161
           Top = 0
           Width = 210
           Align = alClient
@@ -95,71 +145,124 @@ object DeployFrame: TDeployFrame
       ClientHeight = 120
       ClientWidth = 216
       TabOrder = 1
-      object KeyEdit: TEdit
-        Left = 56
-        Height = 22
-        Top = 8
-        Width = 136
-        TabOrder = 0
-      end
-      object KeyLabel: TLabel
-        Left = 16
-        Height = 16
-        Top = 11
-        Width = 26
-        Caption = 'Key:'
-        ParentColor = False
-      end
-      object KeyLabel1: TLabel
-        Left = 16
-        Height = 16
-        Top = 43
-        Width = 37
-        Caption = 'Value:'
-        ParentColor = False
-      end
-      object ValueEdit: TEdit
-        Left = 56
-        Height = 22
-        Top = 40
-        Width = 136
-        TabOrder = 1
-      end
       object Button1: TButton
         Left = 120
         Height = 25
-        Top = 72
+        Top = 88
         Width = 75
         Caption = '删除'
-        TabOrder = 2
+        TabOrder = 0
       end
       object ContextAdd: TButton
         Left = 24
         Height = 25
-        Top = 72
+        Top = 88
         Width = 75
         Caption = '新增'
-        TabOrder = 3
+        TabOrder = 1
+      end
+      object Panel3: TPanel
+        Left = 0
+        Height = 90
+        Top = 0
+        Width = 216
+        Align = alTop
+        BevelColor = clNone
+        BevelOuter = bvNone
+        ClientHeight = 90
+        ClientWidth = 216
+        TabOrder = 2
+        object Panel4: TPanel
+          Left = 0
+          Height = 90
+          Top = 0
+          Width = 56
+          Align = alLeft
+          BevelColor = clNone
+          BevelOuter = bvNone
+          ClientHeight = 90
+          ClientWidth = 56
+          TabOrder = 0
+          object KeyLabel: TLabel
+            Left = 16
+            Height = 16
+            Top = 11
+            Width = 26
+            Caption = 'Key:'
+            ParentColor = False
+          end
+          object KeyLabel1: TLabel
+            Left = 16
+            Height = 16
+            Top = 43
+            Width = 37
+            Caption = 'Value:'
+            ParentColor = False
+          end
+        end
+        object Panel5: TPanel
+          Left = 56
+          Height = 90
+          Top = 0
+          Width = 160
+          Align = alClient
+          BevelColor = clNone
+          BevelOuter = bvNone
+          ClientHeight = 90
+          ClientWidth = 160
+          TabOrder = 1
+          object KeyEdit: TEdit
+            Left = 0
+            Height = 22
+            Top = 10
+            Width = 150
+            Align = alTop
+            BorderSpacing.Top = 10
+            BorderSpacing.Right = 10
+            BorderSpacing.Bottom = 10
+            TabOrder = 0
+          end
+          object ValueEdit: TEdit
+            Left = 30
+            Height = 22
+            Top = 42
+            Width = 120
+            Align = alTop
+            BorderSpacing.Left = 30
+            BorderSpacing.Right = 10
+            TabOrder = 1
+          end
+          object OpenValueFolderButton: TSpeedButton
+            Left = 8
+            Height = 16
+            Top = 43
+            Width = 16
+            Color = clNone
+            Flat = True
+            ImageIndex = 5
+            ImageWidth = 16
+          end
+        end
       end
     end
   end
   object Splitter2: TSplitter
     Left = 218
-    Height = 417
+    Height = 364
     Top = 32
     Width = 6
     Constraints.MaxWidth = 6
     Constraints.MinWidth = 6
   end
-  object TopPanel: TPanel
+  object TopPanel1: TPanel
     Left = 0
     Height = 32
     Top = 0
-    Width = 874
+    Width = 787
     Align = alTop
     ClientHeight = 32
-    ClientWidth = 874
-    TabOrder = 2
+    ClientWidth = 787
+    TabOrder = 3
     object FileName: TEdit
       Left = 64
       Height = 22
@@ -258,8 +361,8 @@ object DeployFrame: TDeployFrame
         0000000000000000000000000000000000000000000000000000
       }
     end
-    object SaveButton: TButton
-      Left = 703
+    object SaveButton1: TButton
+      Left = 616
       Height = 30
       Top = 1
       Width = 75
@@ -270,7 +373,7 @@ object DeployFrame: TDeployFrame
       TabOrder = 1
     end
     object CloseButton1: TButton
-      Left = 788
+      Left = 701
       Height = 30
       Top = 1
       Width = 75
@@ -287,56 +390,6 @@ object DeployFrame: TDeployFrame
       Width = 40
       Caption = '项目名'
       ParentColor = False
-    end
-  end
-  object Panel1: TPanel
-    Left = 224
-    Height = 417
-    Top = 32
-    Width = 650
-    Align = alClient
-    BevelColor = clNone
-    BevelOuter = bvNone
-    ClientHeight = 417
-    ClientWidth = 650
-    ParentColor = False
-    TabOrder = 3
-    object DeployPanel: TPanel
-      Left = 0
-      Height = 417
-      Top = 0
-      Width = 242
-      Align = alLeft
-      ClientHeight = 417
-      ClientWidth = 242
-      TabOrder = 0
-      object ListBox1: TListBox
-        Left = 1
-        Height = 380
-        Top = 21
-        Width = 240
-        Align = alClient
-        BorderSpacing.Top = 20
-        BorderSpacing.Bottom = 15
-        ItemHeight = 0
-        TabOrder = 0
-      end
-    end
-    object ProccedurePanel1: TPanel
-      Left = 248
-      Height = 417
-      Top = 0
-      Width = 402
-      Align = alClient
-      TabOrder = 1
-    end
-    object Splitter1: TSplitter
-      Left = 242
-      Height = 417
-      Top = 0
-      Width = 6
-      Constraints.MaxWidth = 6
-      Constraints.MinWidth = 6
     end
   end
 end

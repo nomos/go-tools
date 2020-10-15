@@ -5,7 +5,7 @@ unit deploy_frame;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, ExtCtrls, ComCtrls, StdCtrls, Buttons;
+  Classes, SysUtils, Forms, Controls, ExtCtrls, StdCtrls, ComCtrls, Buttons;
 
 type
 
@@ -13,32 +13,35 @@ type
 
   TDeployFrame = class(TFrame)
     Button1: TButton;
-    ContextAdd: TButton;
-    KeyEdit: TEdit;
-    ValueEdit: TEdit;
-    FileContext: TListView;
-    KeyLabel1: TLabel;
-    Label1: TLabel;
-    KeyLabel: TLabel;
-    Panel1: TPanel;
-    Panel2: TPanel;
-    SaveButton: TButton;
     CloseButton1: TButton;
+    ConfirmNameButton: TSpeedButton;
+    ContextAdd: TButton;
     ContextPageControl: TPageControl;
     ContextPanel: TPanel;
     DeployContext: TTabSheet;
     DeployPanel: TPanel;
+    FileContextList: TListView;
     FileName: TEdit;
+    GlobalContextList: TListView;
     GlobalSheet: TTabSheet;
+    KeyEdit: TEdit;
+    KeyLabel: TLabel;
+    KeyLabel1: TLabel;
+    Label1: TLabel;
     ListBox1: TListBox;
-    GlobalContext: TListView;
-    ConfirmNameButton: TSpeedButton;
-    ReverseNameButton: TSpeedButton;
-    Splitter1: TSplitter;
-    TopPanel: TPanel;
+    OpenValueFolderButton: TSpeedButton;
+    Panel1: TPanel;
+    Panel2: TPanel;
+    Panel3: TPanel;
+    Panel4: TPanel;
+    Panel5: TPanel;
     ProccedurePanel1: TPanel;
+    ReverseNameButton: TSpeedButton;
+    SaveButton1: TButton;
     Splitter2: TSplitter;
-    procedure GlobalContextAddClick(Sender: TObject);
+    Splitter4: TSplitter;
+    TopPanel1: TPanel;
+    ValueEdit: TEdit;
   private
 
   public
@@ -48,13 +51,6 @@ type
 implementation
 
 {$R *.lfm}
-
-{ TDeployFrame }
-
-procedure TDeployFrame.GlobalContextAddClick(Sender: TObject);
-begin
-
-end;
 
 end.
 
