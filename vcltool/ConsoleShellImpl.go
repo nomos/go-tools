@@ -49,7 +49,6 @@ func (this *TConsoleShell) OnCreate(){
 	//go this.ssh.Connect().Await()
 	this.ssh.SetConsoleWriter(this)
 	this.CmdEdit.SetOnKeyDown(func(sender vcl.IObject, key *types.Char, shift types.TShiftState) {
-		log.Warnf("this",reflect.ValueOf(this).Pointer())
 		switch *key {
 		case keys.VkReturn:
 			text := this.CmdEdit.Text()
@@ -77,6 +76,16 @@ func (this *TConsoleShell) OnCreate(){
 			} else {
 				this.cachedIndex = 0
 			}
+		}
+	})
+	this.SendButton.SetOnClick(func(sender vcl.IObject) {
+		text := this.CmdEdit.Text()
+		log.Warnf("OnSendButtonClick",reflect.ValueOf(this).Pointer())
+		this.GetSender().SendCmd(text)
+		this.CmdEdit.SetText("")
+		if len(this.cachedText) == 0 ||this.cachedText[len(this.cachedText)-1] != text {
+			this.cachedText = append(this.cachedText, text)
+			this.cachedIndex = len(this.cachedText)-1
 		}
 	})
 	this.Console.Clear()
@@ -152,17 +161,5 @@ func (this *TConsoleShell) ExecCmd(s string)*promise.Promise {
 
 func (this *TConsoleShell) OnCmdEditChange(sender vcl.IObject) {
 
-}
-
-
-func (this *TConsoleShell) OnSendButtonClick(sender vcl.IObject) {
-	text := this.CmdEdit.Text()
-	log.Warnf("OnSendButtonClick",reflect.ValueOf(this).Pointer())
-	this.GetSender().SendCmd(text)
-	this.CmdEdit.SetText("")
-	if len(this.cachedText) == 0 ||this.cachedText[len(this.cachedText)-1] != text {
-		this.cachedText = append(this.cachedText, text)
-		this.cachedIndex = len(this.cachedText)-1
-	}
 }
 
