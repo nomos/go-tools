@@ -45,6 +45,8 @@ func NewDeployFile(s string,parent *TAutoDeploy)*DeployFile {
 	frame := NewDeployFrame(sheet)
 	frame.SetName(sname)
 	sheet.SetParent(parent.PageControl)
+	frame.LoadGlobalContext(parent.GlobalContext)
+	frame.SetParent(sheet)
 	ret.frame = frame
 	ret.sheet = sheet
 	ret.frame.file = ret
@@ -106,8 +108,7 @@ func (this *TAutoDeploy) SetGlobalContext(context map[string]string){
 func (this *TAutoDeploy) NewFile(){
 	name:=this.checkFileName("未命名")
 	this.file=NewDeployFile(name,this)
-	this.file.frame.LoadGlobalContext(this.GlobalContext)
-
+	this.deployFiles = append(this.deployFiles, this.file)
 }
 
 func (this *TAutoDeploy) checkFileName(s string)string {
@@ -116,14 +117,15 @@ func (this *TAutoDeploy) checkFileName(s string)string {
 	duplicate:=false
 	for _,file:=range this.deployFiles {
 		if file.Name==s {
-			num,_:=strconv.Atoi(reg1.ReplaceAllString(file.Name,"$1"))
-			if num>maxNum {
-				maxNum = num
-			}
 			duplicate = true
+		}
+		num,_:=strconv.Atoi(reg1.ReplaceAllString(file.Name,"$1"))
+		if num>maxNum {
+			maxNum = num
 		}
 	}
 	if duplicate {
+		log.Warnf("duplicate",maxNum)
 		return s+strconv.Itoa(maxNum+1)
 	}
 	return s

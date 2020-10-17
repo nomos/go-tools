@@ -6,44 +6,35 @@ package vcltool
 import (
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
+	"time"
 )
 
 //::private::
 type TWebViewFrameFields struct {
 	ConfigAble
-	name string
 	url string
-	urls map[string]string
-	webviews map[string]*vcl.TMiniWebview
-	curWebview *vcl.TMiniWebview
+	webview *vcl.TMiniWebview
 }
 
-func (this *TWebViewFrame) SetUrl(s string,url string) {
-	this.name = s
+func (this *TWebViewFrame) SetUrl(url string) {
 	this.url = url
-	this.urls[s] = url
-	this.webviews[s] = vcl.NewMiniWebview(this)
-	this.webviews[s].SetAlign(types.AlClient)
-	this.webviews[s].SetParent(this.Main)
-	this.webviews[s].Realign()
-	this.webviews[s].Navigate(url)
-	this.webviews[s].Hide()
+	this.webview.Navigate(this.url)
+	go func() {
+		time.Sleep(time.Millisecond)
+		vcl.ThreadSync(func() {
+			this.webview.Realign()
+		})
+	}()
 }
 
-func (this *TWebViewFrame) Navigate(s string){
-	if this.curWebview!=nil {
-		this.curWebview.Hide()
-	}
-	if webview,ok:=this.webviews[s];ok {
-		webview.Show()
-		this.curWebview = webview
-		webview.Realign()
-	}
+func (this *TWebViewFrame) Refresh(){
+	this.webview.Refresh()
 }
 
 func (this *TWebViewFrame) OnCreate(){
-	this.webviews = make(map[string]*vcl.TMiniWebview)
-	this.urls = make(map[string]string)
+	this.webview = vcl.NewMiniWebview(this)
+	this.webview.SetParent(this.Main)
+	this.webview.SetAlign(types.AlClient)
 }
 
 func (this *TWebViewFrame) OnDestroy(){

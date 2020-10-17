@@ -45,8 +45,7 @@ type IFrame interface {
 
 type FrameContainer struct {
 	iframes map[string]IFrame
-	urls map[string]string
-	webviewFrame *TWebViewFrame
+	webviewFrames map[string]*TWebViewFrame
 	pageControl *vcl.TPageControl
 	component vcl.IComponent
 }
@@ -54,12 +53,10 @@ type FrameContainer struct {
 func NewFrameContainer(self vcl.IComponent,pageControl *vcl.TPageControl)*FrameContainer{
 	ret:=&FrameContainer{
 		iframes:      make(map[string]IFrame),
-		urls:         make(map[string]string),
-		webviewFrame: NewWebViewFrame(self),
+		webviewFrames:         make(map[string]*TWebViewFrame),
 		pageControl:  pageControl,
 		component:    self,
 	}
-	ret.webviewFrame.OnCreate()
 
 	return ret
 }
@@ -76,11 +73,6 @@ func (this *FrameContainer) OnCreate(){
 				if sheet==nil {
 					return
 				}
-				if _,ok:=this.urls[sheet.Name()];ok {
-					this.webviewFrame.SetParent(nil)
-					this.webviewFrame.SetParent(sheet)
-					this.webviewFrame.Navigate(sheet.Name())
-				}
 			})
 		}()
 
@@ -93,8 +85,11 @@ func (this *FrameContainer) Destroy(){
 		frame.Free()
 	}
 	this.iframes = make(map[string]IFrame)
-	this.webviewFrame.OnDestroy()
-	this.webviewFrame.Free()
+	for _,frame:=range this.webviewFrames{
+		frame.OnDestroy()
+		frame.Free()
+	}
+	this.webviewFrames = make(map[string]*TWebViewFrame)
 }
 
 func (this *FrameContainer) GetIFrame(s string)IFrame{
@@ -119,12 +114,14 @@ func (this *FrameContainer) AddIFrame(name string,frame IFrame,conf... *util.App
 }
 
 func (this *FrameContainer) AddWebView(name string,url string) {
-	this.urls[name+"Sheet"] = url
 	sheet:=vcl.NewTabSheet(this.component)
 	sheet.SetParent(this.pageControl)
 	sheet.SetName(name+"Sheet")
 	sheet.SetCaption(name)
 	sheet.SetAlign(types.AlClient)
-	this.webviewFrame.SetUrl(name+"Sheet",url)
+	frame:=NewWebViewFrame(sheet)
+	frame.SetParent(sheet)
+	frame.OnCreate()
+	frame.SetUrl(url)
 }
 
