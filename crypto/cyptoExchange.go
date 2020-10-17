@@ -1,9 +1,9 @@
 package crypto
 
 import (
-	"github.com/HuobiRDCenter/huobi_Golang/config"
-	"github.com/HuobiRDCenter/huobi_Golang/pkg/client"
 	"github.com/nomos/go-log/log"
+	"github.com/nomos/huobi/config"
+	"github.com/nomos/huobi/pkg/client"
 	"time"
 )
 

@@ -7,8 +7,8 @@ object ConsoleShell: TConsoleShell
   ClientHeight = 529
   ClientWidth = 697
   TabOrder = 0
-  DesignLeft = 580
-  DesignTop = 187
+  DesignLeft = 889
+  DesignTop = 539
   object BottomPanel: TPanel
     Left = 0
     Height = 50
@@ -19,12 +19,12 @@ object ConsoleShell: TConsoleShell
     ClientWidth = 697
     TabOrder = 0
     object CmdEdit: TEdit
-      Left = 11
+      Left = 114
       Height = 24
       Top = 13
-      Width = 590
+      Width = 487
       Align = alClient
-      BorderSpacing.Left = 10
+      BorderSpacing.Left = 3
       BorderSpacing.Top = 12
       BorderSpacing.Right = 10
       BorderSpacing.Bottom = 12
@@ -41,6 +41,18 @@ object ConsoleShell: TConsoleShell
       Caption = 'Send'
       OnClick = SendButtonClick
       TabOrder = 1
+    end
+    object ShellSelect: TComboBox
+      Left = 11
+      Height = 20
+      Top = 15
+      Width = 100
+      Align = alLeft
+      BorderSpacing.Left = 10
+      BorderSpacing.Top = 14
+      ItemHeight = 26
+      Style = csDropDownList
+      TabOrder = 2
     end
   end
   object Panel1: TPanel

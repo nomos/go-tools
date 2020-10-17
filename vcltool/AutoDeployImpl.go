@@ -134,3 +134,8 @@ func (this *TAutoDeploy) checkFileName(s string)string {
 func (this *TAutoDeploy) Save(){
 
 }
+
+func (this *TAutoDeploy) OnLeftPanelClick(sender vcl.IObject) {
+
+}
+

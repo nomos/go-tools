@@ -45,10 +45,10 @@ func (this *TChartFrame) OnCreate(){
 	})
 
 	this.Main.SetOnMouseMove(func(sender vcl.IObject, shift types.TShiftState, x, y int32) {
-		log.WithFields(log.Fields{
-			"x":x,
-			"y":y,
-		}).Info("SetOnMouseMove")
+		//log.WithFields(log.Fields{
+		//	"x":x,
+		//	"y":y,
+		//}).Info("SetOnMouseMove")
 	})
 }
 

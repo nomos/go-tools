@@ -28,6 +28,7 @@ object ConsoleShell: TConsoleShell
       BorderSpacing.Top = 12
       BorderSpacing.Right = 10
       BorderSpacing.Bottom = 12
+      OnChange = CmdEditChange
       TabOrder = 0
     end
     object SendButton: TButton
@@ -38,6 +39,7 @@ object ConsoleShell: TConsoleShell
       Align = alRight
       BorderSpacing.Right = 10
       Caption = 'Send'
+      OnClick = SendButtonClick
       TabOrder = 1
     end
   end

@@ -4,13 +4,11 @@
 package vcltool
 
 import (
-	"github.com/nomos/go-log/log"
 	"github.com/nomos/go-lokas/network/ssh"
 	"github.com/nomos/go-promise"
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
 	"github.com/ying32/govcl/vcl/types/keys"
-	"reflect"
 	"strings"
 )
 
@@ -36,7 +34,6 @@ func (this *TConsoleShell) SetSender (sender ICommandSender) {
 }
 
 func (this *TConsoleShell) GetSender()ICommandSender{
-	log.Warnf("VVVVVV",reflect.ValueOf(this.sender).Pointer())
 	return this.sender
 }
 
@@ -52,7 +49,6 @@ func (this *TConsoleShell) OnCreate(){
 		switch *key {
 		case keys.VkReturn:
 			text := this.CmdEdit.Text()
-			log.Warnf("sender",reflect.ValueOf(this.GetSender()).Pointer())
 			this.GetSender().SendCmd(text)
 			this.CmdEdit.SetText("")
 			if len(this.cachedText) == 0 ||this.cachedText[len(this.cachedText)-1] != text {
@@ -60,7 +56,6 @@ func (this *TConsoleShell) OnCreate(){
 				this.cachedIndex = len(this.cachedText)-1
 			}
 		case keys.VkUp:
-			log.Warnf(this.cachedIndex,this.cachedText)
 			if this.cachedIndex >= 0 && len(this.cachedText) > this.cachedIndex {
 				text := this.cachedText[len(this.cachedText)-this.cachedIndex-1]
 				this.CmdEdit.SetText(text)
@@ -80,7 +75,6 @@ func (this *TConsoleShell) OnCreate(){
 	})
 	this.SendButton.SetOnClick(func(sender vcl.IObject) {
 		text := this.CmdEdit.Text()
-		log.Warnf("OnSendButtonClick",reflect.ValueOf(this).Pointer())
 		this.GetSender().SendCmd(text)
 		this.CmdEdit.SetText("")
 		if len(this.cachedText) == 0 ||this.cachedText[len(this.cachedText)-1] != text {
@@ -155,7 +149,7 @@ func (this *TConsoleShell) ExecShellCmd(s string)*promise.Promise{
 	return this.ssh.NewShellSession().Run(s)
 }
 
-func (this *TConsoleShell) ExecCmd(s string)*promise.Promise {
+func (this *TConsoleShell) ExecSshCmd(s string)*promise.Promise {
 	return this.ssh.RunCmd(s)
 }
 

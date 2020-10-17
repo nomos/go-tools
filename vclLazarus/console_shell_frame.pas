@@ -13,6 +13,7 @@ type
 
   TConsoleShell = class(TFrame)
     BottomPanel: TPanel;
+    ShellSelect: TComboBox;
     Console: TMemo;
     Panel1: TPanel;
     SendButton: TButton;
