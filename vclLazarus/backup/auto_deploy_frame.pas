@@ -12,18 +12,13 @@ type
   { TAutoDeploy }
 
   TAutoDeploy = class(TFrame)
-    ContextPageControl: TPageControl;
-    ContextPanel: TPanel;
-    DeployContext: TTabSheet;
-    FileContextList: TListView;
-    GlobalContextList: TListView;
-    GlobalSheet: TTabSheet;
     ImageList: TImageList;
     LeftPanel: TPanel;
     BottomPanel: TPanel;
     MainPanel: TPanel;
     NewButton: TSpeedButton;
     OpenDeployButton: TSpeedButton;
+    PageControl: TPageControl;
     Panel: TPanel;
     SaveButton: TSpeedButton;
     SaveToButton: TSpeedButton;

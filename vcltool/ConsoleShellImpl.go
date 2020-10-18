@@ -23,33 +23,42 @@ type TConsoleShellFields struct {
 	cachedIndex     int
 	writeChan chan string
 	sender ICommandSender
+	senders map[string]ICommandSender
+	commands map[string]ICommand
 }
 
-type ICommandSender interface {
-	SendCmd(string)
+func (this *TConsoleShell) RegisterSender(s string,sender ICommandSender){
+	this.ShellSelect.Items().Add(s)
+	this.senders[s] = sender
 }
 
-func (this *TConsoleShell) SetSender (sender ICommandSender) {
-	this.sender = sender
+func (this *TConsoleShell) RegisterCmd(command ICommand){
+	this.commands[command.Name()] = command
 }
 
-func (this *TConsoleShell) GetSender()ICommandSender{
-	return this.sender
+func (this *TConsoleShell) RegisterCmdFunc(name string,tips string,f func(value *ParamsValue,console *TConsoleShell)*promise.Promise) {
+	command:=NewCommand(name,tips,f)
+	this.commands[command.Name()] = command
 }
 
 func (this *TConsoleShell) OnCreate(){
-	if this.sender== nil {
-		this.SetSender(this)
-	}
+	this.senders = make(map[string]ICommandSender)
+	this.commands = make(map[string]ICommand)
+	this.RegisterSender("shell",this)
+	this.RegisterCmdFunc("clear","clear console", func(value *ParamsValue,console *TConsoleShell) *promise.Promise {
+		return promise.Async(func(resolve func(interface{}), reject func(interface{})) {
+			console.Clear()
+			resolve(nil)
+		})
+	})
 	this.cachedText = make([]string,0)
-	this.ssh = ssh.NewSshClient("root","9ayl02bf","192.168.110.197:22")
-	//go this.ssh.Connect().Await()
+	this.ssh = ssh.NewSshClient("","","")
 	this.ssh.SetConsoleWriter(this)
 	this.CmdEdit.SetOnKeyDown(func(sender vcl.IObject, key *types.Char, shift types.TShiftState) {
 		switch *key {
 		case keys.VkReturn:
 			text := this.CmdEdit.Text()
-			this.GetSender().SendCmd(text)
+			this.sendCmd(text)
 			this.CmdEdit.SetText("")
 			if len(this.cachedText) == 0 ||this.cachedText[len(this.cachedText)-1] != text {
 				this.cachedText = append(this.cachedText, text)
@@ -75,7 +84,7 @@ func (this *TConsoleShell) OnCreate(){
 	})
 	this.SendButton.SetOnClick(func(sender vcl.IObject) {
 		text := this.CmdEdit.Text()
-		this.GetSender().SendCmd(text)
+		this.sendCmd(text)
 		this.CmdEdit.SetText("")
 		if len(this.cachedText) == 0 ||this.cachedText[len(this.cachedText)-1] != text {
 			this.cachedText = append(this.cachedText, text)
@@ -83,8 +92,12 @@ func (this *TConsoleShell) OnCreate(){
 		}
 	})
 	this.Console.Clear()
-	this.Panel1.SetOnResize(func(sender vcl.IObject) {
-	})
+}
+
+func (this *TConsoleShell) sendCmd(text string){
+	s:=this.ShellSelect.Text()
+	sender:=this.senders[s]
+	sender.SendCmd(text)
 }
 
 
@@ -129,20 +142,31 @@ func (this *TConsoleShell) Disconnect()*promise.Promise {
 }
 
 func (this *TConsoleShell) Clear(){
-	this.Console.Clear()
+	vcl.ThreadSync(func() {
+		this.Console.Clear()
+	})
 }
 
 func (this *TConsoleShell) SendCmd(s string){
-	if strings.TrimSpace(s) == "clear" {
-		this.Console.Clear()
+	name,params:=SplitCommand(s)
+	if cmd,ok:=this.commands[name];ok {
+		para:=&ParamsValue{
+			cmd: name,
+			value:  params,
+			offset: 0,
+		}
+		go cmd.Exec(para,this).Await()
 		return
 	}
+	go this.ssh.RunShellCmd(s).Await()
+}
 
-	if this.ssh.IsConnect() {
-		go this.ssh.RunCmd(s).Await()
-	} else {
-		go this.ssh.RunShellCmd(s).Await()
-	}
+func (this *TConsoleShell) OnSelect(){
+
+}
+
+func (this *TConsoleShell) OnDeselect(){
+
 }
 
 func (this *TConsoleShell) ExecShellCmd(s string)*promise.Promise{
@@ -154,6 +178,11 @@ func (this *TConsoleShell) ExecSshCmd(s string)*promise.Promise {
 }
 
 func (this *TConsoleShell) OnCmdEditChange(sender vcl.IObject) {
+
+}
+
+
+func (this *TConsoleShell) OnSendButtonClick(sender vcl.IObject) {
 
 }
 

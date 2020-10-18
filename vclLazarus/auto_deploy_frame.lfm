@@ -84,21 +84,11 @@ object AutoDeploy: TAutoDeploy
       ImageWidth = 30
     end
   end
-  object BottomPanel: TPanel
-    Left = 0
-    Height = 191
-    Top = 418
-    Width = 901
-    Align = alBottom
-    BevelOuter = bvNone
-    ParentColor = False
-    TabOrder = 1
-  end
   object Splitter3: TSplitter
     Cursor = crVSplit
     Left = 0
     Height = 6
-    Top = 412
+    Top = 603
     Width = 901
     Align = alBottom
     Constraints.MaxHeight = 6
@@ -107,32 +97,32 @@ object AutoDeploy: TAutoDeploy
   end
   object MainPanel: TPanel
     Left = 0
-    Height = 362
+    Height = 553
     Top = 50
     Width = 901
     Align = alClient
     BevelColor = clNone
     BevelOuter = bvNone
-    ClientHeight = 362
+    ClientHeight = 553
     ClientWidth = 901
     Color = 15132390
     ParentColor = False
-    TabOrder = 3
+    TabOrder = 2
     object LeftPanel: TPanel
       Left = 0
-      Height = 362
+      Height = 553
       Top = 0
       Width = 194
       Align = alLeft
       BevelColor = 15132390
-      ClientHeight = 362
+      ClientHeight = 553
       ClientWidth = 194
       ParentColor = False
       TabOrder = 0
       OnClick = LeftPanelClick
       object TreeView1: TTreeView
         Left = 16
-        Height = 315
+        Height = 506
         Top = 31
         Width = 177
         Align = alClient
@@ -191,7 +181,7 @@ object AutoDeploy: TAutoDeploy
     end
     object Splitter1: TSplitter
       Left = 194
-      Height = 362
+      Height = 553
       Top = 0
       Width = 6
       Constraints.MaxWidth = 6
@@ -199,18 +189,18 @@ object AutoDeploy: TAutoDeploy
     end
     object Panel: TPanel
       Left = 200
-      Height = 362
+      Height = 553
       Top = 0
       Width = 701
       Align = alClient
       BevelColor = clNone
       BevelOuter = bvLowered
-      ClientHeight = 362
+      ClientHeight = 553
       ClientWidth = 701
       TabOrder = 2
       object PageControl: TPageControl
         Left = 1
-        Height = 360
+        Height = 551
         Top = 1
         Width = 699
         Align = alClient

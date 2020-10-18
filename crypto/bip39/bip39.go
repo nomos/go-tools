@@ -2,7 +2,7 @@
 //
 // The official BIP39 spec can be found at
 // https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki
-package crypto
+package bip39
 
 import (
 	"crypto/rand"

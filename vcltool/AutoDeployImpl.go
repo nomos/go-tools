@@ -59,7 +59,6 @@ type DeployFolder struct {
 //::private::
 type TAutoDeployFields struct {
 	ConfigAble
-	console       *TConsoleShell
 	folders       []*DeployFolder
 	GlobalContext map[string]string
 	deployFiles []*DeployFile
@@ -73,9 +72,6 @@ func (this *TAutoDeploy) OnCreate(){
 		this.GlobalContext = make(map[string]string)
 		this.conf.Set("context",this.GlobalContext)
 	}
-	this.console = NewConsoleShell(this)
-	this.console.SetParent(this.BottomPanel)
-	this.console.OnCreate()
 	this.initMenuActions()
 	this.initFileActions()
 	this.PageControl.SetOnChange(func(sender vcl.IObject) {

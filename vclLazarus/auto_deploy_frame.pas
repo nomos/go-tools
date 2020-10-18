@@ -14,7 +14,6 @@ type
   TAutoDeploy = class(TFrame)
     ImageList: TImageList;
     LeftPanel: TPanel;
-    BottomPanel: TPanel;
     MainPanel: TPanel;
     NewButton: TSpeedButton;
     OpenDeployButton: TSpeedButton;

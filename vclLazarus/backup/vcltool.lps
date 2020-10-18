@@ -56,11 +56,12 @@
         <ComponentName Value="ConsoleShell"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="14"/>
-        <CursorPos X="3" Y="41"/>
+        <CursorPos X="3" Y="42"/>
         <UsageCount Value="58"/>
         <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
       </Unit5>
       <Unit6>
         <Filename Value="quant_trade_frame.pas"/>
@@ -86,9 +87,8 @@
         <ComponentName Value="AutoDeploy"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="27"/>
+        <TopLine Value="13"/>
         <CursorPos X="105" Y="58"/>
         <UsageCount Value="43"/>
         <Loaded Value="True"/>
@@ -118,121 +118,121 @@
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="deploy_frame.pas"/>
-        <Caret Line="53" Column="3" TopLine="26"/>
+        <Caret Line="52" Column="3" TopLine="25"/>
       </Position1>
       <Position2>
         <Filename Value="deploy_frame.pas"/>
-        <Caret Line="52" Column="3" TopLine="25"/>
+        <Caret Line="51" Column="3" TopLine="24"/>
       </Position2>
       <Position3>
         <Filename Value="deploy_frame.pas"/>
-        <Caret Line="51" Column="3" TopLine="24"/>
+        <Caret Line="52" Column="3" TopLine="25"/>
       </Position3>
       <Position4>
         <Filename Value="deploy_frame.pas"/>
-        <Caret Line="52" Column="3" TopLine="25"/>
+        <Caret Line="53" Column="3" TopLine="26"/>
       </Position4>
       <Position5>
         <Filename Value="deploy_frame.pas"/>
-        <Caret Line="53" Column="3" TopLine="26"/>
+        <Caret Line="52" Column="3" TopLine="25"/>
       </Position5>
       <Position6>
         <Filename Value="deploy_frame.pas"/>
-        <Caret Line="52" Column="3" TopLine="25"/>
+        <Caret Line="51" Column="3" TopLine="24"/>
       </Position6>
       <Position7>
         <Filename Value="deploy_frame.pas"/>
-        <Caret Line="51" Column="3" TopLine="24"/>
+        <Caret Line="52" Column="3" TopLine="25"/>
       </Position7>
       <Position8>
         <Filename Value="deploy_frame.pas"/>
-        <Caret Line="52" Column="3" TopLine="25"/>
+        <Caret Line="53" Column="3" TopLine="26"/>
       </Position8>
       <Position9>
         <Filename Value="deploy_frame.pas"/>
-        <Caret Line="53" Column="3" TopLine="26"/>
+        <Caret Line="54" Column="3" TopLine="27"/>
       </Position9>
       <Position10>
         <Filename Value="deploy_frame.pas"/>
-        <Caret Line="54" Column="3" TopLine="27"/>
+        <Caret Line="55" Column="3" TopLine="28"/>
       </Position10>
       <Position11>
         <Filename Value="deploy_frame.pas"/>
-        <Caret Line="55" Column="3" TopLine="28"/>
+        <Caret Line="54" Column="3" TopLine="27"/>
       </Position11>
       <Position12>
         <Filename Value="deploy_frame.pas"/>
-        <Caret Line="54" Column="3" TopLine="27"/>
+        <Caret Line="55" Column="3" TopLine="28"/>
       </Position12>
       <Position13>
-        <Filename Value="deploy_frame.pas"/>
-        <Caret Line="55" Column="3" TopLine="28"/>
+        <Filename Value="auto_deploy_frame.pas"/>
+        <Caret Line="29" Column="88" TopLine="26"/>
       </Position13>
       <Position14>
         <Filename Value="auto_deploy_frame.pas"/>
-        <Caret Line="29" Column="88" TopLine="26"/>
+        <Caret Line="28" Column="88" TopLine="25"/>
       </Position14>
       <Position15>
         <Filename Value="auto_deploy_frame.pas"/>
-        <Caret Line="28" Column="88" TopLine="25"/>
+        <Caret Line="29" Column="88" TopLine="26"/>
       </Position15>
       <Position16>
         <Filename Value="auto_deploy_frame.pas"/>
-        <Caret Line="29" Column="88" TopLine="26"/>
+        <Caret Line="53" Column="88" TopLine="48"/>
       </Position16>
       <Position17>
         <Filename Value="auto_deploy_frame.pas"/>
-        <Caret Line="53" Column="88" TopLine="48"/>
+        <Caret Line="54" Column="88" TopLine="49"/>
       </Position17>
       <Position18>
         <Filename Value="auto_deploy_frame.pas"/>
-        <Caret Line="54" Column="88" TopLine="49"/>
+        <Caret Line="55" Column="88" TopLine="50"/>
       </Position18>
       <Position19>
         <Filename Value="auto_deploy_frame.pas"/>
-        <Caret Line="55" Column="88" TopLine="50"/>
+        <Caret Line="56" Column="88" TopLine="51"/>
       </Position19>
       <Position20>
-        <Filename Value="auto_deploy_frame.pas"/>
-        <Caret Line="56" Column="88" TopLine="51"/>
+        <Filename Value="json_value_edit_frame.pas"/>
       </Position20>
       <Position21>
-        <Filename Value="json_value_edit_frame.pas"/>
+        <Filename Value="console_shell_frame.pas"/>
       </Position21>
       <Position22>
         <Filename Value="console_shell_frame.pas"/>
+        <Caret Line="36" Column="3" TopLine="8"/>
       </Position22>
       <Position23>
-        <Filename Value="console_shell_frame.pas"/>
-        <Caret Line="36" Column="3" TopLine="8"/>
+        <Filename Value="auto_deploy_frame.pas"/>
+        <Caret Line="63" Column="105" TopLine="32"/>
       </Position23>
       <Position24>
         <Filename Value="auto_deploy_frame.pas"/>
-        <Caret Line="63" Column="105" TopLine="32"/>
+        <Caret Line="62" Column="105" TopLine="31"/>
       </Position24>
       <Position25>
         <Filename Value="auto_deploy_frame.pas"/>
-        <Caret Line="62" Column="105" TopLine="31"/>
+        <Caret Line="61" Column="105" TopLine="30"/>
       </Position25>
       <Position26>
         <Filename Value="auto_deploy_frame.pas"/>
-        <Caret Line="61" Column="105" TopLine="30"/>
+        <Caret Line="60" Column="105" TopLine="29"/>
       </Position26>
       <Position27>
         <Filename Value="auto_deploy_frame.pas"/>
-        <Caret Line="60" Column="105" TopLine="29"/>
+        <Caret Line="59" Column="105" TopLine="28"/>
       </Position27>
       <Position28>
         <Filename Value="auto_deploy_frame.pas"/>
-        <Caret Line="59" Column="105" TopLine="28"/>
+        <Caret Line="58" Column="105" TopLine="27"/>
       </Position28>
       <Position29>
         <Filename Value="auto_deploy_frame.pas"/>
-        <Caret Line="58" Column="105" TopLine="27"/>
+        <Caret Line="57" Column="105" TopLine="26"/>
       </Position29>
       <Position30>
-        <Filename Value="auto_deploy_frame.pas"/>
-        <Caret Line="57" Column="105" TopLine="26"/>
+        <Filename Value="console_shell_frame.pas"/>
+        <Caret Line="41" Column="3"/>
       </Position30>
     </JumpHistory>
     <RunParams>
