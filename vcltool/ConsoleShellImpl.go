@@ -15,37 +15,69 @@ import (
 //::private::
 type TConsoleShellFields struct {
 	ConfigAble
-	ssh *ssh.SshClient
-	addr string
-	user string
-	pwd string
-	cachedText      []string
-	cachedIndex     int
-	writeChan chan string
-	sender ICommandSender
-	senders map[string]ICommandSender
-	commands map[string]ICommand
+	ssh            *ssh.SshClient
+	addr           string
+	user           string
+	pwd            string
+	cachedText     []string
+	cachedIndex    int
+	writeChan      chan string
+	sender         ICommandSender
+	senders        map[string]ICommandSender
+	commonCommands map[string]ICommand
+	commands map[string]map[string]ICommand
 }
 
 func (this *TConsoleShell) RegisterSender(s string,sender ICommandSender){
-	this.ShellSelect.Items().Add(s)
+	this.AddShellType(s)
 	this.senders[s] = sender
 }
 
-func (this *TConsoleShell) RegisterCmd(command ICommand){
-	this.commands[command.Name()] = command
+func (this *TConsoleShell) AddShellType(s string){
+	count:=this.ShellSelect.Items().Count()
+	for i :=int32(0);i<count;i++ {
+		str:=this.ShellSelect.Items().S(i)
+		if str== s {
+			return
+		}
+	}
+	this.ShellSelect.Items().Add(s)
 }
 
-func (this *TConsoleShell) RegisterCmdFunc(name string,tips string,f func(value *ParamsValue,console *TConsoleShell)*promise.Promise) {
+func (this *TConsoleShell) RegisterCommonCmd(command ICommand){
+	this.commonCommands[command.Name()] = command
+}
+
+func (this *TConsoleShell) RegisterCommonCmdFunc(name string,tips string,f func(value *ParamsValue,console *TConsoleShell)*promise.Promise) {
 	command:=NewCommand(name,tips,f)
-	this.commands[command.Name()] = command
+	this.commonCommands[command.Name()] = command
+}
+
+func (this *TConsoleShell) RegisterCmd(typ string,command ICommand) {
+	this.AddShellType(typ)
+	if _,ok:=this.commands[typ];!ok {
+		this.commands[typ] = make(map[string]ICommand)
+	}
+	this.commands[typ][command.Name()] = command
+}
+
+func (this *TConsoleShell) RegisterCmdFunc (typ string,tips string,name string,f func (value *ParamsValue,console *TConsoleShell)*promise.Promise) {
+	this.AddShellType(typ)
+	command:=NewCommand(name,tips,f)
+	if _,ok:=this.commands[typ];!ok {
+		this.commands[typ] = make(map[string]ICommand)
+	}
+	this.commands[typ][command.Name()] = command
+
 }
 
 func (this *TConsoleShell) OnCreate(){
 	this.senders = make(map[string]ICommandSender)
-	this.commands = make(map[string]ICommand)
+	this.commonCommands = make(map[string]ICommand)
+	this.commands = make(map[string]map[string]ICommand)
+	loadCommands(this)
 	this.RegisterSender("shell",this)
-	this.RegisterCmdFunc("clear","clear console", func(value *ParamsValue,console *TConsoleShell) *promise.Promise {
+	this.RegisterCommonCmdFunc("clear","clear console", func(value *ParamsValue,console *TConsoleShell) *promise.Promise {
 		return promise.Async(func(resolve func(interface{}), reject func(interface{})) {
 			console.Clear()
 			resolve(nil)
@@ -100,8 +132,6 @@ func (this *TConsoleShell) sendCmd(text string){
 	sender.SendCmd(text)
 }
 
-
-
 func (this *TConsoleShell) OnDestroy(){
 
 }
@@ -149,7 +179,7 @@ func (this *TConsoleShell) Clear(){
 
 func (this *TConsoleShell) SendCmd(s string){
 	name,params:=SplitCommand(s)
-	if cmd,ok:=this.commands[name];ok {
+	if cmd,ok:=this.commonCommands[name];ok {
 		para:=&ParamsValue{
 			cmd: name,
 			value:  params,
