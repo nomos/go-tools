@@ -4,6 +4,7 @@
 package vcltool
 
 import (
+	"github.com/nomos/go-log/log"
 	"github.com/nomos/go-lokas/network/ssh"
 	"github.com/nomos/go-promise"
 	"github.com/ying32/govcl/vcl"
@@ -15,6 +16,7 @@ import (
 //::private::
 type TConsoleShellFields struct {
 	ConfigAble
+	*log.ComposeLogger
 	ssh            *ssh.SshClient
 	addr           string
 	user           string
@@ -29,6 +31,7 @@ type TConsoleShellFields struct {
 }
 
 func (this *TConsoleShell) RegisterSender(s string,sender ICommandSender){
+
 	this.AddShellType(s)
 	this.senders[s] = sender
 }
@@ -61,17 +64,18 @@ func (this *TConsoleShell) RegisterCmd(typ string,command ICommand) {
 	this.commands[typ][command.Name()] = command
 }
 
-func (this *TConsoleShell) RegisterCmdFunc (typ string,tips string,name string,f func (value *ParamsValue,console *TConsoleShell)*promise.Promise) {
+func (this *TConsoleShell) RegisterCmdFunc (typ string,name string,tips string,f func (value *ParamsValue,console *TConsoleShell)*promise.Promise) {
 	this.AddShellType(typ)
 	command:=NewCommand(name,tips,f)
 	if _,ok:=this.commands[typ];!ok {
 		this.commands[typ] = make(map[string]ICommand)
 	}
-	this.commands[typ][command.Name()] = command
-
+	this.commands[typ][name] = command
 }
 
 func (this *TConsoleShell) OnCreate(){
+	this.ComposeLogger = log.NewComposeLogger(true,log.DefaultConfig(),1)
+	this.ComposeLogger.SetConsoleWriter(this)
 	this.senders = make(map[string]ICommandSender)
 	this.commonCommands = make(map[string]ICommand)
 	this.commands = make(map[string]map[string]ICommand)
@@ -127,9 +131,32 @@ func (this *TConsoleShell) OnCreate(){
 }
 
 func (this *TConsoleShell) sendCmd(text string){
+	name,params:=SplitCommand(text)
 	s:=this.ShellSelect.Text()
+	if this.commands[s]!=nil {
+		if cmd,ok:=this.commands[s][name];ok {
+			para:=&ParamsValue{
+				cmd: name,
+				value:  params,
+				offset: 0,
+			}
+			go cmd.Exec(para,this).Await()
+			return
+		}
+	}
+	if cmd,ok:=this.commonCommands[name];ok {
+		para:=&ParamsValue{
+			cmd: name,
+			value:  params,
+			offset: 0,
+		}
+		go cmd.Exec(para,this).Await()
+		return
+	}
 	sender:=this.senders[s]
-	sender.SendCmd(text)
+	if sender != nil {
+		sender.SendCmd(text)
+	}
 }
 
 func (this *TConsoleShell) OnDestroy(){
@@ -178,17 +205,7 @@ func (this *TConsoleShell) Clear(){
 }
 
 func (this *TConsoleShell) SendCmd(s string){
-	name,params:=SplitCommand(s)
-	if cmd,ok:=this.commonCommands[name];ok {
-		para:=&ParamsValue{
-			cmd: name,
-			value:  params,
-			offset: 0,
-		}
-		go cmd.Exec(para,this).Await()
-		return
-	}
-	go this.ssh.RunShellCmd(s).Await()
+	this.ssh.RunShellCmd(s).Await()
 }
 
 func (this *TConsoleShell) OnSelect(){
