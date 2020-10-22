@@ -152,6 +152,10 @@ func (this *TConsoleShell) resetCache() {
 
 
 func (this *TConsoleShell) addCachedText(text string) {
+
+	if strings.TrimSpace(text)=="" {
+		return
+	}
 	texts:=make([]string,0)
 	for _,cmds:=range this.cachedText {
 		if cmds != text {
