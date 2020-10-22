@@ -9,7 +9,6 @@ import (
 	"github.com/nomos/go-lokas/network/sshc"
 	"github.com/nomos/go-promise"
 	"github.com/nomos/go-tools/cmds"
-	"github.com/nomos/go-tools/commands"
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
 	"github.com/ying32/govcl/vcl/types/keys"
