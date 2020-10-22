@@ -34,6 +34,7 @@ type TConsoleShellFields struct {
 	buffer *bytes.Buffer
 	stdIn io.WriteCloser
 	shell bool
+	cacheReset bool
 }
 
 func (this *TConsoleShell) RegisterSender(s string,sender ICommandSender){
@@ -88,6 +89,7 @@ func (this *TConsoleShell) OnCreate(){
 	if this.cachedText == nil {
 		this.cachedText = make([]string,0)
 	}
+	this.cachedIndex = len(this.cachedText)-1
 	this.cachedIndex = this.conf.GetInt("cached_index")
 	loadCommands(this)
 	this.RegisterSender("shell",this)
@@ -113,42 +115,54 @@ func (this *TConsoleShell) OnCreate(){
 			text := this.CmdEdit.Text()
 			this.sendCmd(text)
 			this.CmdEdit.SetText("")
-			if len(this.cachedText) == 0 ||this.cachedText[len(this.cachedText)-1] != text {
-				this.cachedText = append(this.cachedText, text)
-				this.cachedIndex = len(this.cachedText)-1
-			}
+			this.addCachedText(text)
 		case keys.VkUp:
 			if this.cachedIndex >= 0 && len(this.cachedText) > this.cachedIndex {
-				text := this.cachedText[len(this.cachedText)-this.cachedIndex-1]
-				this.CmdEdit.SetText(text)
-				this.cachedIndex++
-			} else {
-				this.cachedIndex = len(this.cachedText) - 1
-			}
-		case keys.VkDown:
-			if this.cachedIndex >= 0 && len(this.cachedText) > this.cachedIndex {
-				text := this.cachedText[len(this.cachedText)-this.cachedIndex-1]
+				text := this.cachedText[this.cachedIndex]
 				this.CmdEdit.SetText(text)
 				this.cachedIndex--
 			} else {
 				this.cachedIndex = 0
 			}
+		case keys.VkDown:
+			if this.cachedIndex >= 0 && len(this.cachedText) > this.cachedIndex {
+				text := this.cachedText[this.cachedIndex]
+				this.CmdEdit.SetText(text)
+				this.cachedIndex++
+			} else {
+				this.cachedIndex = len(this.cachedText) - 1
+			}
+		default:
+			this.resetCache()
 		}
-		this.conf.Set("cached_text",this.cachedText)
-		this.conf.Set("cached_index",this.cachedIndex)
 	})
 	this.SendButton.SetOnClick(func(sender vcl.IObject) {
 		text := this.CmdEdit.Text()
 		this.sendCmd(text)
 		this.CmdEdit.SetText("")
-		if len(this.cachedText) == 0 ||this.cachedText[len(this.cachedText)-1] != text {
-			this.cachedText = append(this.cachedText, text)
-			this.cachedIndex = len(this.cachedText)-1
-		}
-		this.conf.Set("cached_text",this.cachedText)
-		this.conf.Set("cached_index",this.cachedIndex)
+		this.addCachedText(text)
 	})
 	this.Console.Clear()
+}
+
+func (this *TConsoleShell) resetCache() {
+	this.cacheReset = true
+	this.cachedIndex = len(this.cachedText) -1
+}
+
+
+func (this *TConsoleShell) addCachedText(text string) {
+	texts:=make([]string,0)
+	for _,cmds:=range this.cachedText {
+		if cmds != text {
+			texts = append(texts, cmds)
+		}
+	}
+	texts = append(texts, text)
+	this.cachedText = texts
+	this.resetCache()
+	this.conf.Set("cached_text",this.cachedText)
+	this.conf.Set("cached_index",this.cachedIndex)
 }
 
 func (this *TConsoleShell) sendCmd(text string){
