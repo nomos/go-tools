@@ -12,8 +12,6 @@ type ChartPainting struct {
 	Canvas *vcl.TCanvas
 	ChartBorder *ChartBorder
 	ChartFrame IChartFramePainting
-
-
 }
 
 type ChartKLine struct {
