@@ -14,7 +14,6 @@ func (this *WsClient) Init(accessKey string,secretKey string,host string,proxy..
 	if len(proxy)>0 {
 		this.proxy = proxy[0]
 	}
-
 }
 
 func (this *WsClient) reset() {
