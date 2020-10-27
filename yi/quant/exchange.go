@@ -58,7 +58,4 @@ type ISpotExchange interface {
 
 	// 撤销单个委托单
 	CancelOrder(symbol string, id string, opts ...OrderOption) (result *Order, err error)
-
-	// 调用其他功能
-	IO(name string, params string) (string, error)
 }
