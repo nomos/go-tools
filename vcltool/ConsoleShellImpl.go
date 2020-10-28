@@ -108,7 +108,7 @@ func (this *TConsoleShell) OnCreate(){
 		})
 	})
 	this.ssh = sshc.NewSshClient("","","")
-	this.ssh.SetConsoleWriter(this)
+	this.ssh.SetStringWriter(this)
 	this.CmdEdit.SetOnKeyDown(func(sender vcl.IObject, key *types.Char, shift types.TShiftState) {
 		switch *key {
 		case keys.VkReturn:
@@ -282,3 +282,13 @@ func (this *TConsoleShell) OnSendButtonClick(sender vcl.IObject) {
 
 }
 
+func (this *TConsoleShell) GetOutputs(data interface{})[]string{
+	return data.([]string)
+}
+func (this *TConsoleShell) GetLastOutput(data interface{})string{
+	ret:=data.([]string)
+	if len(ret) == 0 {
+		return ""
+	}
+	return ret[len(ret)-1]
+}

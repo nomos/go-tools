@@ -2,11 +2,6 @@ package data
 
 import "github.com/nomos/go-lokas/protocol"
 
-
-
-
-
-
 type PERIOD protocol.Enum
 
 const (
