@@ -17,6 +17,7 @@ const (
 	YI_ChartData protocol.BINARY_TAG = 36004
 	YI_Record protocol.BINARY_TAG = 36005
 	YI_DayRecord protocol.BINARY_TAG = 36006
+	YI_SpotAsset protocol.BINARY_TAG = 36007
 )
 
 func init() {
@@ -26,4 +27,5 @@ func init() {
 	protocol.GetTypeRegistry().RegistryType(YI_ChartData,reflect.TypeOf((*charts.ChartData)(nil)).Elem())
 	protocol.GetTypeRegistry().RegistryType(YI_Record,reflect.TypeOf((*data.Record)(nil)).Elem())
 	protocol.GetTypeRegistry().RegistryType(YI_DayRecord,reflect.TypeOf((*data.DayRecord)(nil)).Elem())
+	protocol.GetTypeRegistry().RegistryType(YI_SpotAsset,reflect.TypeOf((*quant.SpotAsset)(nil)).Elem())
 }

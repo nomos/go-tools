@@ -254,7 +254,7 @@ func (this *TConsoleShell) Clear(){
 }
 
 func (this *TConsoleShell) SendCmd(s string){
-	this.ssh.RunShellCmd(s).Await()
+	go this.ssh.RunShellCmd(s).Await()
 }
 
 func (this *TConsoleShell) OnSelect(){
@@ -285,6 +285,7 @@ func (this *TConsoleShell) OnSendButtonClick(sender vcl.IObject) {
 func (this *TConsoleShell) GetOutputs(data interface{})[]string{
 	return data.([]string)
 }
+
 func (this *TConsoleShell) GetLastOutput(data interface{})string{
 	ret:=data.([]string)
 	if len(ret) == 0 {
