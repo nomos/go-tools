@@ -5,6 +5,7 @@ package vcltool
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/nomos/go-log/log"
 	"github.com/nomos/go-lokas/network/sshc"
 	"github.com/nomos/go-promise"
@@ -146,9 +147,7 @@ func (this *TConsoleShell) registerWrappedCmd(s string,cmd *cmds.WrappedCmd){
 		for i:=0;i<cmd.ParamsNum;i++{
 			params = append(params, value.String())
 		}
-		return promise.Async(func(resolve func(interface{}), reject func(interface{})) {
-			this.ExecShellCmd(cmd.FillParams(params...))
-		})
+		return this.ExecWrappedCmd(params,cmd)
 	})
 }
 
@@ -261,7 +260,7 @@ func (this *TConsoleShell) Clear(){
 
 func (this *TConsoleShell) SendCmd(s string){
 	this.WriteString(">"+s)
-	go this.ssh.RunShellCmd(s).Await()
+	go this.ssh.RunShellCmd(s,false).Await()
 }
 
 func (this *TConsoleShell) OnSelect(){
@@ -272,9 +271,41 @@ func (this *TConsoleShell) OnDeselect(){
 
 }
 
-func (this *TConsoleShell) ExecShellCmd(s string)*promise.Promise{
+func (this *TConsoleShell) ExecShellCmd(s string,isExpect bool)*promise.Promise{
 	this.WriteString(">"+s)
-	return this.ssh.NewShellSession().Run(s)
+	return this.ssh.NewShellSession().Run(s,isExpect)
+}
+
+func (this *TConsoleShell) ExecWrappedCmd(args []string,cmd *cmds.WrappedCmd)*promise.Promise{
+	s:=cmd.FillParams(args...)
+	this.WriteString(">"+s)
+	return promise.Async(func(resolve func(interface{}), reject func(interface{})) {
+		go func() {
+			outputs,err:=this.ssh.NewShellSession().Run(s,cmd.CmdType==cmds.Cmd_Expect).Await()
+			if err != nil {
+				log.Error(err.Error())
+				reject(err)
+				return
+			}
+			if cmd.CmdHandler!=nil {
+				res:=cmd.CmdHandler(outputs.([]string))
+				if res.Success {
+					this.Infof(s+" success ",res.Results)
+				} else {
+					this.Errorf(s+" failed ",res.Results)
+				}
+				resolve(res)
+				return
+			}
+			resolve(&cmds.CmdResult{
+				Outputs: outputs.(cmds.CmdOutput),
+				Success: false,
+				Results: make(map[string]interface{}),
+			})
+			this.Warnf(fmt.Sprintf(s+" failed"))
+		}()
+
+	})
 }
 
 func (this *TConsoleShell) ExecSshCmd(s string)*promise.Promise {

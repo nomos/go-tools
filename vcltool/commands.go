@@ -10,8 +10,8 @@ func loadCommands(shell *TConsoleShell){
 		ssh-keygen -t rsa -C `+name+`;
 		
 		`
-		return shell.ssh.RunShellCmd(cmdstr1).Then(func(data interface{}) interface{} {
-			return shell.ssh.RunShellCmd("ssh-add ~/.ssh/id_rsa")
+		return shell.ssh.RunShellCmd(cmdstr1,false).Then(func(data interface{}) interface{} {
+			return shell.ssh.RunShellCmd("ssh-add ~/.ssh/id_rsa",false)
 		})
 	})
 }
