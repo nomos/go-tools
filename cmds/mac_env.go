@@ -4,10 +4,34 @@ import "regexp"
 
 func init(){
 	RegisterCmd("dockerv",setup_brew_mac)
+	RegisterCmd("sshmongo",sshmongo)
 	RegisterCmd("upload",upload_mac)
 }
 
 var (
+	sshmongo = &WrappedCmd{
+		CmdString:  `
+spawn ssh -L 27017:139.196.98.237:27017 -Nf root@101.132.188.236
+expect {
+ "(yes/no)?" {send "yes\n"}
+"*assword:" 
+{send "$1\n"}
+}
+expect eof
+`,
+		Tips:       "",
+		ParamsNum:  1,
+		ParamsMap:  nil,
+		CmdType:    Cmd_Expect,
+		CmdHandler: func(output CmdOutput) *CmdResult {
+			ret:=&CmdResult{
+				Outputs: output,
+				Success: false,
+				Results: nil,
+			}
+			return ret
+		},
+	}
 	setup_brew_mac = &WrappedCmd{
 		CmdString: `docker -v`,
 		Tips:      "dockerv",
