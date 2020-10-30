@@ -1,9 +1,13 @@
 package cmds
 
-const (
+func init(){
+	RegisterCmd("sshx",sshexec)
+}
+
+var (
 	//远程执行命令
-	Sshexec WrappedCmd  = `
-@!/bin/bash
+	sshexec  = &WrappedCmd{
+		CmdString: `
 ip=$1
 passwd=$2
 cmd=$3
@@ -23,5 +27,9 @@ proc remote_exec {ip passwd cmd} {
 }
 remote_exec ${ip} ${passwd} ${cmd}
 EOF
-`
+`,
+		Tips:      "sshx [ip] [pass] [cmd]",
+		ParamsNum: 3,
+		ParamsMap: nil,
+	}
 )

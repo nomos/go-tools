@@ -99,14 +99,9 @@ func (this *TConsoleShell) OnCreate(){
 			resolve(nil)
 		})
 	})
-	this.RegisterCommonCmdFunc("sshx","", func(value *ParamsValue, console *TConsoleShell) *promise.Promise {
-		ip:=value.String()
-		passwd:=value.String()
-		cmd:=value.String()
-		return promise.Async(func(resolve func(interface{}), reject func(interface{})) {
-			this.ssh.RunShellCmd(cmds.Sshexec.FillParams(ip,passwd,cmd))
-		})
-	})
+	for k,v:=range cmds.GetAllCmds() {
+		this.registerWrappedCmd(k,v)
+	}
 	this.ssh = sshc.NewSshClient("","","")
 	this.ssh.SetStringWriter(this)
 	this.CmdEdit.SetOnKeyDown(func(sender vcl.IObject, key *types.Char, shift types.TShiftState) {
@@ -145,6 +140,18 @@ func (this *TConsoleShell) OnCreate(){
 	this.Console.Clear()
 }
 
+func (this *TConsoleShell) registerWrappedCmd(s string,cmd *cmds.WrappedCmd){
+	this.RegisterCommonCmdFunc(s,cmd.Tips, func(value *ParamsValue, console *TConsoleShell) *promise.Promise {
+		params:=[]string{}
+		for i:=0;i<cmd.ParamsNum;i++{
+			params = append(params, value.String())
+		}
+		return promise.Async(func(resolve func(interface{}), reject func(interface{})) {
+			this.ExecShellCmd(cmd.FillParams(params...))
+		})
+	})
+}
+
 func (this *TConsoleShell) resetCache() {
 	this.cacheReset = true
 	this.cachedIndex = len(this.cachedText) -1
@@ -171,7 +178,6 @@ func (this *TConsoleShell) addCachedText(text string) {
 
 func (this *TConsoleShell) sendCmd(text string){
 	if this.shell {
-
 		int,err:=this.stdIn.Write([]byte(text+"\n"))
 		if err != nil {
 			log.Error(err.Error())
@@ -254,6 +260,7 @@ func (this *TConsoleShell) Clear(){
 }
 
 func (this *TConsoleShell) SendCmd(s string){
+	this.WriteString(">"+s)
 	go this.ssh.RunShellCmd(s).Await()
 }
 
@@ -266,10 +273,12 @@ func (this *TConsoleShell) OnDeselect(){
 }
 
 func (this *TConsoleShell) ExecShellCmd(s string)*promise.Promise{
+	this.WriteString(">"+s)
 	return this.ssh.NewShellSession().Run(s)
 }
 
 func (this *TConsoleShell) ExecSshCmd(s string)*promise.Promise {
+	this.WriteString(this.ssh.GetConnStr()+">"+s)
 	return this.ssh.RunCmd(s)
 }
 
