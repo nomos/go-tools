@@ -298,7 +298,7 @@ func (this *TConsoleShell) ExecWrappedCmd(args []string,cmd *cmds.WrappedCmd)*pr
 				return
 			}
 			resolve(&cmds.CmdResult{
-				Outputs: outputs.(cmds.CmdOutput),
+				Outputs: outputs.([]string),
 				Success: false,
 				Results: make(map[string]interface{}),
 			})

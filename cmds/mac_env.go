@@ -6,9 +6,27 @@ func init(){
 	RegisterCmd("dockerv",setup_brew_mac)
 	RegisterCmd("sshmongo",sshmongo)
 	RegisterCmd("upload",upload_mac)
+	RegisterCmd("instbrew",instbrew)
 }
 
 var (
+	instbrew = &WrappedCmd{
+		CmdString:  `
+git clone git://mirrors.ustc.edu.cn/homebrew-core.git/ /usr/local/Homebrew/Library/Taps/homebrew/homebrew-core --depth=1
+git clone git://mirrors.ustc.edu.cn/homebrew-cask.git/ /usr/local/Homebrew/Library/Taps/homebrew/homebrew-cask --depth=1
+cd "$(brew --repo)"
+git remote set-url origin https://mirrors.ustc.edu.cn/brew.git
+cd "$(brew --repo)/Library/Taps/homebrew/homebrew-core"
+git remote set-url origin https://mirrors.ustc.edu.cn/homebrew-core.git
+cd "$(brew --repo)/Library/Taps/homebrew/homebrew-cask"
+git remote set-url origin https://mirrors.ustc.edu.cn/homebrew-cask.git
+`,
+		Tips:       "",
+		ParamsNum:  0,
+		ParamsMap:  nil,
+		CmdType:    Cmd_Shell,
+		CmdHandler: nil,
+	}
 	sshmongo = &WrappedCmd{
 		CmdString:  `
 spawn ssh -L 27017:139.196.98.237:27017 -Nf root@101.132.188.236
