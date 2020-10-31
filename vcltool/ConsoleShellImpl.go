@@ -144,6 +144,12 @@ func (this *TConsoleShell) OnCreate(){
 func (this *TConsoleShell) registerWrappedCmd(s string,cmd *cmds.WrappedCmd){
 	this.RegisterCommonCmdFunc(s,cmd.Tips, func(value *ParamsValue, console *TConsoleShell) *promise.Promise {
 		params:=[]string{}
+		defer func() {
+			if r := recover(); r != nil {
+				err:=fmt.Sprintf("%v",r)
+				this.Error(err)
+			}
+		}()
 		for i:=0;i<cmd.ParamsNum;i++{
 			params = append(params, value.String())
 		}
