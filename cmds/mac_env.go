@@ -1,6 +1,8 @@
 package cmds
 
-import "regexp"
+import (
+	"regexp"
+)
 
 func init(){
 	RegisterCmd("dockerv",setup_brew_mac)
