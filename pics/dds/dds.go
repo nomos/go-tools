@@ -235,7 +235,7 @@ func decode_DXT1_block(uncompressed, compressed []byte) {
 	}
 }
 
-func Decode(reader io.Reader) (*Texture, error) {
+func Decode(reader io.Reader,bgrFlip bool) (*Texture, error) {
 	var header DDS_Header
 
 	//	load the header
@@ -446,9 +446,11 @@ func Decode(reader io.Reader) (*Texture, error) {
 		// data was BGR, I need it RGB
 		for i := 0; i < (sz / img_n); i += 1 {
 			offset := i * img_n
-			temp := dds_data[offset]
-			dds_data[offset] = dds_data[offset+2]
-			dds_data[offset+2] = temp
+			if bgrFlip {
+				temp := dds_data[offset]
+				dds_data[offset] = dds_data[offset+2]
+				dds_data[offset+2] = temp
+			}
 
 			// always want rgba
 			if img_n == 3 {
