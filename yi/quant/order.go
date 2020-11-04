@@ -73,7 +73,7 @@ func (s ORDER_STATUS) String() string {
 	}
 }
 
-type Item struct {
+type OrderItem struct {
 	protocol.Serializable
 	Price  float64
 	Amount float64
@@ -83,12 +83,12 @@ type OrderBook struct {
 	protocol.Serializable
 	Symbol string
 	Time   time.Time
-	Asks   []Item
-	Bids   []Item
+	Asks   []OrderItem
+	Bids   []OrderItem
 }
 
 // Ask 卖一
-func (o *OrderBook) Ask() (result Item) {
+func (o *OrderBook) Ask() (result OrderItem) {
 	if len(o.Asks) > 0 {
 		result = o.Asks[0]
 	}
@@ -96,7 +96,7 @@ func (o *OrderBook) Ask() (result Item) {
 }
 
 // Bid 买一
-func (o *OrderBook) Bid() (result Item) {
+func (o *OrderBook) Bid() (result OrderItem) {
 	if len(o.Bids) > 0 {
 		result = o.Bids[0]
 	}

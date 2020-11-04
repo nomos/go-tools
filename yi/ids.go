@@ -21,7 +21,7 @@ const (
 )
 
 func init() {
-	protocol.GetTypeRegistry().RegistryType(YI_Item,reflect.TypeOf((*quant.Item)(nil)).Elem())
+	protocol.GetTypeRegistry().RegistryType(YI_Item,reflect.TypeOf((*quant.OrderItem)(nil)).Elem())
 	protocol.GetTypeRegistry().RegistryType(YI_OrderBook,reflect.TypeOf((*quant.OrderBook)(nil)).Elem())
 	protocol.GetTypeRegistry().RegistryType(YI_Order,reflect.TypeOf((*quant.Order)(nil)).Elem())
 	protocol.GetTypeRegistry().RegistryType(YI_ChartData,reflect.TypeOf((*charts.ChartData)(nil)).Elem())

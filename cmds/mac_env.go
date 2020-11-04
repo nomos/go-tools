@@ -23,6 +23,8 @@ var (
 	}
 	sshmongo = &WrappedCmd{
 		CmdString:  `
+ssh -NCPf root@47.103.151.11 -L 3307:127.0.0.1:3306
+ssh -L 3306:47.103.151.11:3306 -Nf root@47.103.151.11
 spawn ssh -L 27017:139.196.98.237:27017 -Nf root@101.132.188.236
 expect {
  "(yes/no)?" {send "yes\n"}
