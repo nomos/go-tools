@@ -52,7 +52,7 @@ type WrappedCmd struct {
 func (this *WrappedCmd) FillParams(param... string)string{
 	ret :=this.CmdString
 	for i,s:=range param{
-		ret = strings.Replace(ret,"$"+strconv.Itoa(i+1),s,1)
+		ret = strings.Replace(ret,"$"+strconv.Itoa(i+1),s,-1)
 	}
 	return ret
 }

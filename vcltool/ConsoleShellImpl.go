@@ -153,7 +153,7 @@ func (this *TConsoleShell) registerWrappedCmd(s string,cmd *cmds.WrappedCmd){
 		for i:=0;i<cmd.ParamsNum;i++{
 			params = append(params, value.String())
 		}
-		return this.ExecWrappedCmd(params,cmd)
+		return this.ExecWrappedCmd(cmd,params...)
 	})
 }
 
@@ -282,7 +282,7 @@ func (this *TConsoleShell) ExecShellCmd(s string,isExpect bool)*promise.Promise{
 	return this.ssh.NewShellSession().Run(s,isExpect)
 }
 
-func (this *TConsoleShell) ExecWrappedCmd(args []string,cmd *cmds.WrappedCmd)*promise.Promise{
+func (this *TConsoleShell) ExecWrappedCmd(cmd *cmds.WrappedCmd,args... string)*promise.Promise{
 	s:=cmd.FillParams(args...)
 	this.WriteString(">"+s)
 	return promise.Async(func(resolve func(interface{}), reject func(interface{})) {
