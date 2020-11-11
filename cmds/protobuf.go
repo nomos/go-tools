@@ -23,9 +23,13 @@ send "rm $3/$1_define.js\n"
 expect "*#"
 send "$3/$1.d.ts\n"
 expect "*#"
-send "pbjs -t json-module -w commonjs -o $3/$1_define.js $2/*.proto\n"
+send "pbjs -t json-module -w commonjs -o $3/$1.js $2/*.proto\n"
 expect "*#"
-send "pbjs -t static-module $2/*.proto | pbts -o $3/$1.d.ts -\n"
+send "pbjs -t static-module $2/*.proto  | pbts  --no-delimited -o $3/$1.d.ts --keep-case --no-comments  -\n"
+expect "*#"
+send "chmod a+r+w  $3/$1.js\n"
+expect "*#"
+send "chmod a+r+w  $3/$1.d.ts\n"
 expect eof
 exit
 `,
