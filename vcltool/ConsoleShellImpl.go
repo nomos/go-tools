@@ -36,6 +36,8 @@ type TConsoleShellFields struct {
 	stdIn io.WriteCloser
 	shell bool
 	cacheReset bool
+	msgChan chan string
+	done chan struct{}
 }
 
 func (this *TConsoleShell) RegisterSender(s string,sender ICommandSender){
@@ -81,6 +83,7 @@ func (this *TConsoleShell) RegisterCmdFunc (typ string,name string,tips string,f
 }
 
 func (this *TConsoleShell) OnCreate(){
+	this.start()
 	this.ComposeLogger = log.NewComposeLogger(true,log.DefaultConfig(),1)
 	this.ComposeLogger.SetConsoleWriter(this)
 	this.senders = make(map[string]ICommandSender)
@@ -139,6 +142,29 @@ func (this *TConsoleShell) OnCreate(){
 		this.addCachedText(text)
 	})
 	this.Console.Clear()
+}
+
+func (this *TConsoleShell) start(){
+	this.msgChan = make(chan string,1)
+	this.done = make(chan struct{})
+	go func() {
+		for {
+			select{
+			case str:=<-this.msgChan:
+				vcl.ThreadSync(func() {
+					this.Console.Lines().Add(str)
+				})
+			case <-this.done:
+				return
+			}
+		}
+	}()
+}
+
+func (this *TConsoleShell) stop(){
+	if this.done!=nil {
+		this.done<- struct{}{}
+	}
 }
 
 func (this *TConsoleShell) registerWrappedCmd(s string,cmd *cmds.WrappedCmd){
@@ -220,7 +246,7 @@ func (this *TConsoleShell) sendCmd(text string){
 }
 
 func (this *TConsoleShell) OnDestroy(){
-
+	this.stop()
 }
 
 func (this *TConsoleShell) Connect(user,pass,addr string)*promise.Promise{
@@ -231,26 +257,22 @@ func (this *TConsoleShell) Connect(user,pass,addr string)*promise.Promise{
 }
 
 func (this *TConsoleShell) WriteString(str string){
-	vcl.ThreadSync(func() {
-		str = strings.TrimRight(str," ")
-		str = strings.TrimRight(str,"\n")
-		str = strings.TrimRight(str," ")
-		if str!="" {
-			this.Console.Lines().Add(str)
-		}
-	})
+	str = strings.TrimRight(str," ")
+	str = strings.TrimRight(str,"\n")
+	str = strings.TrimRight(str," ")
+	if str!="" {
+		this.msgChan<-str
+	}
 }
 
 func (this *TConsoleShell) Write(p []byte)(int,error){
-	vcl.ThreadSync(func() {
-		str:=string(p)
-		str = strings.TrimRight(str," ")
-		str = strings.TrimRight(str,"\n")
-		str = strings.TrimRight(str," ")
-		if str!="" {
-			this.Console.Lines().Add(str)
-		}
-	})
+	str:=string(p)
+	str = strings.TrimRight(str," ")
+	str = strings.TrimRight(str,"\n")
+	str = strings.TrimRight(str," ")
+	if str!="" {
+		this.msgChan<-str
+	}
 	return 0,nil
 }
 

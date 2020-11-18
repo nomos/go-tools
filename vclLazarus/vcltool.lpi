@@ -30,7 +30,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="11">
+    <Units Count="12">
       <Unit0>
         <Filename Value="vcltool.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -87,6 +87,7 @@
         <Filename Value="form_list_frame.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FormListFrame"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
       </Unit9>
       <Unit10>
@@ -96,6 +97,12 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
       </Unit10>
+      <Unit11>
+        <Filename Value="excel2jsonminigame.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="Excel2JsonMiniGameFrame"/>
+        <ResourceBaseClass Value="Frame"/>
+      </Unit11>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

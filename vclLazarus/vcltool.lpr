@@ -7,7 +7,7 @@ uses
   cthreads,
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, auto_deploy_frame, form_list_frame, deploy_frame;
+  Forms, auto_deploy_frame, form_list_frame, deploy_frame, excel2jsonminigame;
 
 {$R *.res}
 
