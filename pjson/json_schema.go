@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/iancoleman/orderedmap"
-	"github.com/nomos/go-lokas/util"
 	"github.com/nomos/go-log/log"
+	"github.com/nomos/go-lokas/util/stringutil"
 	"math"
 	"reflect"
 	"strconv"
@@ -170,7 +170,7 @@ func (this *Schema) ToLineString()string {
 	if this.Key!="" {
 		ret+=`"`+this.Key+`":`
 	}
-	ret = util.AddStringGap(ret,10,6)
+	ret = stringutil.AddStringGap(ret,10,6)
 
 	switch this.Type {
 	case Object:

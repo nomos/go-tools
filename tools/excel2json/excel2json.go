@@ -1,10 +1,12 @@
 package excel2json
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/360EntSecGroup-Skylar/excelize"
 	"github.com/nomos/go-log/log"
 	"github.com/nomos/go-lokas/util"
+	"github.com/nomos/go-lokas/util/stringutil"
 	"io/ioutil"
 	"path"
 	"regexp"
@@ -19,6 +21,15 @@ const (
 	type_string = iota+1
 	type_int
 	type_float
+	type_int_arr
+	type_float_arr
+	type_string_arr
+	type_string_int_map
+	type_string_float_map
+	type_string_string_map
+	type_int_int_map
+	type_int_float_map
+	type_int_string_map
 )
 
 func (this fieldType) String()string{
@@ -29,24 +40,95 @@ func (this fieldType) String()string{
 		return "number"
 	case type_float:
 		return "number"
+	case type_int_arr:
+		return "number[]"
+	case type_float_arr:
+		return "number[]"
+	case type_string_arr:
+		return "string[]"
+	case type_string_int_map:
+		return "{[key:string]:number}"
+	case type_string_float_map:
+		return "{[key:string]:number}"
+	case type_string_string_map:
+		return "{[key:string]:string}"
+	case type_int_int_map:
+		return "{[key:number]:number}"
+	case type_int_float_map:
+		return "{[key:number]:number}"
+	case type_int_string_map:
+		return "{[key:number]:string}"
 	default:
 		return ""
 	}
 }
 
-func (this fieldType) encode(s interface{}) (string,error){
+func (this fieldType) check(s string)(string,error) {
 	switch this {
-	case type_string:
-		return s.(string),nil
-	case type_int:
-		return strconv.Itoa(s.(int)),nil
-	case type_float:
-		return strconv.FormatFloat(s.(float64), 'g', -1, 64),nil
+	case type_int_arr:
+		reg:=regexp.MustCompile(`(([0-9]+)([,]([0-9]+))*)?`)
+		if reg.FindString(s)!=s {
+			return "",errors.New("check []int error")
+		}
+		return s,nil
+	case type_float_arr:
+		reg:=regexp.MustCompile(`((([0-9]|[.])+)([,](([0-9]|[.])+))*)?`)
+		if reg.FindString(s)!=s {
+			return "",errors.New("check []float error")
+		}
+		return s,nil
+	case type_string_arr:
+		reg:=regexp.MustCompile(`((\w+)([,](\w+))*)?`)
+		if reg.FindString(s)!=s {
+			return "",errors.New("check []string error")
+		}
+		return s,nil
+	case type_string_string_map:
+		reg:=regexp.MustCompile(`((\w+\s*[:]\s*\w+)([,](\w+\s*[:]\s*\w+))*)?`)
+		if reg.FindString(s)!=s {
+			return "",errors.New("check [string]string error")
+		}
+		return s,nil
+	case type_string_int_map:
+		reg:=regexp.MustCompile(`((\w+\s*[:]\s*[0-9]+)([,](\w+\s*[:]\s*[0-9]+))*)?`)
+		if reg.FindString(s)!=s {
+			return "",errors.New("check [string]int error")
+		}
+		return s,nil
+	case type_string_float_map:
+		reg:=regexp.MustCompile(`((\w+\s*[:]\s*([0-9]|[.])+)([,](\w+\s*[:]\s*([0-9]|[.])+))*)?`)
+		if reg.FindString(s)!=s {
+			return "",errors.New("check [string]float error")
+		}
+		return s,nil
+	case type_int_string_map:
+		reg:=regexp.MustCompile(`(([0-9]+\s*[:]\s*\w+)([,]([0-9]+\s*[:]\s*\w+))*)?`)
+		if reg.FindString(s)!=s {
+			return "",errors.New("check [int]string error")
+		}
+		return s,nil
+	case type_int_int_map:
+		reg:=regexp.MustCompile(`(([0-9]+\s*[:]\s*[0-9]+)([,]([0-9]+\s*[:]\s*[0-9]+))*)?`)
+		if reg.FindString(s)!=s {
+			return "",errors.New("check [int]int error")
+		}
+		return s,nil
+	case type_int_float_map:
+		reg:=regexp.MustCompile(`(([0-9]+\s*[:]\s*([0-9]|[.])+)([,]([0-9]+\s*[:]\s*([0-9]|[.])+))*)?`)
+		if reg.FindString(s)!=s {
+			return "",errors.New("check [int]float error")
+		}
+		return s,nil
 	default:
-		return "",errors.New("unrecognized type")
+		return s,nil
 	}
 }
 
+func trimLR(s string)[]string{
+	s = strings.TrimRight(s,"]")
+	s = strings.TrimLeft(s,"[")
+	return strings.Split(s,",")
+}
 
 func (this fieldType) decode(s string) (interface{},error){
 	switch this {
@@ -64,9 +146,126 @@ func (this fieldType) decode(s string) (interface{},error){
 			return nil,err
 		}
 		return ret,nil
+	case type_int_arr:
+		ret:= make([]float64,0)
+		s ="["+s+"]"
+		err:=json.Unmarshal([]byte(s),&ret)
+		if err != nil {
+			return nil,err
+		}
+		return ret,nil
+	case type_float_arr:
+		s ="["+s+"]"
+		ret:= make([]float64,0)
+		err:=json.Unmarshal([]byte(s),&ret)
+		if err != nil {
+			return nil,err
+		}
+		return ret,nil
+	case type_string_arr:
+		ret:=trimLR(s)
+		return ret,nil
+	case type_string_int_map:
+		arr:=trimLR(s)
+		ret := make(map[string]int)
+		for _,iter:=range arr {
+			iterArr:=strings.Split(iter,":")
+			if len(iterArr)!=2 {
+				return nil,errors.New("unmarshal error")
+			}
+			key:=iterArr[0]
+			value,err:=strconv.Atoi(iterArr[1])
+			if err != nil {
+				return nil,err
+			}
+			ret[key] = value
+		}
+		return ret,nil
+	case type_string_float_map:
+		arr:=trimLR(s)
+		ret := make(map[string]float64)
+		for _,iter:=range arr {
+			iterArr:=strings.Split(iter,":")
+			if len(iterArr)!=2 {
+				return nil,errors.New("unmarshal error")
+			}
+			key:=iterArr[0]
+			value,err:=strconv.ParseFloat(iterArr[1], 64)
+			if err != nil {
+				return nil,err
+			}
+			ret[key] = value
+		}
+		return ret,nil
+	case type_string_string_map:
+		arr:=trimLR(s)
+		ret := make(map[string]string)
+		for _,iter:=range arr {
+			iterArr:=strings.Split(iter,":")
+			if len(iterArr)!=2 {
+				return nil,errors.New("unmarshal error")
+			}
+			key:=iterArr[0]
+			ret[key] = iterArr[1]
+		}
+		return ret,nil
+	case type_int_int_map:
+		arr:=trimLR(s)
+		ret := make(map[int]int)
+		for _,iter:=range arr {
+			iterArr:=strings.Split(iter,":")
+			if len(iterArr)!=2 {
+				return nil,errors.New("unmarshal error")
+			}
+			key,err:=strconv.Atoi(iterArr[0])
+			if err != nil {
+				return nil,err
+			}
+			value,err:=strconv.Atoi(iterArr[1])
+			if err != nil {
+				return nil,err
+			}
+			ret[key] = value
+		}
+		return ret,nil
+	case type_int_float_map:
+		arr:=trimLR(s)
+		ret := make(map[int]float64)
+		for _,iter:=range arr {
+			iterArr:=strings.Split(iter,":")
+			if len(iterArr)!=2 {
+				return nil,errors.New("unmarshal error")
+			}
+			key,err:=strconv.Atoi(iterArr[0])
+			if err != nil {
+				return nil,err
+			}
+			value,err:=strconv.ParseFloat(iterArr[1], 64)
+			if err != nil {
+				return nil,err
+			}
+			ret[key] = value
+		}
+		return ret,nil
+	case type_int_string_map:
+		arr:=trimLR(s)
+		ret := make(map[int]string)
+		for _,iter:=range arr {
+			iterArr:=strings.Split(iter,":")
+			if len(iterArr)!=2 {
+				return nil,errors.New("unmarshal error")
+			}
+			key,err:=strconv.Atoi(iterArr[0])
+			if err != nil {
+				return nil,err
+			}
+			ret[key] = iterArr[1]
+		}
+		return ret,nil
 	default:
 		return 0,errors.New("unrecognized type:"+s)
 	}
+	return 0,errors.New("unrecognized type:"+s)
 }
 
 func getFieldType(s string)(fieldType,error) {
@@ -77,6 +276,18 @@ func getFieldType(s string)(fieldType,error) {
 		return type_int,nil
 	case "float":
 		return type_float,nil
+	case "[]int":
+		return type_int_arr,nil
+	case "[]float":
+		return type_float_arr,nil
+	case "[]string":
+		return type_string_arr,nil
+	case "[string]int":
+		return type_string_int_map,nil
+	case "[string]string":
+		return type_string_string_map,nil
+	case "[string]float":
+		return type_string_float_map,nil
 	default:
 		return 0,errors.New("unrecognized type:"+s)
 	}
@@ -94,22 +305,20 @@ func (this *gameDataField) string(data gameData)string {
 	return ""
 }
 
-type gameData struct {
-	id int
-	data []interface{}
-}
+type gameData map[string]interface{}
 
 //对应一个文件
 type gameFileSource struct {
 	fields []*gameDataField
-	data []*gameData
+	data []gameData
 }
 
 func (this *gameFileSource) fieldString()string {
 	ret:=""
 	for _,field:=range this.fields {
-		ret+="\t"+field.fieldName+" "+field.fieldType.String()+"\n"
+		ret+="\t"+field.fieldName+":"+field.fieldType.String()+"\n"
 	}
+	ret = strings.TrimRight(ret,"\n")
 	return ret
 }
 
@@ -127,21 +336,21 @@ func (this *gameFileSource) parseData(in []string)error{
 	if this.isEmptyLine(in) {
 		return nil
 	}
-	data:=&gameData{
-		id:       0,
-		data:     []interface{}{},
-	}
+	data:=make(gameData)
 	for _,field:=range this.fields {
 		str:=in[field.fieldIndex]
 		t:=field.fieldType
+		_,err:=t.check(str)
+		if err != nil {
+			colName,_:=excelize.ColumnNumberToName(field.fieldIndex)
+			return errors.New("列:"+colName+" 格式检查错误:"+err.Error())
+		}
 		d,err:=t.decode(str)
 		if err != nil {
-			return err
+			colName,_:=excelize.ColumnNumberToName(field.fieldIndex)
+			return errors.New("列:"+colName+" 反序列化错误:"+err.Error())
 		}
-		if field.fieldName == "id" {
-			data.id = d.(int)
-		}
-		data.data = append(data.data, d)
+		data[field.fieldName] = d
 	}
 	this.data = append(this.data, data)
 	return nil
@@ -153,6 +362,7 @@ type gameDataSource struct {
 }
 
 type excel2JsonMiniGame struct {
+	embedJson bool
 	logger log.ILogger
 }
 
@@ -162,16 +372,20 @@ func (this *excel2JsonMiniGame)generateData(source *gameDataSource,p string)erro
 		if err != nil {
 			return err
 		}
-		err=this.generatJsonData(data,key,p)
-		if err != nil {
-			return err
+		if !this.embedJson {
+			err=this.generatJsonData(data,key,p)
+			if err != nil {
+				return err
+			}
 		}
+
 	}
 	return nil
 }
 
-func Excel2JsonMiniGame(excelPath,distPath string,logger log.ILogger) {
+func Excel2JsonMiniGame(excelPath,distPath string,logger log.ILogger,embed bool) {
 	ret := &excel2JsonMiniGame{}
+	ret.embedJson = embed
 	if logger!=nil {
 		ret.logger = logger
 	} else {
@@ -195,7 +409,7 @@ func  (this *excel2JsonMiniGame)generate(excelPath,distPath string)error{
 		return err
 	}
 	paths = util.FilterFileWithExt(".xlsx",paths)
-	this.logger.Infof("paths",paths)
+	this.logger.Infof("当前路径",paths)
 	var source = &gameDataSource{files: map[string]*gameFileSource{}}
 	for _,p:=range paths {
 		this.logger.Warn("开始读取"+p)
@@ -205,12 +419,13 @@ func  (this *excel2JsonMiniGame)generate(excelPath,distPath string)error{
 			return err
 		}
 	}
-	this.logger.Warn("读取完成")
+	this.logger.Warn("读取目录成功:"+excelPath)
 	err=this.generateData(source,distPath)
 	if err != nil {
 		this.logger.Error(err.Error())
 		return err
 	}
+	this.logger.Warn("-------ALL DONE-------")
 	return nil
 }
 
@@ -226,8 +441,9 @@ func (this *excel2JsonMiniGame)checkClassName(s string)bool{
 }
 
 
-func (this *excel2JsonMiniGame) parseGameFields (data [][]string) (map[int]*gameDataField,error) {
+func (this *excel2JsonMiniGame) parseGameFields (key string,data [][]string) (map[int]*gameDataField,error) {
 	ret:=make(map[int]*gameDataField)
+	hasId:=false
 	for index,col:=range data {
 		if col[0] == "" {
 			continue
@@ -235,16 +451,25 @@ func (this *excel2JsonMiniGame) parseGameFields (data [][]string) (map[int]*game
 		type_str:=col[0]
 		type_desc:=col[1]
 		type_name:=col[2]
+		type_str = strings.TrimSpace(type_str)
+		type_desc = strings.TrimSpace(type_desc)
+		type_name = strings.TrimSpace(type_name)
 		t,err:=getFieldType(type_str)
 		if err != nil {
 			this.logger.Error(err.Error())
 			return nil,err
+		}
+		if type_name== "id" {
+			hasId = true
 		}
 		field:= &gameDataField{
 			fieldIndex: index,
 			fieldName:  type_name,
 			fieldDesc:  type_desc,
 			fieldType:  t,
+		}
+		if !hasId {
+			return nil,errors.New("class "+key+" with out id")
 		}
 		ret[index] = field
 	}
@@ -272,8 +497,9 @@ func (this *excel2JsonMiniGame)parseGameFile(key string,file *gameFileSource,f *
 		col, _ := rows.Columns()
 		resultRows = append(resultRows, col)
 	}
-	fields,err:=this.parseGameFields(results)
+	fields,err:=this.parseGameFields(key,results)
 	if err != nil {
+		this.logger.Error(err.Error())
 		return err
 	}
 	fields1:=make([]*gameDataField,0)
@@ -291,7 +517,7 @@ func (this *excel2JsonMiniGame)parseGameFile(key string,file *gameFileSource,f *
 		}
 		err:=file.parseData(row)
 		if err != nil {
-			this.logger.Error(err.Error())
+			this.logger.Error("格式化 "+key+" 行:"+strconv.Itoa(index)+err.Error())
 			return err
 		}
 	}
@@ -300,9 +526,7 @@ func (this *excel2JsonMiniGame)parseGameFile(key string,file *gameFileSource,f *
 
 
 func (this *excel2JsonMiniGame)fetchGameFile(key string,source *gameDataSource,f *excelize.File)error {
-	this.logger.Warn("fetchGameFile")
-
-	file:=&gameFileSource{data: []*gameData{}}
+	file:=&gameFileSource{data: make([]gameData,0)}
 	source.files[key] = file
 	err := this.parseGameFile(key,file,f)
 	if err != nil {
@@ -321,42 +545,80 @@ func (this *excel2JsonMiniGame)fetchGameDataSource(source *gameDataSource,p stri
 		if !this.checkClassName(key) {
 			continue
 		}
+		this.logger.Warnf("开始读取分表:"+key)
 		err = this.fetchGameFile(key,source,f)
 		if err != nil {
 			return err
 		}
+		this.logger.Warnf("读取分表完成:"+key)
 	}
 	return nil
 }
 
 func (this *excel2JsonMiniGame)generateTsSchema(data *gameFileSource,name string,p string)error{
-	tsPath := util.FindFile(p, name+".ts", false)
+	lowerName:=stringutil.FirstToLower(name)
+
+	this.logger.Warnf("开始生成Ts文件",name,path.Join(p,lowerName+".ts"))
+	tsPath := util.FindFile(p, lowerName+".ts", false)
 	if tsPath == "" {
-		tsPath = path.Join(p, name+".ts")
-		util.CreateFile(tsPath)
+		tsPath = path.Join(p, lowerName+".ts")
+		util.CreateFile(tsPath,0666)
 	}
-	lowerName:=strings.ToLower(name)
-	output:=strings.Replace(tsTemplate,`${lowerclass}`,lowerName,-1)
+	var template string
+	if this.embedJson {
+		str,err:=this.generateJson(data)
+		if err != nil {
+			return err
+		}
+		template = "const json = `"+str+"`"+tsTemplate
+	} else {
+		template = `const json = require("./${lowerclass}.json")`+tsTemplate
+	}
+	output:=strings.Replace(template,`${lowerclass}`,lowerName,-1)
 	output=strings.Replace(output,`${class}`,name,-1)
 	output=strings.Replace(output,`${fields}`,data.fieldString(),-1)
 	log.Warnf(tsPath)
-	err:=ioutil.WriteFile(tsPath,[]byte(output),0)
+	err:=ioutil.WriteFile(tsPath,[]byte(output),0666)
 	if err != nil {
 		this.logger.Error(err.Error())
 		return err
 	}
-	this.logger.Warnf("生成Ts文件",name,path.Join(p,name,".ts"))
-	//this.logger.Info(output)
+	this.logger.Warnf("生成Ts文件成功",name,path.Join(p,lowerName+".ts"))
 	return nil
+}
+func (this *excel2JsonMiniGame) generateJson(data *gameFileSource)(string,error) {
+	strarr,err :=json.Marshal(data.data)
+	if err != nil {
+		this.logger.Error(err.Error())
+		return "",err
+	}
+	return string(strarr),nil
+
 }
 
 func (this *excel2JsonMiniGame)generatJsonData(data *gameFileSource,name string,p string)error{
-	this.logger.Warnf("生成Json文件",name,path.Join(p,name,".json"))
+	lowerName:=stringutil.FirstToLower(name)
+	this.logger.Warnf("开始生成Json文件",name,path.Join(p,lowerName+".json"))
+	output,err:=this.generateJson(data)
+	if err != nil {
+		return err
+	}
+	jsonPath := util.FindFile(p, lowerName+".json", false)
+	if jsonPath == "" {
+		jsonPath = path.Join(p, lowerName+".json")
+		util.CreateFile(jsonPath,0666)
+	}
+	log.Warnf(jsonPath)
+	err=ioutil.WriteFile(jsonPath,[]byte(output),0666)
+	if err != nil {
+		this.logger.Error(err.Error())
+		return err
+	}
+	this.logger.Warnf("生成Json文件成功",name,path.Join(p,lowerName+".json"))
 	return nil
 }
 
-const tsTemplate = `const json = require("./${lowerclass}.json")
-
+const tsTemplate = `
 export interface I${class}Data {
 ${fields}
 }
@@ -378,7 +640,7 @@ class _${class}DataSource {
     }
     constructor(json:string) {
         let objs = JSON.parse(json)
-        for (let obj of objs.data) {
+        for (let obj of objs) {
             this.data.set(obj.id,obj)
         }
     }

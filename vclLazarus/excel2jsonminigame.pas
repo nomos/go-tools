@@ -20,6 +20,8 @@ type
     Label2: TLabel;
     OpenExcelDirButton: TSpeedButton;
     OpenDistDirButton: TSpeedButton;
+    HelpButton: TSpeedButton;
+    StaticText1: TStaticText;
   private
 
   public

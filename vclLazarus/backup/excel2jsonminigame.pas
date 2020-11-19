@@ -12,14 +12,16 @@ type
   { TExcel2JsonMiniGameFrame }
 
   TExcel2JsonMiniGameFrame = class(TFrame)
+    GenerateButton: TButton;
     IndieFolderCheck: TCheckBox;
-    GenerateButton: TBitBtn;
     ExcelDirLabel: TEdit;
     DistDirLabel: TEdit;
     Label1: TLabel;
     Label2: TLabel;
     OpenExcelDirButton: TSpeedButton;
     OpenDistDirButton: TSpeedButton;
+    HelpButton: TSpeedButton;
+    StaticText1: TStaticText;
   private
 
   public

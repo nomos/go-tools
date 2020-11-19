@@ -27,7 +27,7 @@ func (this *TExcel2JsonMiniGameFrame) OnCreate(){
 	if this.getDistPath()!="" {
 		this.setDistPath(this.getDistPath())
 	}
-	this.setIndiv(this.getIndiv())
+	this.setEmbed(this.getEmbed())
 
 	this.OpenExcelDirButton.SetOnClick(func(sender vcl.IObject) {
 		if this.getExcelPath()!="" {
@@ -50,7 +50,7 @@ func (this *TExcel2JsonMiniGameFrame) OnCreate(){
 		}
 	})
 	this.IndieFolderCheck.SetOnClick(func(sender vcl.IObject) {
-		this.setIndiv(this.IndieFolderCheck.Checked())
+		this.setEmbed(this.IndieFolderCheck.Checked())
 	})
 	this.GenerateButton.SetOnClick(func(sender vcl.IObject) {
 		log.Warn("click")
@@ -63,16 +63,30 @@ func (this *TExcel2JsonMiniGameFrame) OnCreate(){
 			return
 		}
 		this.logger.Info("开始生成Json配置...")
-		excel2json.Excel2JsonMiniGame(this.getExcelPath(),this.getDistPath(),this.logger)
+		excel2json.Excel2JsonMiniGame(this.getExcelPath(),this.getDistPath(),this.logger,this.getEmbed())
+	})
+	this.HelpButton.SetOnClick(func(sender vcl.IObject) {
+		this.logger.Info("excel的前三行分别为:类型,描述,属性名")
+		this.logger.Info("excel表名首字母大写为导出的数据类,默认和其他表名不导出")
+		this.logger.Info("属性名必须为英文,且必须包括id字段")
+		this.logger.Info("目前支持的类型及类型格式:")
+		this.logger.Info("基本类型int,float,string")
+		this.logger.Info("数组:[]int,[]float,[]string")
+		this.logger.Info("数组格式 [1,2,3,4,5] 或 [1.1,3.4,5.66] 或 [aa,bbb,ccc]")
+		this.logger.Info("字符字典类型:[string]string,[string]int,[string]float")
+		this.logger.Info("字符字典格式 [aaa:a1,bbb:b2,ccc:c3] 或 [a:1,b:2,c:3] 或 [e:0.5,b:0.6,c:9.3]")
+		this.logger.Info("数字字典类型:[int]string,[int]int,[int]float")
+		this.logger.Info("数字字典格式 [1:a1,2:b2,3:c3] 或 [1:1,2:2,3:3] 或 [1:0.5,2:0.6,3:9.3]")
+		this.logger.Info("导出到cocos勾选嵌入Ts")
 	})
 }
 
-func (this *TExcel2JsonMiniGameFrame) getIndiv()bool {
-	return this.conf.GetBool("indiv_folder")
+func (this *TExcel2JsonMiniGameFrame) getEmbed()bool {
+	return this.conf.GetBool("embbed")
 }
 
-func (this *TExcel2JsonMiniGameFrame) setIndiv(v bool) {
-	this.conf.Set("indiv_folder",v)
+func (this *TExcel2JsonMiniGameFrame) setEmbed(v bool) {
+	this.conf.Set("embbed",v)
 	this.IndieFolderCheck.SetChecked(v)
 }
 
