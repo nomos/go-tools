@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"github.com/nomos/go-log/log"
+	"github.com/nomos/go-lokas/util/gzip"
 	"image"
 	_ "image/jpeg"
 	_ "image/png"
@@ -54,6 +55,22 @@ func Png2Base64(path string) (int,int,string,error) {
 	}
 	width,height,arr := decCodeByteArray(img)
 	ret := base64.StdEncoding.EncodeToString(arr)
+	return width,height,ret,nil
+}
+
+func Png2CompressedBase64(path string) (int,int,string,error) {
+	img, err := readImageFile(path)
+	if err != nil {
+		log.Error(err.Error())
+		return 0,0,"",err
+	}
+	width,height,arr := decCodeByteArray(img)
+	arr2:=make([]byte,len(arr)+2)
+	arr[0] = uint8(width)
+	arr[1] = uint8(height)
+	arr3:=arr2[2:]
+	copy(arr3,arr)
+	ret,_:=gzip.CompressBase64(string(arr2))
 	return width,height,ret,nil
 }
 
