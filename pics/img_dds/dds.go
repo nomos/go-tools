@@ -1,4 +1,4 @@
-package dds
+package img_dds
 
 import (
 "encoding/binary"

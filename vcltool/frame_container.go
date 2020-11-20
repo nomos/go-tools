@@ -1,21 +1,38 @@
 package vcltool
 
 import (
+	"github.com/nomos/go-events"
+	"github.com/nomos/go-log/log"
 	"github.com/nomos/go-lokas/util"
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
 )
 
 type IConfigAble interface {
-	SetConfig(config *util.AppConfig)
 	Config()*util.AppConfig
-	SetSheetName(s string)
 	SheetName()string
+	SetConfig(config *util.AppConfig)
+	setSheetName(s string)
+	setContainer( IFrameContainer)
 }
 
 type ConfigAble struct {
 	conf *util.AppConfig
+	log log.ILogger
 	sheetName string
+	listener events.EventEmmiter
+	container IFrameContainer
+}
+func (this *ConfigAble) setContainer(container IFrameContainer) {
+	this.container = container
+}
+
+func (this *ConfigAble) SetEventEmitter(listener events.EventEmmiter) {
+	this.listener = listener
+}
+
+func (this *ConfigAble) SetLogger(log log.ILogger) {
+	this.log = log
 }
 
 func (this *ConfigAble) SetConfig(config *util.AppConfig) {
@@ -26,7 +43,7 @@ func (this *ConfigAble) Config()*util.AppConfig{
 	return this.conf
 }
 
-func (this *ConfigAble) SetSheetName(s string ){
+func (this *ConfigAble) setSheetName(s string ){
 	this.sheetName = s
 }
 
@@ -40,18 +57,28 @@ type IFrame interface {
 	OnCreate()
 	OnDestroy()
 	SetParent(vcl.IWinControl)
+	SetEventEmitter(emmiter events.EventEmmiter)
+	SetLogger(logger log.ILogger)
 	Free()
 }
 
+type IFrameContainer interface {
+	IsFrameSelected(frame IFrame)bool
+}
+
 type FrameContainer struct {
+	log log.ILogger
+	listener events.EventEmmiter
 	iframes map[string]IFrame
 	webviewFrames map[string]*TWebViewFrame
 	pageControl *vcl.TPageControl
 	component vcl.IComponent
 }
 
-func NewFrameContainer(self vcl.IComponent,pageControl *vcl.TPageControl)*FrameContainer{
+func NewFrameContainer(self vcl.IComponent,pageControl *vcl.TPageControl,log log.ILogger,listener events.EventEmmiter)*FrameContainer{
 	ret:=&FrameContainer{
+		log:log,
+		listener: listener,
 		iframes:      make(map[string]IFrame),
 		webviewFrames:         make(map[string]*TWebViewFrame),
 		pageControl:  pageControl,
@@ -79,6 +106,18 @@ func (this *FrameContainer) OnCreate(){
 	})
 }
 
+func (this *FrameContainer) IsFrameSelected(frame IFrame)bool{
+	control:=this.pageControl.Controls(this.pageControl.ActivePageIndex())
+	if control == nil {
+		return false
+	}
+	sheet:=vcl.AsTabSheet(control)
+	if sheet==nil {
+		return false
+	}
+	return sheet.Name() == frame.Name()+"Sheet"
+}
+
 func (this *FrameContainer) Destroy(){
 	for _,frame:=range this.iframes {
 		frame.OnDestroy()
@@ -101,7 +140,10 @@ func (this *FrameContainer) AddIFrame(name string,frame IFrame,conf... *util.App
 	if len(conf)>0 {
 		frame.SetConfig(conf[0])
 	}
-	frame.SetSheetName(name)
+	frame.SetEventEmitter(this.listener)
+	frame.SetLogger(this.log)
+	frame.setSheetName(name)
+	frame.setContainer(this)
 	this.iframes[name] = frame
 	sheet:=vcl.NewTabSheet(this.component)
 	sheet.SetParent(this.pageControl)
