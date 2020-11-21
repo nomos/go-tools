@@ -3,6 +3,7 @@ package img_png
 import (
 	"bytes"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"github.com/nomos/go-log/log"
 	"github.com/nomos/go-lokas/util/gzip"
@@ -65,9 +66,12 @@ func Png2CompressedBase64(path string) (int,int,string,error) {
 		return 0,0,"",err
 	}
 	width,height,arr := decCodeByteArray(img)
+	if width>255||height>255 {
+		return 0,0,"",errors.New("width or height must <=255")
+	}
 	arr2:=make([]byte,len(arr)+2)
-	arr[0] = uint8(width)
-	arr[1] = uint8(height)
+	arr2[0] = uint8(width)
+	arr2[1] = uint8(height)
 	arr3:=arr2[2:]
 	copy(arr3,arr)
 	log.Warnf(arr)
