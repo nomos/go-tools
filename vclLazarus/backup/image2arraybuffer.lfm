@@ -3,11 +3,12 @@ object Image2ArrayBuffer: TImage2ArrayBuffer
   Height = 250
   Top = 0
   Width = 392
+  Align = alClient
   ClientHeight = 250
   ClientWidth = 392
   TabOrder = 0
-  DesignLeft = 729
-  DesignTop = 466
+  DesignLeft = 475
+  DesignTop = 276
   object DropDownPanel: TPanel
     Left = 15
     Height = 220

@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="11"/>
     <BuildModes Active="Default"/>
-    <Units Count="12">
+    <Units Count="13">
       <Unit0>
         <Filename Value="vcltool.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -11,7 +11,7 @@
         <WindowIndex Value="-1"/>
         <TopLine Value="-1"/>
         <CursorPos X="-1" Y="-1"/>
-        <UsageCount Value="143"/>
+        <UsageCount Value="348"/>
       </Unit0>
       <Unit1>
         <Filename Value="json_edit_frame.pas"/>
@@ -20,7 +20,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="143"/>
+        <UsageCount Value="348"/>
       </Unit1>
       <Unit2>
         <Filename Value="json_value_edit_frame.pas"/>
@@ -29,7 +29,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="143"/>
+        <UsageCount Value="348"/>
       </Unit2>
       <Unit3>
         <Filename Value="text_frame.pas"/>
@@ -39,14 +39,14 @@
         <WindowIndex Value="-1"/>
         <TopLine Value="-1"/>
         <CursorPos X="-1" Y="-1"/>
-        <UsageCount Value="143"/>
+        <UsageCount Value="348"/>
       </Unit3>
       <Unit4>
         <Filename Value="web_view_frame.pas"/>
         <IsPartOfProject Value="True"/>
         <HasResources Value="True"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="143"/>
+        <UsageCount Value="348"/>
       </Unit4>
       <Unit5>
         <Filename Value="console_shell_frame.pas"/>
@@ -56,7 +56,7 @@
         <ResourceBaseClass Value="Frame"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="3" Y="42"/>
-        <UsageCount Value="143"/>
+        <UsageCount Value="348"/>
       </Unit5>
       <Unit6>
         <Filename Value="quant_trade_frame.pas"/>
@@ -66,14 +66,14 @@
         <WindowIndex Value="-1"/>
         <TopLine Value="-1"/>
         <CursorPos X="-1" Y="-1"/>
-        <UsageCount Value="143"/>
+        <UsageCount Value="348"/>
       </Unit6>
       <Unit7>
         <Filename Value="chart_frame.pas"/>
         <IsPartOfProject Value="True"/>
         <HasResources Value="True"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="143"/>
+        <UsageCount Value="348"/>
       </Unit7>
       <Unit8>
         <Filename Value="auto_deploy_frame.pas"/>
@@ -84,7 +84,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="12"/>
         <CursorPos X="105" Y="57"/>
-        <UsageCount Value="128"/>
+        <UsageCount Value="333"/>
       </Unit8>
       <Unit9>
         <Filename Value="form_list_frame.pas"/>
@@ -93,7 +93,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="125"/>
+        <UsageCount Value="330"/>
       </Unit9>
       <Unit10>
         <Filename Value="deploy_frame.pas"/>
@@ -102,7 +102,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="105"/>
+        <UsageCount Value="310"/>
       </Unit10>
       <Unit11>
         <Filename Value="excel2jsonminigame.pas"/>
@@ -110,14 +110,22 @@
         <ComponentName Value="Excel2JsonMiniGameFrame"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="105"/>
+        <WindowIndex Value="-1"/>
+        <UsageCount Value="310"/>
       </Unit11>
+      <Unit12>
+        <Filename Value="image2arraybuffer.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="Image2ArrayBuffer"/>
+        <ResourceBaseClass Value="Frame"/>
+        <IsVisibleTab Value="True"/>
+        <CursorPos X="3" Y="32"/>
+        <UsageCount Value="225"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit12>
     </Units>
-    <General>
-      <ActiveWindowIndexAtStart Value="-1"/>
-    </General>
     <JumpHistory HistoryIndex="-1"/>
     <RunParams>
       <FormatVersion Value="2"/>

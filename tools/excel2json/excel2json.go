@@ -368,6 +368,7 @@ type excel2JsonMiniGame struct {
 
 func (this *excel2JsonMiniGame)generateData(source *gameDataSource,p string)error{
 	for key,data:=range source.files{
+		log.Warnf("key",key)
 		err:=this.generateTsSchema(data,key,p)
 		if err != nil {
 			return err
@@ -409,13 +410,15 @@ func  (this *excel2JsonMiniGame)generate(excelPath,distPath string)error{
 		return err
 	}
 	paths = util.FilterFileWithExt(".xlsx",paths)
+	paths = util.FilterFileWithFunc(paths, func(s string) bool {
+		return !regexp.MustCompile(`[~][$]`).MatchString(s)
+	})
 	this.logger.Infof("当前路径",paths)
 	var source = &gameDataSource{files: map[string]*gameFileSource{}}
 	for _,p:=range paths {
 		this.logger.Warn("开始读取"+p)
 		err=this.fetchGameDataSource(source,p)
 		if err != nil {
-			this.logger.Error(err.Error())
 			return err
 		}
 	}
@@ -517,8 +520,8 @@ func (this *excel2JsonMiniGame)parseGameFile(key string,file *gameFileSource,f *
 		}
 		err:=file.parseData(row)
 		if err != nil {
-			this.logger.Error("格式化 "+key+" 行:"+strconv.Itoa(index)+err.Error())
-			return err
+			this.logger.Error("格式化 "+key+" 行:"+strconv.Itoa(index+1)+err.Error())
+			return errors.New("格式化 "+key+" 行:"+strconv.Itoa(index+1)+err.Error())
 		}
 	}
 	return nil
@@ -556,7 +559,8 @@ func (this *excel2JsonMiniGame)fetchGameDataSource(source *gameDataSource,p stri
 }
 
 func (this *excel2JsonMiniGame)generateTsSchema(data *gameFileSource,name string,p string)error{
-	lowerName:=stringutil.FirstToLower(name)
+	lowerName:=stringutil.CamelToUnder(name)
+	lowerName+="_data"
 
 	this.logger.Warnf("开始生成Ts文件",name,path.Join(p,lowerName+".ts"))
 	tsPath := util.FindFile(p, lowerName+".ts", false)
@@ -597,7 +601,8 @@ func (this *excel2JsonMiniGame) generateJson(data *gameFileSource)(string,error)
 }
 
 func (this *excel2JsonMiniGame)generatJsonData(data *gameFileSource,name string,p string)error{
-	lowerName:=stringutil.FirstToLower(name)
+	lowerName:=stringutil.CamelToUnder(name)
+	lowerName+="_data"
 	this.logger.Warnf("开始生成Json文件",name,path.Join(p,lowerName+".json"))
 	output,err:=this.generateJson(data)
 	if err != nil {
@@ -625,7 +630,7 @@ ${fields}
 
 class _${class}DataSource {
     protected data:Map<number, I${class}Data> = new Map<number, I${class}Data>()
-    getById(id:number):IDragonData {
+    getById(id:number):I${class}Data {
         return this.data.get(id)
     }
     all():I${class}Data[]{
