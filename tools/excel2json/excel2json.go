@@ -6,6 +6,7 @@ import (
 	"github.com/360EntSecGroup-Skylar/excelize"
 	"github.com/nomos/go-log/log"
 	"github.com/nomos/go-lokas/util"
+	"github.com/nomos/go-lokas/util/slice"
 	"github.com/nomos/go-lokas/util/stringutil"
 	"io/ioutil"
 	"path"
@@ -18,7 +19,8 @@ import (
 type fieldType int
 
 const (
-	type_string = iota+1
+	type_tag = iota+1
+	type_string
 	type_int
 	type_float
 	type_int_arr
@@ -270,6 +272,8 @@ func (this fieldType) decode(s string) (interface{},error){
 
 func getFieldType(s string)(fieldType,error) {
 	switch s {
+	case "#":
+		return type_tag,nil
 	case "string":
 		return type_string,nil
 	case "int":
@@ -310,12 +314,16 @@ type gameData map[string]interface{}
 //对应一个文件
 type gameFileSource struct {
 	fields []*gameDataField
+	enums map[string]int
 	data []gameData
 }
 
 func (this *gameFileSource) fieldString()string {
 	ret:=""
 	for _,field:=range this.fields {
+		if field.fieldName == "#" {
+			continue
+		}
 		ret+="\t"+field.fieldName+":"+field.fieldType.String()+"\n"
 	}
 	ret = strings.TrimRight(ret,"\n")
@@ -337,8 +345,25 @@ func (this *gameFileSource) parseData(in []string)error{
 		return nil
 	}
 	data:=make(gameData)
+	hasEnum:=false
+	var enumField *gameDataField
 	for _,field:=range this.fields {
-		str:=in[field.fieldIndex]
+		if field.fieldName=="#" {
+			hasEnum=true
+			enumField = field
+			break
+		}
+	}
+	for _,field:=range this.fields {
+		if field.fieldName=="#" {
+			continue
+		}
+		str:=""
+		if len(in)<=field.fieldIndex {
+			log.Warn("out of range")
+		} else {
+			str=in[field.fieldIndex]
+		}
 		t:=field.fieldType
 		_,err:=t.check(str)
 		if err != nil {
@@ -349,6 +374,14 @@ func (this *gameFileSource) parseData(in []string)error{
 		if err != nil {
 			colName,_:=excelize.ColumnNumberToName(field.fieldIndex)
 			return errors.New("列:"+colName+" 反序列化错误:"+err.Error())
+		}
+		if field.fieldName == "id"&&hasEnum {
+			if len(in)>field.fieldIndex {
+				enum:=in[enumField.fieldIndex]
+				if enum!="" {
+					this.enums[enum] = d.(int)
+				}
+			}
 		}
 		data[field.fieldName] = d
 	}
@@ -374,7 +407,7 @@ func (this *excel2JsonMiniGame)generateData(source *gameDataSource,p string)erro
 			return err
 		}
 		if !this.embedJson {
-			err=this.generatJsonData(data,key,p)
+			err=this.generateJsonData(data,key,p)
 			if err != nil {
 				return err
 			}
@@ -442,7 +475,6 @@ func (this *excel2JsonMiniGame)checkClassName(s string)bool{
 	}
 	return IsCapitalWord(s)
 }
-
 
 func (this *excel2JsonMiniGame) parseGameFields (key string,data [][]string) (map[int]*gameDataField,error) {
 	ret:=make(map[int]*gameDataField)
@@ -527,9 +559,8 @@ func (this *excel2JsonMiniGame)parseGameFile(key string,file *gameFileSource,f *
 	return nil
 }
 
-
 func (this *excel2JsonMiniGame)fetchGameFile(key string,source *gameDataSource,f *excelize.File)error {
-	file:=&gameFileSource{data: make([]gameData,0)}
+	file:=&gameFileSource{data: make([]gameData,0),enums: map[string]int{}}
 	source.files[key] = file
 	err := this.parseGameFile(key,file,f)
 	if err != nil {
@@ -558,6 +589,47 @@ func (this *excel2JsonMiniGame)fetchGameDataSource(source *gameDataSource,p stri
 	return nil
 }
 
+func (this *excel2JsonMiniGame)generateEnums(name string,data *gameFileSource)string {
+	out:="export enum "+name+"Enum {\n"
+	enumsArr:=make([]slice.KVIntString,0)
+	for k,v:=range data.enums {
+		enumsArr = append(enumsArr, slice.KVIntString{
+			K: v,
+			V: "\t"+k+" = "+strconv.Itoa(v)+",\n",
+		})
+	}
+	sort.Slice(enumsArr, func(i, j int) bool {
+		return enumsArr[i].K<enumsArr[j].K
+	})
+	for _,v:=range enumsArr {
+		out+=v.V
+	}
+	out+="}\n"
+	return out
+}
+
+
+func (this *excel2JsonMiniGame)generateEnumGetter(name string,data *gameFileSource)string {
+	out:=""
+	enumsArr:=make([]slice.KVIntString,0)
+	for k,v:=range data.enums {
+		enumsArr = append(enumsArr, slice.KVIntString{
+			K: v,
+			V: "\t"+`get `+k+`():I`+name+`Data{
+		return this.getById(`+strconv.Itoa(v)+`)
+	}
+`,
+		})
+	}
+	sort.Slice(enumsArr, func(i, j int) bool {
+		return enumsArr[i].K<enumsArr[j].K
+	})
+	for _,v:=range enumsArr {
+		out+=v.V
+	}
+	return out
+}
+
 func (this *excel2JsonMiniGame)generateTsSchema(data *gameFileSource,name string,p string)error{
 	lowerName:=stringutil.CamelToUnder(name)
 	lowerName+="_data"
@@ -581,6 +653,8 @@ func (this *excel2JsonMiniGame)generateTsSchema(data *gameFileSource,name string
 	output:=strings.Replace(template,`${lowerclass}`,lowerName,-1)
 	output=strings.Replace(output,`${class}`,name,-1)
 	output=strings.Replace(output,`${fields}`,data.fieldString(),-1)
+	output=strings.Replace(output,`${enums}`,this.generateEnums(name,data),-1)
+	output=strings.Replace(output,`${enumsGetter}`,this.generateEnumGetter(name,data),-1)
 	log.Warnf(tsPath)
 	err:=ioutil.WriteFile(tsPath,[]byte(output),0666)
 	if err != nil {
@@ -590,7 +664,8 @@ func (this *excel2JsonMiniGame)generateTsSchema(data *gameFileSource,name string
 	this.logger.Warnf("生成Ts文件成功",name,path.Join(p,lowerName+".ts"))
 	return nil
 }
-func (this *excel2JsonMiniGame) generateJson(data *gameFileSource)(string,error) {
+
+func (this *excel2JsonMiniGame)generateJson(data *gameFileSource)(string,error) {
 	strarr,err :=json.Marshal(data.data)
 	if err != nil {
 		this.logger.Error(err.Error())
@@ -600,7 +675,7 @@ func (this *excel2JsonMiniGame) generateJson(data *gameFileSource)(string,error)
 
 }
 
-func (this *excel2JsonMiniGame)generatJsonData(data *gameFileSource,name string,p string)error{
+func (this *excel2JsonMiniGame) generateJsonData(data *gameFileSource,name string,p string)error{
 	lowerName:=stringutil.CamelToUnder(name)
 	lowerName+="_data"
 	this.logger.Warnf("开始生成Json文件",name,path.Join(p,lowerName+".json"))
@@ -628,6 +703,8 @@ export interface I${class}Data {
 ${fields}
 }
 
+${enums}
+
 class _${class}DataSource {
     protected data:Map<number, I${class}Data> = new Map<number, I${class}Data>()
     getById(id:number):I${class}Data {
@@ -649,6 +726,7 @@ class _${class}DataSource {
             this.data.set(obj.id,obj)
         }
     }
+${enumsGetter}
 }
 
 export const ${class}DataSource = new _${class}DataSource(json)
