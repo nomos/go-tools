@@ -137,12 +137,18 @@ func (this fieldType) decode(s string) (interface{},error){
 	case type_string:
 		return s,nil
 	case type_int:
+		if s =="" {
+			return 0,nil
+		}
 		ret,err:=strconv.Atoi(s)
 		if err != nil {
 			return nil,err
 		}
 		return ret,nil
 	case type_float:
+		if s =="" {
+			return 0.0,nil
+		}
 		ret,err:=strconv.ParseFloat(s, 64)
 		if err != nil {
 			return nil,err
@@ -490,9 +496,9 @@ func (this *excel2JsonMiniGame) parseGameFields (key string,data [][]string) (ma
 		type_desc = strings.TrimSpace(type_desc)
 		type_name = strings.TrimSpace(type_name)
 		t,err:=getFieldType(type_str)
+		colName,_:=excelize.ColumnNumberToName(index)
 		if err != nil {
-			this.logger.Error(err.Error())
-			return nil,err
+			return nil,errors.New("行:1 "+"列:"+colName+" 解析错误:"+err.Error())
 		}
 		if type_name== "id" {
 			hasId = true
@@ -592,10 +598,24 @@ func (this *excel2JsonMiniGame)fetchGameDataSource(source *gameDataSource,p stri
 func (this *excel2JsonMiniGame)generateEnums(name string,data *gameFileSource)string {
 	out:="export enum "+name+"Enum {\n"
 	enumsArr:=make([]slice.KVIntString,0)
+
 	for k,v:=range data.enums {
+		descStr:=""
+		for _,data:=range data.data {
+			if data["id"] == v {
+				if desc,ok:=data["desc"];ok{
+					descStr = desc.(string)
+				}
+			}
+		}
+		value:="\t"+k+" = "+strconv.Itoa(v)+","
+		if descStr!="" {
+			value+=" //"+descStr
+		}
+		value+="\n"
 		enumsArr = append(enumsArr, slice.KVIntString{
 			K: v,
-			V: "\t"+k+" = "+strconv.Itoa(v)+",\n",
+			V: value,
 		})
 	}
 	sort.Slice(enumsArr, func(i, j int) bool {
