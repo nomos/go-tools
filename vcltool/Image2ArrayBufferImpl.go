@@ -8,6 +8,8 @@ import (
     "github.com/nomos/go-tools/pics/img_png"
     "github.com/ying32/govcl/vcl"
     _ "github.com/ying32/govcl/vcl/types"
+    "path"
+    "strings"
 )
 
 //::private::
@@ -30,7 +32,8 @@ func (this *TImage2ArrayBuffer) OnCreate(){
             this.log.Infof("width:",w)
             this.log.Infof("height:",h)
             this.log.Infof("data:",data)
-            clipboard.WriteAll(data)
+            fileName:=strings.Replace(path.Base(filePath),".png","",-1)
+            clipboard.WriteAll("export const "+fileName+" = `"+data+"`")
             this.log.Info("已拷贝到剪切板")
             //if path.Ext(filePath) == ".png" {
             //    outPath:= strings.Replace(filePath,".png",".txt",1)
