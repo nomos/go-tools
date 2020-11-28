@@ -4,6 +4,7 @@
 package vcltool
 
 import (
+    "github.com/atotto/clipboard"
     "github.com/nomos/go-tools/pics/img_png"
     "github.com/ying32/govcl/vcl"
     _ "github.com/ying32/govcl/vcl/types"
@@ -29,6 +30,8 @@ func (this *TImage2ArrayBuffer) OnCreate(){
             this.log.Infof("width:",w)
             this.log.Infof("height:",h)
             this.log.Infof("data:",data)
+            clipboard.WriteAll(data)
+            this.log.Info("已拷贝到剪切板")
             //if path.Ext(filePath) == ".png" {
             //    outPath:= strings.Replace(filePath,".png",".txt",1)
             //    err:=ioutil.WriteFile(outPath,[]byte(strconv.Itoa(w)+" "+strconv.Itoa(h)+"\n"+data),0666)
