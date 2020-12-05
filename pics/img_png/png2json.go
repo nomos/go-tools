@@ -44,7 +44,7 @@ func Png2ByteArray(path string) (*ImageRGBAMap,error) {
 		log.Error(err.Error())
 		return nil,err
 	}
-	ret := deCodeRGBA(img)
+	ret := decodeRGBA(img)
 	return ret,nil
 }
 
@@ -54,7 +54,7 @@ func Png2Base64(path string) (int,int,string,error) {
 		log.Error(err.Error())
 		return 0,0,"",err
 	}
-	width,height,arr := decCodeByteArray(img)
+	width,height,arr := decodeByteArray(img)
 	ret := base64.StdEncoding.EncodeToString(arr)
 	return width,height,ret,nil
 }
@@ -65,7 +65,7 @@ func Png2CompressedBase64(path string) (int,int,string,error) {
 		log.Error(err.Error())
 		return 0,0,"",err
 	}
-	width,height,arr := decCodeByteArray(img)
+	width,height,arr := decodeByteArray(img)
 	if width>255||height>255 {
 		return 0,0,"",errors.New("width or height must <=255")
 	}
@@ -85,7 +85,7 @@ func Png2ImageMap(path string) (int,int,[]byte,error) {
 		log.Error(err.Error())
 		return 0,0,nil,err
 	}
-	width,height,arr := decCodeByteArray(img)
+	width,height,arr := decodeByteArray(img)
 	return width,height,arr,nil
 }
 
@@ -121,7 +121,7 @@ type ImageRGBAMap struct {
 	Data   []ColorPoint
 }
 
-func decCodeByteArray(img image.Image) (int,int,[]byte) {
+func decodeByteArray(img image.Image) (int,int,[]byte) {
 	log.Info("读取图片数据中....")
 	rectangle := img.Bounds()
 	width:=rectangle.Max.X-rectangle.Min.X
@@ -142,7 +142,7 @@ func decCodeByteArray(img image.Image) (int,int,[]byte) {
 	return width,height,arr
 }
 
-func deCodeRGBA(img image.Image) *ImageRGBAMap {
+func decodeRGBA(img image.Image) *ImageRGBAMap {
 	log.Info("读取图片RGBA中....")
 	imageMap := &ImageRGBAMap{}
 	rectangle := img.Bounds()

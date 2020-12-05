@@ -8,7 +8,7 @@ uses
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
   Forms, auto_deploy_frame, form_list_frame, deploy_frame, excel2jsonminigame,
-  image2arraybuffer;
+  image2arraybuffer, imagecutter;
 
 {$R *.res}
 
