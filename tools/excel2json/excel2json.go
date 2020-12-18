@@ -448,7 +448,7 @@ func  (this *excel2JsonMiniGame)generate(excelPath,distPath string)error{
 		this.logger.Error(err.Error())
 		return err
 	}
-	paths = util.FilterFileWithExt(".xlsx",paths)
+	paths = util.FilterFileWithExt(paths,".xlsx",".xlsm")
 	paths = util.FilterFileWithFunc(paths, func(s string) bool {
 		return !regexp.MustCompile(`[~][$]`).MatchString(s)
 	})
@@ -666,6 +666,7 @@ func (this *excel2JsonMiniGame)generateTsSchema(data *gameFileSource,name string
 		if err != nil {
 			return err
 		}
+		str = strings.ReplaceAll(str,`\`,`\\`)
 		template = "const json = `"+str+"`"+tsTemplate
 	} else {
 		template = `const json = require("./${lowerclass}.json")`+tsTemplate
