@@ -33,7 +33,7 @@ func (this *TImage2ArrayBuffer) OnCreate(){
             this.log.Infof("height:",h)
             this.log.Infof("data:",data)
             fileName:=strings.Replace(path.Base(filePath),".png","",-1)
-            clipboard.WriteAll("export const "+fileName+" = `"+data+"`")
+            clipboard.WriteAll(fileName+" : `"+data+"`")
             this.log.Info("已拷贝到剪切板")
             //if path.Ext(filePath) == ".png" {
             //    outPath:= strings.Replace(filePath,".png",".txt",1)
