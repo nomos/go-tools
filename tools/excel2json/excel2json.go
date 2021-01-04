@@ -132,11 +132,16 @@ func trimLR(s string)[]string{
 	return strings.Split(s,",")
 }
 
+var errIgnore = errors.New("ignore")
+
 func (this fieldType) decode(s string) (interface{},error){
 	switch this {
 	case type_string:
 		return s,nil
 	case type_int:
+		if s=="#" {
+			return 0,errIgnore
+		}
 		if s =="" {
 			return 0,nil
 		}
@@ -360,6 +365,7 @@ func (this *gameFileSource) parseData(in []string)error{
 			break
 		}
 	}
+	ignored:=false
 	for _,field:=range this.fields {
 		if field.fieldName=="#" {
 			continue
@@ -377,6 +383,10 @@ func (this *gameFileSource) parseData(in []string)error{
 			return errors.New("列:"+colName+" 格式检查错误:"+err.Error())
 		}
 		d,err:=t.decode(str)
+		if field.fieldName=="id"&&err==errIgnore {
+			ignored = true
+			continue
+		}
 		if err != nil {
 			colName,_:=excelize.ColumnNumberToName(field.fieldIndex)
 			return errors.New("列:"+colName+" 反序列化错误:"+err.Error())
@@ -390,6 +400,9 @@ func (this *gameFileSource) parseData(in []string)error{
 			}
 		}
 		data[field.fieldName] = d
+	}
+	if ignored {
+		return nil
 	}
 	this.data = append(this.data, data)
 	return nil
@@ -728,8 +741,12 @@ ${enums}
 
 class _${class}DataSource {
     protected data:Map<number, I${class}Data> = new Map<number, I${class}Data>()
+    protected strMap:Map<string, I${class}Data> = new Map<string, I${class}Data>()
     getById(id:number):I${class}Data {
         return this.data.get(id)
+    }
+    getByName(name:string):I${class}Data {
+        return this.strMap.get(name)
     }
     all():I${class}Data[]{
         let ret:I${class}Data[] = []
@@ -745,6 +762,9 @@ class _${class}DataSource {
         let objs = JSON.parse(json)
         for (let obj of objs) {
             this.data.set(obj.id,obj)
+			if (obj["name"]) {
+				this.strMap.set(obj["name"],obj)
+			}
         }
     }
 ${enumsGetter}
