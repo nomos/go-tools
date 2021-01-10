@@ -21,6 +21,7 @@ type fieldType int
 const (
 	type_tag = iota+1
 	type_string
+	type_bool
 	type_int
 	type_float
 	type_int_arr
@@ -38,6 +39,8 @@ func (this fieldType) String()string{
 	switch this {
 	case type_string:
 		return "string"
+	case type_bool:
+		return "boolean"
 	case type_int:
 		return "number"
 	case type_float:
@@ -138,6 +141,14 @@ func (this fieldType) decode(s string) (interface{},error){
 	switch this {
 	case type_string:
 		return s,nil
+	case type_bool:
+		if s=="1" {
+			return true,nil
+		} else if s=="0" {
+			return false,nil
+		} else {
+			return nil,errors.New("wrong bool format:"+s)
+		}
 	case type_int:
 		if s=="#" {
 			return 0,errIgnore
@@ -287,6 +298,8 @@ func getFieldType(s string)(fieldType,error) {
 		return type_tag,nil
 	case "string":
 		return type_string,nil
+	case "bool":
+		return type_bool,nil
 	case "int":
 		return type_int,nil
 	case "float":
