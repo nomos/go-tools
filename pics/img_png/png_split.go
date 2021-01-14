@@ -68,6 +68,9 @@ func SubImage(imgPath string,width,height int)error{
 	ext:=path.Ext(imgPath)
 	path1:=strings.Replace(imgPath,ext,"",1)
 	digital:=util.DigitalNum(len(imgs)+1)
+	if digital<2 {
+		digital = 2
+	}
 	log.Warnf("digital",digital)
 	exist,err:=util.PathExists(path1)
 	if err != nil {
