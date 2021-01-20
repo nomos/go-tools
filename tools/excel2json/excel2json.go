@@ -522,7 +522,7 @@ func (this *excel2JsonMiniGame) parseGameFields (key string,data [][]string) (ma
 		type_desc = strings.TrimSpace(type_desc)
 		type_name = strings.TrimSpace(type_name)
 		t,err:=getFieldType(type_str)
-		colName,_:=excelize.ColumnNumberToName(index)
+		colName,_:=excelize.ColumnNumberToName(index-1)
 		if err != nil {
 			return nil,errors.New("行:1 "+"列:"+colName+" 解析错误:"+err.Error())
 		}
