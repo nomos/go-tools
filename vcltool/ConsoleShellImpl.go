@@ -84,7 +84,7 @@ func (this *TConsoleShell) RegisterCmdFunc (typ string,name string,tips string,f
 
 func (this *TConsoleShell) OnCreate(){
 	this.start()
-	this.ComposeLogger = log.NewComposeLogger(true,log.DefaultConfig(),1)
+	this.ComposeLogger = log.NewComposeLogger(true,log.DefaultConfig(""),1)
 	this.ComposeLogger.SetConsoleWriter(this)
 	this.senders = make(map[string]ICommandSender)
 	this.commonCommands = make(map[string]ICommand)
