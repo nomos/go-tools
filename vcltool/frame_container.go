@@ -12,11 +12,14 @@ type IConfigAble interface {
 	Config()*util.AppConfig
 	SheetName()string
 	SetConfig(config *util.AppConfig)
+	SetContent(s string,data interface{})
+	GetContent(s string)interface{}
 	setSheetName(s string)
 	setContainer( IFrameContainer)
 }
 
 type ConfigAble struct {
+	content map[string]interface{}
 	conf *util.AppConfig
 	log log.ILogger
 	sheetName string
@@ -24,6 +27,21 @@ type ConfigAble struct {
 	container IFrameContainer
 	index int
 }
+
+func (this *ConfigAble)SetContent(s string,data interface{}){
+	if this.content==nil {
+		this.content = map[string]interface{}{}
+	}
+	this.content[s] = data
+}
+
+func (this *ConfigAble)GetContent(s string)interface{}{
+	if this.content==nil {
+		this.content = map[string]interface{}{}
+	}
+	return this.content[s]
+}
+
 func (this *ConfigAble) setContainer(container IFrameContainer) {
 	this.container = container
 }
@@ -154,10 +172,23 @@ func (this *FrameContainer) GetIFrame(s string)IFrame{
 	return this.iframes[s]
 }
 
+type FrameOption func(frame IFrame)
 
-func (this *FrameContainer) AddIFrame(name string,frame IFrame,conf... *util.AppConfig)IFrame{
-	if len(conf)>0 {
-		frame.SetConfig(conf[0])
+func WithConfig(conf *util.AppConfig)FrameOption{
+	return func(frame IFrame) {
+		frame.SetConfig(conf)
+	}
+}
+
+func WithContent(s string,data interface{})FrameOption{
+	return func(frame IFrame) {
+		frame.SetContent(s,data)
+	}
+}
+
+func (this *FrameContainer) AddIFrame(name string,frame IFrame,opts... FrameOption)IFrame{
+	for _,opt:=range opts {
+		opt(frame)
 	}
 	frame.SetEventEmitter(this.listener)
 	frame.SetLogger(this.log)
