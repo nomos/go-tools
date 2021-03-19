@@ -4,7 +4,6 @@
 package vcltool
 
 import (
-	"github.com/nomos/go-log/log"
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
 	"time"
@@ -30,7 +29,6 @@ func (this *TWebViewFrame) OnCreate(){
 	this.webview = vcl.NewMiniWebview(this)
 	this.webview.SetParent(this.Main)
 	this.webview.SetAlign(types.AlClient)
-	log.Warnf("TWebViewFrame",this.container)
 	this.container.On("page_change", func(i ...interface{}) {
 		num:=i[0].(int)
 		if this.index==num {
