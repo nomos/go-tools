@@ -3,6 +3,7 @@ package vcltool
 import (
 	"errors"
 	"fmt"
+	"github.com/nomos/go-log/log"
 	"github.com/nomos/go-promise"
 	"strconv"
 	"strings"
@@ -16,7 +17,8 @@ type ICommandSender interface {
 
 type ICommand interface {
 	Name()string
-	Exec(param *ParamsValue,console *TConsoleShell)*promise.Promise
+	ConsoleExec(param *ParamsValue,console *TConsoleShell)*promise.Promise
+	Exec(params... string)*promise.Promise
 	Tips()string
 }
 
@@ -38,9 +40,55 @@ func (this *Command) Name()string{
 	return this.name
 }
 
-func (this *Command) Exec(param *ParamsValue,console *TConsoleShell)*promise.Promise {
+func (this *Command) Exec(params... string)*promise.Promise{
+	param:=&ParamsValue{
+		cmd:    "",
+		value: params,
+		offset: 0,
+	}
+	return this.ConsoleExec(param,&TConsoleShell{})
+
+}
+
+func (this *Command) ConsoleExec(param *ParamsValue,console *TConsoleShell)*promise.Promise {
 	if this.exec!=nil {
-		return this.exec(param,console)
+		return promise.Async(func(resolve func(interface{}), reject func(interface{})) {
+			defer func() {
+				if r:=recover();r!=nil {
+					err := r.(error)
+					if cmdErr,ok := r.(*CmdError);ok{
+						if cmdErr.errorType == CMD_ERROR_PARAM_LEN {
+							errStr := cmdErr.cmd+" 命令长度必须大于"+strconv.Itoa(cmdErr.offset+1)
+							log.Error(errStr)
+							if console!=nil {
+								console.Write([]byte(errStr))
+							}
+						}
+						if cmdErr.errorType == CMD_ERROR_PARAM_TYPE {
+							errStr := cmdErr.cmd+" 命令参数("+strconv.Itoa(cmdErr.offset+1)+")类型必须为"+cmdErr.paramType
+							log.Error(errStr)
+							if console!=nil {
+								console.Write([]byte(errStr))
+							}
+						}
+					} else {
+						console.Write([]byte(this.name+" 执行命令时出现未知错误"))
+					}
+					errStr:="type "+this.name+" help|?"
+					log.Info(errStr)
+					if console!=nil {
+						console.Write([]byte(errStr))
+					}
+					reject(err)
+				}
+			}()
+			res,err:=this.exec(param,console).Await()
+			if err!=nil {
+				reject(err)
+				return
+			}
+			resolve(res)
+		})
 	}
 	return promise.Reject(errors.New("cant found exec"))
 }
@@ -62,6 +110,10 @@ type ParamsValue struct {
 	cmd string
 	value []string
 	offset int
+}
+
+func (this *ParamsValue) IsHelp()bool{
+	return len(this.value)==1&&(this.value[0] == "?"||this.value[0]=="help")
 }
 
 const (

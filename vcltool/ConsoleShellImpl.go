@@ -229,7 +229,7 @@ func (this *TConsoleShell) sendCmd(text string){
 				value:  params,
 				offset: 0,
 			}
-			go cmd.Exec(para,this).Await()
+			go cmd.ConsoleExec(para,this).Await()
 			return
 		}
 	}
@@ -239,7 +239,7 @@ func (this *TConsoleShell) sendCmd(text string){
 			value:  params,
 			offset: 0,
 		}
-		go cmd.Exec(para,this).Await()
+		go cmd.ConsoleExec(para,this).Await()
 		return
 	}
 	sender:=this.senders[s]
