@@ -5,6 +5,7 @@ package vcltool
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"github.com/nomos/go-log/log"
 	"github.com/nomos/go-lokas/network/sshc"
@@ -13,7 +14,9 @@ import (
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
 	"github.com/ying32/govcl/vcl/types/keys"
+	"go.uber.org/zap/zapcore"
 	"io"
+	"regexp"
 	"strings"
 )
 
@@ -274,6 +277,32 @@ func (this *TConsoleShell) Write(p []byte)(int,error){
 		this.msgChan<-str
 	}
 	return 0,nil
+}
+
+func (this *TConsoleShell)WriteConsole(e zapcore.Entry, p []byte) error {
+	return nil
+}
+func (this *TConsoleShell)WriteJson(e zapcore.Entry, p []byte) error {
+	var j map[string]interface{}
+	json.Unmarshal(p,&j)
+	level:=j["level"].(string)
+	time:=j["time"].(string)
+	caller:=j["caller"].(string)
+	msg:=j["msg"].(string)
+	o:=make(map[string]interface{})
+	for k,v:=range j {
+		if k!="level"&&k!="time"&&k!="caller"&&k!="msg" {
+			o[k] = v
+		}
+	}
+	level = regexp.MustCompile(`[[][A-Z]+[]][A-z]*`).FindString(level)
+	jstr,_:=json.Marshal(o)
+	str := time+" "+level+"   "+caller+" "+msg+" "+string(jstr)
+	this.Write([]byte(str))
+	return nil
+}
+func (this *TConsoleShell)WriteObject(e zapcore.Entry, o map[string]interface{}) error {
+	return nil
 }
 
 func (this *TConsoleShell) Disconnect()*promise.Promise {
