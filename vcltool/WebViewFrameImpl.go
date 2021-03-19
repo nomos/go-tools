@@ -6,7 +6,6 @@ package vcltool
 import (
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
-	"time"
 )
 
 //::private::
@@ -35,13 +34,6 @@ func (this *TWebViewFrame) OnCreate(){
 			if !this.initiated {
 				this.webview.Navigate(this.url)
 				this.initiated = true
-				go func() {
-					time.Sleep(time.Millisecond)
-					vcl.ThreadSync(func() {
-						this.webview.Realign()
-						this.webview.Refresh()
-					})
-				}()
 			}
 		}
 	})
