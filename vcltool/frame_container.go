@@ -22,6 +22,7 @@ type ConfigAble struct {
 	sheetName string
 	listener events.EventEmmiter
 	container IFrameContainer
+	index int
 }
 func (this *ConfigAble) setContainer(container IFrameContainer) {
 	this.container = container
@@ -29,6 +30,16 @@ func (this *ConfigAble) setContainer(container IFrameContainer) {
 
 func (this *ConfigAble) SetEventEmitter(listener events.EventEmmiter) {
 	this.listener = listener
+}
+
+
+func (this *ConfigAble)SetIndex(num int) {
+	this.index = num
+}
+
+
+func (this *ConfigAble)GetIndex()int {
+	return this.index
 }
 
 func (this *ConfigAble) SetLogger(log log.ILogger) {
@@ -60,10 +71,14 @@ type IFrame interface {
 	SetEventEmitter(emmiter events.EventEmmiter)
 	SetLogger(logger log.ILogger)
 	Free()
+	SetIndex(num int)
+	GetIndex()int
 }
 
 type IFrameContainer interface {
 	IsFrameSelected(frame IFrame)bool
+	On(evt events.EventName,listener...events.Listener)
+	Emit(evt events.EventName,args...interface{})
 }
 
 type FrameContainer struct {
@@ -73,6 +88,7 @@ type FrameContainer struct {
 	webviewFrames map[string]*TWebViewFrame
 	pageControl *vcl.TPageControl
 	component vcl.IComponent
+	num int
 }
 
 func NewFrameContainer(self vcl.IComponent,pageControl *vcl.TPageControl,log log.ILogger,listener events.EventEmmiter)*FrameContainer{
@@ -83,23 +99,26 @@ func NewFrameContainer(self vcl.IComponent,pageControl *vcl.TPageControl,log log
 		webviewFrames:         make(map[string]*TWebViewFrame),
 		pageControl:  pageControl,
 		component:    self,
+		num:0,
 	}
 
 	return ret
+}
+
+func (this *FrameContainer) On(evt events.EventName,listener...events.Listener){
+	this.listener.On(evt,listener...)
+}
+
+func (this *FrameContainer) Emit(evt events.EventName,args...interface{}){
+	this.listener.Emit(evt,args...)
 }
 
 func (this *FrameContainer) OnCreate(){
 	this.pageControl.SetOnChanging(func(sender vcl.IObject, allowChange *bool) {
 		go func() {
 			vcl.ThreadSync(func() {
-				control:=this.pageControl.Controls(this.pageControl.ActivePageIndex())
-				if control == nil {
-					return
-				}
-				sheet:=vcl.AsTabSheet(control)
-				if sheet==nil {
-					return
-				}
+				index:=int(this.pageControl.ActivePageIndex())
+				this.listener.Emit("page_change",index)
 			})
 		}()
 
@@ -147,6 +166,8 @@ func (this *FrameContainer) AddIFrame(name string,frame IFrame,conf... *util.App
 	this.iframes[name] = frame
 	sheet:=vcl.NewTabSheet(this.component)
 	sheet.SetParent(this.pageControl)
+	frame.SetIndex(this.num)
+	this.num++
 	sheet.SetName(frame.Name()+"Sheet")
 	sheet.SetCaption(name)
 	sheet.SetAlign(types.AlClient)
@@ -162,6 +183,10 @@ func (this *FrameContainer) AddWebView(name string,url string) {
 	sheet.SetCaption(name)
 	sheet.SetAlign(types.AlClient)
 	frame:=NewWebViewFrame(sheet)
+	frame.setContainer(this)
+	this.iframes[name] = frame
+	frame.SetIndex(this.num)
+	this.num++
 	frame.SetParent(sheet)
 	frame.OnCreate()
 	frame.SetUrl(url)
