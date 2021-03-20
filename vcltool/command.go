@@ -52,6 +52,13 @@ func (this *Command) Exec(params... string)*promise.Promise{
 
 func (this *Command) ConsoleExec(param *ParamsValue,console *TConsoleShell)*promise.Promise {
 	if this.exec!=nil {
+		if param.IsHelp() {
+			log.Info(this.tips)
+			if console!=nil {
+				console.Write([]byte(this.tips))
+			}
+			return promise.Resolve(nil)
+		}
 		return promise.Async(func(resolve func(interface{}), reject func(interface{})) {
 			defer func() {
 				if r:=recover();r!=nil {
