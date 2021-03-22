@@ -32,7 +32,7 @@ func SplitCommand(cmd string)(string,[]string){
 
 type Command struct {
 	name string
-	exec func(value *ParamsValue,console *TConsoleShell)*promise.Promise
+	execFunc func(value *ParamsValue,console *TConsoleShell)*promise.Promise
 	tips string
 }
 
@@ -51,7 +51,7 @@ func (this *Command) Exec(params... string)*promise.Promise{
 }
 
 func (this *Command) ConsoleExec(param *ParamsValue,console *TConsoleShell)*promise.Promise {
-	if this.exec!=nil {
+	if this.execFunc!=nil {
 		if param.IsHelp() {
 			log.Info(this.tips)
 			if console!=nil {
@@ -89,7 +89,7 @@ func (this *Command) ConsoleExec(param *ParamsValue,console *TConsoleShell)*prom
 					reject(err)
 				}
 			}()
-			res,err:=this.exec(param,console).Await()
+			res,err:=this.execFunc(param,console).Await()
 			if err!=nil {
 				reject(err)
 				return
@@ -107,7 +107,7 @@ func (this *Command) Tips()string{
 func NewCommand(name string,tips string,f func(value *ParamsValue,console *TConsoleShell)*promise.Promise)ICommand{
 	ret:=&Command{
 		name: name,
-		exec: f,
+		execFunc: f,
 		tips:tips,
 	}
 	return ret
