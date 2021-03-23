@@ -1,7 +1,6 @@
 package data
 
 import (
-	"github.com/nomos/go-lokas/protocol"
 	"github.com/shopspring/decimal"
 	"time"
 )
@@ -11,7 +10,6 @@ type Market struct {
 }
 
 type Record struct {
-	protocol.Serializable
 	Timestamp time.Time
 	Amount    decimal.Decimal
 	Vol       decimal.Decimal
@@ -22,7 +20,6 @@ type Record struct {
 }
 
 type DayRecord struct {
-	protocol.Serializable
 	Timestamp     time.Time
 	Amount        decimal.Decimal
 	Vol           decimal.Decimal

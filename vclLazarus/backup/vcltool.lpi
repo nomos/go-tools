@@ -30,7 +30,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="13">
+    <Units Count="14">
       <Unit0>
         <Filename Value="vcltool.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -108,8 +108,15 @@
         <Filename Value="image2arraybuffer.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="Image2ArrayBuffer"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
       </Unit12>
+      <Unit13>
+        <Filename Value="imagecutter.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="ImageCutter"/>
+        <ResourceBaseClass Value="Frame"/>
+      </Unit13>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

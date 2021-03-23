@@ -74,13 +74,11 @@ func (s ORDER_STATUS) String() string {
 }
 
 type OrderItem struct {
-	protocol.Serializable
 	Price  float64
 	Amount float64
 }
 
 type OrderBook struct {
-	protocol.Serializable
 	Symbol string
 	Time   time.Time
 	Asks   []OrderItem
@@ -112,7 +110,6 @@ func (o *OrderBook) AskPrice() (result float64) {
 }
 
 type Order struct {
-	protocol.Serializable
 	Id string
 	ClientId string	//exchange only
 	Symbol string

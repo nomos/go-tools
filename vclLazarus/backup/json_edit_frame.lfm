@@ -7,8 +7,8 @@ object JsonEditFrame: TJsonEditFrame
   ClientHeight = 543
   ClientWidth = 744
   TabOrder = 0
-  DesignLeft = 492
-  DesignTop = 245
+  DesignLeft = 763
+  DesignTop = 418
   object OpPanel: TPanel
     Left = 0
     Height = 64
@@ -19,7 +19,7 @@ object JsonEditFrame: TJsonEditFrame
     BevelOuter = bvNone
     ClientHeight = 64
     ClientWidth = 744
-    Color = 15527148
+    Color = 13619151
     ParentColor = False
     TabOrder = 0
     object Button_Object: TSpeedButton
@@ -28,7 +28,7 @@ object JsonEditFrame: TJsonEditFrame
       Hint = '新建对象'
       Top = 16
       Width = 34
-      Color = 13619151
+      Color = clBlack
       Flat = True
       Images = ButtonImageList
       ImageIndex = 1
@@ -268,6 +268,7 @@ object JsonEditFrame: TJsonEditFrame
     TabOrder = 4
   end
   object ButtonImageList: TImageList
+    DrawingStyle = dsTransparent
     Left = 824
     Top = 16
     Bitmap = {

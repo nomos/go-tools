@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="11"/>
     <BuildModes Active="Default"/>
-    <Units Count="13">
+    <Units Count="14">
       <Unit0>
         <Filename Value="vcltool.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -19,8 +19,11 @@
         <ComponentName Value="JsonEditFrame"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
-        <EditorIndex Value="-1"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="3"/>
+        <CursorPos Y="46"/>
         <UsageCount Value="348"/>
+        <Loaded Value="True"/>
       </Unit1>
       <Unit2>
         <Filename Value="json_value_edit_frame.pas"/>
@@ -35,11 +38,9 @@
         <Filename Value="text_frame.pas"/>
         <IsPartOfProject Value="True"/>
         <HasResources Value="True"/>
-        <EditorIndex Value="-1"/>
-        <WindowIndex Value="-1"/>
-        <TopLine Value="-1"/>
-        <CursorPos X="-1" Y="-1"/>
+        <EditorIndex Value="4"/>
         <UsageCount Value="348"/>
+        <Loaded Value="True"/>
       </Unit3>
       <Unit4>
         <Filename Value="web_view_frame.pas"/>
@@ -62,11 +63,10 @@
         <Filename Value="quant_trade_frame.pas"/>
         <IsPartOfProject Value="True"/>
         <HasResources Value="True"/>
-        <EditorIndex Value="-1"/>
-        <WindowIndex Value="-1"/>
-        <TopLine Value="-1"/>
-        <CursorPos X="-1" Y="-1"/>
+        <EditorIndex Value="5"/>
+        <CursorPos X="27" Y="31"/>
         <UsageCount Value="348"/>
+        <Loaded Value="True"/>
       </Unit6>
       <Unit7>
         <Filename Value="chart_frame.pas"/>
@@ -81,10 +81,11 @@
         <ComponentName Value="AutoDeploy"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
-        <EditorIndex Value="-1"/>
+        <EditorIndex Value="2"/>
         <TopLine Value="12"/>
         <CursorPos X="105" Y="57"/>
         <UsageCount Value="333"/>
+        <Loaded Value="True"/>
       </Unit8>
       <Unit9>
         <Filename Value="form_list_frame.pas"/>
@@ -92,8 +93,9 @@
         <ComponentName Value="FormListFrame"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
-        <EditorIndex Value="-1"/>
+        <EditorIndex Value="6"/>
         <UsageCount Value="330"/>
+        <Loaded Value="True"/>
       </Unit9>
       <Unit10>
         <Filename Value="deploy_frame.pas"/>
@@ -110,23 +112,36 @@
         <ComponentName Value="Excel2JsonMiniGameFrame"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
-        <EditorIndex Value="-1"/>
-        <WindowIndex Value="-1"/>
+        <EditorIndex Value="7"/>
         <UsageCount Value="310"/>
+        <Loaded Value="True"/>
       </Unit11>
       <Unit12>
         <Filename Value="image2arraybuffer.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="Image2ArrayBuffer"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
-        <IsVisibleTab Value="True"/>
         <CursorPos X="3" Y="32"/>
         <UsageCount Value="225"/>
         <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
       </Unit12>
+      <Unit13>
+        <Filename Value="imagecutter.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="ImageCutter"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Frame"/>
+        <EditorIndex Value="1"/>
+        <UsageCount Value="21"/>
+        <Loaded Value="True"/>
+      </Unit13>
     </Units>
-    <JumpHistory HistoryIndex="-1"/>
+    <JumpHistory Count="1">
+      <Position1>
+        <Filename Value="json_edit_frame.pas"/>
+      </Position1>
+    </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
       <Modes Count="0" ActiveMode=""/>

@@ -19,7 +19,6 @@ object JsonEditFrame: TJsonEditFrame
     BevelOuter = bvNone
     ClientHeight = 64
     ClientWidth = 744
-    Color = 15527148
     ParentColor = False
     TabOrder = 0
     object Button_Object: TSpeedButton
@@ -28,7 +27,7 @@ object JsonEditFrame: TJsonEditFrame
       Hint = '新建对象'
       Top = 16
       Width = 34
-      Color = 13619151
+      Color = clBlack
       Flat = True
       Images = ButtonImageList
       ImageIndex = 1
@@ -268,6 +267,7 @@ object JsonEditFrame: TJsonEditFrame
     TabOrder = 4
   end
   object ButtonImageList: TImageList
+    DrawingStyle = dsTransparent
     Left = 824
     Top = 16
     Bitmap = {

@@ -34,6 +34,7 @@ type
     StatusBar: TStatusBar;
     TreePanel: TTreeView;
     DownButton: TSpeedButton;
+    procedure Button_ObjectClick(Sender: TObject);
     procedure EditPanelClick(Sender: TObject);
     procedure PairSplitterSide2MouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -50,6 +51,11 @@ implementation
 { TJsonEditFrame }
 
 procedure TJsonEditFrame.EditPanelClick(Sender: TObject);
+begin
+
+end;
+
+procedure TJsonEditFrame.Button_ObjectClick(Sender: TObject);
 begin
 
 end;
