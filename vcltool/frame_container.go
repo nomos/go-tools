@@ -3,15 +3,15 @@ package vcltool
 import (
 	"github.com/nomos/go-events"
 	"github.com/nomos/go-log/log"
-	"github.com/nomos/go-lokas/util"
+	"github.com/nomos/go-lokas"
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
 )
 
 type IConfigAble interface {
-	Config()*util.AppConfig
+	Config()lokas.IConfig
 	SheetName()string
-	SetConfig(config *util.AppConfig)
+	SetConfig(config lokas.IConfig)
 	SetContent(s string,data interface{})
 	GetContent(s string)interface{}
 	setSheetName(s string)
@@ -20,7 +20,7 @@ type IConfigAble interface {
 
 type ConfigAble struct {
 	content map[string]interface{}
-	conf *util.AppConfig
+	conf lokas.IConfig
 	log log.ILogger
 	sheetName string
 	listener events.EventEmmiter
@@ -64,11 +64,11 @@ func (this *ConfigAble) SetLogger(log log.ILogger) {
 	this.log = log
 }
 
-func (this *ConfigAble) SetConfig(config *util.AppConfig) {
+func (this *ConfigAble) SetConfig(config lokas.IConfig) {
 	this.conf = config
 }
 
-func (this *ConfigAble) Config()*util.AppConfig{
+func (this *ConfigAble) Config()lokas.IConfig{
 	return this.conf
 }
 
@@ -174,7 +174,7 @@ func (this *FrameContainer) GetIFrame(s string)IFrame{
 
 type FrameOption func(frame IFrame)
 
-func WithConfig(conf *util.AppConfig)FrameOption{
+func WithConfig(conf lokas.IConfig)FrameOption{
 	return func(frame IFrame) {
 		frame.SetConfig(conf)
 	}

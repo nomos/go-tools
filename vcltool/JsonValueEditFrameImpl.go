@@ -6,7 +6,7 @@ package vcltool
 import (
     "github.com/nomos/go-events"
     "github.com/nomos/go-log/log"
-    "github.com/nomos/go-lokas/util"
+    "github.com/nomos/go-lokas"
     "github.com/nomos/go-tools/pjson"
     "github.com/ying32/govcl/vcl"
     "github.com/ying32/govcl/vcl/types"
@@ -22,7 +22,7 @@ type TJsonValueEditFrameFields struct {
     schema *pjson.Schema
     onSchemaChange func()
     assigning bool
-    conf *util.AppConfig
+    conf lokas.IConfig
 }
 
 func (this *TJsonValueEditFrame) OnCreate(){
