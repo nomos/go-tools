@@ -18,6 +18,7 @@ type ICommandSender interface {
 type ICommand interface {
 	Name()string
 	ConsoleExec(param *ParamsValue,console *TConsoleShell)*promise.Promise
+	ExecWithConsole(console *TConsoleShell,params... string)*promise.Promise
 	Exec(params... string)*promise.Promise
 	Tips()string
 }
@@ -47,7 +48,15 @@ func (this *Command) Exec(params... string)*promise.Promise{
 		offset: 0,
 	}
 	return this.ConsoleExec(param,&TConsoleShell{})
+}
 
+func (this *Command) ExecWithConsole(console *TConsoleShell,params... string)*promise.Promise{
+	param:=&ParamsValue{
+		cmd:    "",
+		value: params,
+		offset: 0,
+	}
+	return this.ConsoleExec(param,console)
 }
 
 func (this *Command) ConsoleExec(param *ParamsValue,console *TConsoleShell)*promise.Promise {
@@ -79,7 +88,8 @@ func (this *Command) ConsoleExec(param *ParamsValue,console *TConsoleShell)*prom
 							}
 						}
 					} else {
-						console.Write([]byte(this.name+" 执行命令时出现未知错误"))
+						log.Error(err.Error())
+						console.Write([]byte(this.name+" 执行命令时出现未知错误:"+err.Error()))
 					}
 					errStr:="type "+this.name+" help|?"
 					log.Info(errStr)
@@ -155,6 +165,14 @@ func NewCmdError(errType int,cmd string,offset int,typ string)*CmdError {
 	}
 }
 
+func (this *ParamsValue) LeftParams()[]interface{}{
+	ret:=[]interface{}{}
+	for i :=this.offset;i<len(this.value);i++{
+		ret = append(ret, this.value[i])
+	}
+	return ret
+}
+
 func (this *ParamsValue) StringOpt()string {
 	if len(this.value)-1<this.offset {
 		return ""
@@ -184,7 +202,6 @@ func (this *ParamsValue) Int()int {
 	this.offset++
 	return ret
 }
-
 
 func (this *ParamsValue) IntOpt()int {
 	if len(this.value)-1<this.offset {

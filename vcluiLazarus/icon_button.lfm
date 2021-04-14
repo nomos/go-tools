@@ -1,14 +1,18 @@
 object IconButton: TIconButton
   Left = 0
-  Height = 269
+  Height = 32
   Top = 0
-  Width = 299
+  Width = 32
   Align = alClient
-  ClientHeight = 269
-  ClientWidth = 299
+  ClientHeight = 32
+  ClientWidth = 32
+  Constraints.MaxHeight = 32
+  Constraints.MaxWidth = 32
+  Constraints.MinHeight = 32
+  Constraints.MinWidth = 32
   TabOrder = 0
-  DesignLeft = 842
-  DesignTop = 454
+  DesignLeft = 735
+  DesignTop = 326
   object Button: TSpeedButton
     AnchorSideLeft.Control = Owner
     AnchorSideLeft.Side = asrCenter
@@ -18,9 +22,9 @@ object IconButton: TIconButton
     AnchorSideRight.Side = asrCenter
     AnchorSideBottom.Control = Owner
     AnchorSideBottom.Side = asrCenter
-    Left = 133
+    Left = 0
     Height = 32
-    Top = 118
+    Top = 0
     Width = 32
     Constraints.MaxHeight = 32
     Constraints.MaxWidth = 32

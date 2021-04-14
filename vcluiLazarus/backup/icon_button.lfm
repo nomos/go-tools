@@ -26,7 +26,7 @@ object IconButton: TIconButton
     Constraints.MaxWidth = 32
     Constraints.MinHeight = 32
     Constraints.MinWidth = 32
-    Color = clDefault
+    Color = clWhite
     Flat = True
     Images = Resource.ImageList
     ImageIndex = 0
