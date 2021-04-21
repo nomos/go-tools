@@ -301,7 +301,7 @@ object Excel2JsonMiniGameFrame: TExcel2JsonMiniGameFrame
   object IndieFolderCheck: TCheckBox
     Left = 32
     Height = 18
-    Top = 160
+    Top = 163
     Width = 60
     Caption = '嵌入Ts'
     TabOrder = 2

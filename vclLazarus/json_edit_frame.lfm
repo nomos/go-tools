@@ -7,8 +7,8 @@ object JsonEditFrame: TJsonEditFrame
   ClientHeight = 543
   ClientWidth = 744
   TabOrder = 0
-  DesignLeft = 763
-  DesignTop = 418
+  DesignLeft = 725
+  DesignTop = 407
   object OpPanel: TPanel
     Left = 0
     Height = 64

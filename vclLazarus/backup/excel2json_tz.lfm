@@ -1,13 +1,14 @@
-object Excel2JsonMiniGameFrame: TExcel2JsonMiniGameFrame
+object Excel2JsonTz: TExcel2JsonTz
   Left = 0
-  Height = 212
+  Height = 236
   Top = 0
-  Width = 523
-  ClientHeight = 212
-  ClientWidth = 523
+  Width = 597
+  Align = alClient
+  ClientHeight = 236
+  ClientWidth = 597
   TabOrder = 0
-  DesignLeft = 520
-  DesignTop = 654
+  DesignLeft = 1117
+  DesignTop = 756
   object OpenExcelDirButton: TSpeedButton
     Left = 32
     Height = 30
@@ -298,14 +299,6 @@ object Excel2JsonMiniGameFrame: TExcel2JsonMiniGameFrame
     Width = 408
     TabOrder = 1
   end
-  object IndieFolderCheck: TCheckBox
-    Left = 32
-    Height = 18
-    Top = 163
-    Width = 66
-    Caption = '嵌入Ts'
-    TabOrder = 2
-  end
   object Label1: TLabel
     Left = 32
     Height = 16
@@ -328,7 +321,7 @@ object Excel2JsonMiniGameFrame: TExcel2JsonMiniGameFrame
     Top = 150
     Width = 121
     Caption = '生成配置'
-    TabOrder = 3
+    TabOrder = 2
   end
   object HelpButton: TSpeedButton
     Left = 464
@@ -343,6 +336,24 @@ object Excel2JsonMiniGameFrame: TExcel2JsonMiniGameFrame
     Top = 162
     Width = 137
     Caption = '初次使用请查看帮助'
+    TabOrder = 3
+  end
+  object ExportSelect: TComboBox
+    Left = 32
+    Height = 20
+    Top = 160
+    Width = 100
+    AutoDropDown = True
+    DropDownCount = 0
+    ItemHeight = 19
+    Items.Strings = (
+      'Server'
+      'Client'
+      'All'
+    )
+    OnChange = ExportSelectChange
+    ParentShowHint = False
     TabOrder = 4
+    Text = 'Server'
   end
 end

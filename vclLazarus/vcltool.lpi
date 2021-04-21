@@ -30,7 +30,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="14">
+    <Units Count="15">
       <Unit0>
         <Filename Value="vcltool.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -117,6 +117,13 @@
         <ComponentName Value="ImageCutter"/>
         <ResourceBaseClass Value="Frame"/>
       </Unit13>
+      <Unit14>
+        <Filename Value="excel2json_tz.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="Excel2JsonTz"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Frame"/>
+      </Unit14>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

@@ -130,7 +130,6 @@
         <Filename Value="imagecutter.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="ImageCutter"/>
-        <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
         <EditorIndex Value="1"/>
         <UsageCount Value="21"/>

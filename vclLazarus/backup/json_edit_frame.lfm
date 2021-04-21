@@ -19,7 +19,6 @@ object JsonEditFrame: TJsonEditFrame
     BevelOuter = bvNone
     ClientHeight = 64
     ClientWidth = 744
-    Color = 13619151
     ParentColor = False
     TabOrder = 0
     object Button_Object: TSpeedButton
