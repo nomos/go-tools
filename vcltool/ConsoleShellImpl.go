@@ -18,6 +18,7 @@ import (
 	"io"
 	"regexp"
 	"strings"
+	"time"
 )
 
 //::private::
@@ -148,7 +149,7 @@ func (this *TConsoleShell) OnCreate(){
 }
 
 func (this *TConsoleShell) start(){
-	this.msgChan = make(chan string,1)
+	this.msgChan = make(chan string,1000)
 	this.done = make(chan struct{})
 	go func() {
 		for {
@@ -160,6 +161,7 @@ func (this *TConsoleShell) start(){
 			case <-this.done:
 				return
 			}
+			time.Sleep(1)
 		}
 	}()
 }
