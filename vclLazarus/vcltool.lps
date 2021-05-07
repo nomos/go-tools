@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="11"/>
     <BuildModes Active="Default"/>
-    <Units Count="15">
+    <Units Count="17">
       <Unit0>
         <Filename Value="vcltool.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -31,7 +31,6 @@
         <ComponentName Value="JsonValueEditFrame"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="9"/>
         <UsageCount Value="348"/>
         <Loaded Value="True"/>
@@ -135,7 +134,7 @@
         <ComponentName Value="ImageCutter"/>
         <ResourceBaseClass Value="Frame"/>
         <EditorIndex Value="1"/>
-        <UsageCount Value="21"/>
+        <UsageCount Value="23"/>
         <Loaded Value="True"/>
       </Unit13>
       <Unit14>
@@ -146,10 +145,32 @@
         <ResourceBaseClass Value="Frame"/>
         <EditorIndex Value="8"/>
         <CursorPos X="3" Y="40"/>
-        <UsageCount Value="20"/>
+        <UsageCount Value="22"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit14>
+      <Unit15>
+        <Filename Value="empty.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="Form1"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="10"/>
+        <UsageCount Value="22"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit15>
+      <Unit16>
+        <Filename Value="model_gen.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="ModelGenFrame"/>
+        <ResourceBaseClass Value="Frame"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="11"/>
+        <CursorPos X="93" Y="16"/>
+        <UsageCount Value="22"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit16>
     </Units>
     <JumpHistory Count="3" HistoryIndex="2">
       <Position1>

@@ -7,7 +7,7 @@ object Excel2JsonTz: TExcel2JsonTz
   ClientHeight = 236
   ClientWidth = 597
   TabOrder = 0
-  DesignLeft = 1117
+  DesignLeft = 1116
   DesignTop = 756
   object OpenExcelDirButton: TSpeedButton
     Left = 32
@@ -345,7 +345,8 @@ object Excel2JsonTz: TExcel2JsonTz
     Width = 100
     AutoDropDown = True
     DropDownCount = 0
-    ItemHeight = 19
+    ItemHeight = 26
+    ItemIndex = 0
     Items.Strings = (
       'Server'
       'Client'
@@ -353,6 +354,7 @@ object Excel2JsonTz: TExcel2JsonTz
     )
     OnChange = ExportSelectChange
     ParentShowHint = False
+    Style = csDropDownList
     TabOrder = 4
     Text = 'Server'
   end

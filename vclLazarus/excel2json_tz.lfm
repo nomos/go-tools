@@ -7,8 +7,8 @@ object Excel2JsonTz: TExcel2JsonTz
   ClientHeight = 236
   ClientWidth = 597
   TabOrder = 0
-  DesignLeft = 1116
-  DesignTop = 756
+  DesignLeft = 458
+  DesignTop = 890
   object OpenExcelDirButton: TSpeedButton
     Left = 32
     Height = 30

@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="11"/>
     <BuildModes Active="Default"/>
-    <Units Count="14">
+    <Units Count="15">
       <Unit0>
         <Filename Value="vcltool.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -19,11 +19,11 @@
         <ComponentName Value="JsonEditFrame"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
         <CursorPos Y="46"/>
         <UsageCount Value="348"/>
         <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
       </Unit1>
       <Unit2>
         <Filename Value="json_value_edit_frame.pas"/>
@@ -31,8 +31,10 @@
         <ComponentName Value="JsonValueEditFrame"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
-        <EditorIndex Value="-1"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="9"/>
         <UsageCount Value="348"/>
+        <Loaded Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="text_frame.pas"/>
@@ -115,6 +117,7 @@
         <EditorIndex Value="7"/>
         <UsageCount Value="310"/>
         <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
       </Unit11>
       <Unit12>
         <Filename Value="image2arraybuffer.pas"/>
@@ -135,11 +138,30 @@
         <UsageCount Value="21"/>
         <Loaded Value="True"/>
       </Unit13>
+      <Unit14>
+        <Filename Value="excel2json_tz.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="Excel2JsonTz"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Frame"/>
+        <EditorIndex Value="8"/>
+        <CursorPos X="3" Y="40"/>
+        <UsageCount Value="20"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit14>
     </Units>
-    <JumpHistory Count="1">
+    <JumpHistory Count="3" HistoryIndex="2">
       <Position1>
         <Filename Value="json_edit_frame.pas"/>
       </Position1>
+      <Position2>
+        <Filename Value="excel2json_tz.pas"/>
+      </Position2>
+      <Position3>
+        <Filename Value="excel2json_tz.pas"/>
+        <Caret Line="41" Column="3"/>
+      </Position3>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>

@@ -16,7 +16,6 @@ type TExcel2JsonMiniGameFrameFields struct {
 }
 
 func (this *TExcel2JsonMiniGameFrame) OnCreate(){
-	log.Warn("TExcel2JsonMiniGameFrame OnCreate")
 	openDirDialog := vcl.NewSelectDirectoryDialog(this)
 	openDirDialog.SetOptions(openDirDialog.Options().Include(types.OfShowHelp, types.OfAllowMultiSelect)) //rtl.Include(, types.OfShowHelp))
 	openDirDialog.SetTitle("打开文件夹")

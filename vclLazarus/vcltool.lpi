@@ -30,7 +30,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="15">
+    <Units Count="17">
       <Unit0>
         <Filename Value="vcltool.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -124,6 +124,18 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
       </Unit14>
+      <Unit15>
+        <Filename Value="empty.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="Form1"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit15>
+      <Unit16>
+        <Filename Value="model_gen.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="ModelGenFrame"/>
+        <ResourceBaseClass Value="Frame"/>
+      </Unit16>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
