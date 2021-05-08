@@ -6,6 +6,7 @@ package vcltool
 import (
 	"github.com/nomos/go-log/log"
 	"github.com/ying32/govcl/vcl"
+    "github.com/ying32/govcl/vcl/types"
 	"regexp"
 	"strconv"
 	"strings"

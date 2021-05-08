@@ -1,9 +1,9 @@
 object Form1: TForm1
-  Left = 792
+  Left = 665
   Height = 287
-  Top = 558
+  Top = 664
   Width = 588
   Align = alClient
-  Caption = 'EmptyForm'
+  Caption = '未命名'
   LCLVersion = '2.0.10.0'
 end

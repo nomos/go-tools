@@ -4,7 +4,7 @@
 package vcltool
 
 //::private::
-type TForm1Fields struct {
+type TEmptyFormFields struct {
 }
 
 

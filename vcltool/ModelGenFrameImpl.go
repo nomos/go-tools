@@ -5,6 +5,7 @@ package vcltool
 
 import (
     "github.com/ying32/govcl/vcl"
+    "github.com/ying32/govcl/vcl/types"
 )
 
 //::private::
