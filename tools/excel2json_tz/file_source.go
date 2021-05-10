@@ -10,7 +10,7 @@ func newFileSource(p string)*fileSource{
 	ret:=&fileSource{
 		path:    p,
 		sheets:  []*sheetSource{},
-		mapping: newMappingSource(),
+		//mapping: newMappingSource(),
 	}
 	return ret
 }
@@ -41,7 +41,12 @@ func (this *fileSource) readMappingSource()error {
 	var err error
 	for _,key:=range this.file.GetSheetList() {
 		if key == MappingTag {
-			this.mapping.ReadIn()
+			err=this.mapping.Load()
+			if err != nil {
+				log.Error(err.Error())
+				return err
+			}
+			return nil
 		}
 	}
 	return errors.New("mapping source not found")

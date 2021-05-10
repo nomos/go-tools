@@ -400,7 +400,6 @@ func Decode(reader io.Reader,bgrFlip bool) (*Texture, error) {
 			}
 		}
 	} else {
-		//return 0, 0, nil, fmt.Errorf("TODO uncompressed")
 		DXT_family = 0
 		img_n = 3
 		if has_alpha {
@@ -414,7 +413,6 @@ func Decode(reader io.Reader,bgrFlip bool) (*Texture, error) {
 		// do this once for each face
 		for cf := 0; cf < int(cubemap_faces); cf += 1 {
 
-			// TODO: make it efficient.
 			//stbi__getn( s, &dds_data[cf*s->img_x*s->img_y*s->img_n], s->img_x*s->img_y*s->img_n );
 			faces_buf := make([]byte, img_x*img_y*uint32(img_n))
 			io.ReadFull(reader, faces_buf)
