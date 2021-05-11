@@ -13,6 +13,7 @@ import (
 //::private::
 type TExcel2JsonTzFields struct {
     ConfigAble
+    generator *excel2json_tz.Generator
 }
 
 func (this *TExcel2JsonTz) OnCreate(){
@@ -22,6 +23,8 @@ func (this *TExcel2JsonTz) OnCreate(){
     openDirDialog.SetTitle("打开文件夹")
     if this.getExcelPath()!="" {
         this.setExcelPath(this.getExcelPath())
+        this.generator = excel2json_tz.New(this.getExcelPath())
+        this.generator.Load()
     }
     if this.getDistPath()!="" {
         this.setDistPath(this.getDistPath())
@@ -46,10 +49,13 @@ func (this *TExcel2JsonTz) OnCreate(){
             p := openDirDialog.FileName()
             this.log.Warn("选择导出路径"+p)
             this.setDistPath(p)
+            this.generator = excel2json_tz.New(this.getExcelPath())
+            this.generator.Load()
         }
     })
     this.ExportSelect.SetOnChange(func(sender vcl.IObject) {
-        this.SetExportType(excel2json_tz.GetExportType(this.ExportSelect.Text()))
+        exportType,_:=excel2json_tz.GetExportType(this.ExportSelect.Text())
+        this.SetExportType(exportType)
     })
     this.GenerateButton.SetOnClick(func(sender vcl.IObject) {
         if this.getExcelPath()=="" {
@@ -74,7 +80,8 @@ func (this *TExcel2JsonTz) SetExportType(t excel2json_tz.ExportType){
 }
 
 func (this *TExcel2JsonTz) GetExportType()excel2json_tz.ExportType{
-    return excel2json_tz.GetExportType(this.conf.GetString("exportType"))
+    exportType,_:= excel2json_tz.GetExportType(this.conf.GetString("exportType"))
+    return exportType
 }
 
 func (this *TExcel2JsonTz) getExcelPath()string {

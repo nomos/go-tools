@@ -1,13 +1,28 @@
 package excel2json_tz
 
+import "errors"
+
 const MappingTag = "Mapping"
 
-type fieldType int
+type FieldType int
 
 const (
-	type_string = iota + 1
-	type_int
-	type_float
+	ERR_CELL_NOT_EXIST = "cell not exist"
+)
+
+const (
+	EXCEL_INDEX_LINE = 0
+	EXCEL_EXPORT_LINE = 1
+	EXCEL_NAME_LINE  = 2
+	EXCEL_TYPE_LINE  = 3
+	EXCEL_DESC_LINE  = 4
+)
+
+const (
+	TypeString FieldType= iota + 1
+	TypeInt
+	TypeFloat
+
 )
 
 type ExportType string
@@ -23,31 +38,46 @@ func (this ExportType) String()string {
 	return string(this)
 }
 
-func GetExportType(s string)ExportType{
+func GetExportType(s string)(ExportType,error){
 	if s=="" {
-		return TypeAll
+		return TypeAll,nil
 	}
 	switch s {
 	case TypeAll.String():
-		return TypeAll
+		return TypeAll,nil
 	case TypeClient.String():
-		return TypeClient
+		return TypeClient,nil
 	case TypeServer.String():
-		return TypeServer
+		return TypeServer,nil
+	case TypeIgnore.String():
+		return TypeIgnore,nil
 	default:
-		panic("type not exist:"+s)
+		return "",errors.New("type not exist:"+s)
 	}
 }
 
-func (this fieldType) String() string {
+func (this FieldType) String() string {
 	switch this {
-	case type_string:
-		return "string"
-	case type_int:
+	case TypeString:
+		return "text"
+	case TypeInt:
 		return "int"
-	case type_float:
+	case TypeFloat:
 		return "float"
 	default:
 		return ""
+	}
+}
+
+func GetFieldType(s string)(FieldType,error){
+	switch s {
+	case TypeInt.String():
+		return TypeInt,nil
+	case TypeFloat.String():
+		return TypeFloat,nil
+	case TypeString.String():
+		return TypeString,nil
+	default:
+		return -1,errors.New("type not exist:"+s)
 	}
 }

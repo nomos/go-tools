@@ -9,22 +9,23 @@ import (
 func newFileSource(p string)*fileSource{
 	ret:=&fileSource{
 		path:    p,
-		sheets:  []*sheetSource{},
-		//mapping: newMappingSource(),
+		sheets:  map[string]*SheetSource{},
 	}
 	return ret
 }
 
 type fileSource struct {
 	path string
-	sheets []*sheetSource
+	sheets map[string]*SheetSource
 	mapping *mappingSource
 	file *excelize.File
 }
 
 func (this *fileSource) Load()error {
+	log.Infof("fileSource:Load",this.path)
 	var err error
 	this.file, err = excelize.OpenFile(this.path)
+	this.mapping = newMappingSource(this.file)
 	if err != nil {
 		log.Error(err.Error())
 		return err
@@ -32,6 +33,10 @@ func (this *fileSource) Load()error {
 	err=this.readMappingSource()
 	if err != nil {
 		log.Error(err.Error())
+		return err
+	}
+	err=this.readSheetSource()
+	if err != nil {
 		return err
 	}
 	return nil
@@ -50,4 +55,17 @@ func (this *fileSource) readMappingSource()error {
 		}
 	}
 	return errors.New("mapping source not found")
+}
+
+func (this *fileSource) readSheetSource()error {
+	for k,v:=range this.mapping.Mapping {
+		this.sheets[k] = NewSheetSource(this.file,k,v)
+	}
+	for _,s:=range this.sheets {
+		err:=s.Load()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

@@ -20,6 +20,7 @@ type dirSource struct {
 }
 
 func (this *dirSource) Load()error {
+	log.Infof("dirSource:Load",this.dir)
 	paths,err := util.WalkDirFiles(this.dir,false)
 	if err != nil {
 		log.Error(err.Error())
@@ -32,9 +33,16 @@ func (this *dirSource) Load()error {
 	for _,p:=range paths {
 		this.addFileSource(p)
 	}
+	for _,f:=range this.files {
+		err:=f.Load()
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
 func (this *dirSource) addFileSource(p string) {
+	log.Infof("dirSource:addFileSource:",p)
 	this.files[p] = newFileSource(p)
 }
