@@ -94,7 +94,7 @@ func (this *DataLine) LogString(lenOffset []int)string {
 	}
 	ret:=""
 	for i,v:=range strArr {
-		for getDescLen(ret)+4<lenOffset[i] {
+		for getDescLen(ret)<lenOffset[i] {
 			ret+=" "
 		}
 		ret+=v

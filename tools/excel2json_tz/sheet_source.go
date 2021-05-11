@@ -173,7 +173,7 @@ func (this *SheetSource) LoadData()error{
 		}
 	}
 	for _,v:=range this.Data {
-		log.Infof(stringutil.AddStringGap(v.Row.RowName(),3,1),v.LogString(lenOffset))
+		log.Infof(stringutil.AddStringGap("["+v.Row.RowName()+"]",7,1)+v.LogString(lenOffset))
 	}
 	if len(lineIgnores)>0 {
 		log.Warnf("跳过空行:"+strings.Join(lineIgnores,"|"))
