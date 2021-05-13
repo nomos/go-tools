@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func SplitCommand(cmd string)(string,[]string){
+func SplitCommandParams(cmd string)(string,[]string){
 	splits := strings.Split(cmd," ")
 	if len(splits)==0 {
 		return "",[]string{}
