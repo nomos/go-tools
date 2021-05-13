@@ -101,12 +101,26 @@ func (this *Command) Tips()string{
 	return this.tips
 }
 
+func (this *Command) SetConsole(console IConsole) {
+	this.console = console
+}
+
 func NewCommand(name string,tips string,f func(value *ParamsValue,console IConsole)*promise.Promise,console IConsole)ICommand{
 	ret:=&Command{
 		name: name,
 		execFunc: f,
 		tips:tips,
 		console:console,
+	}
+	return ret
+}
+
+func NewCommandNoConsole(name string,tips string,f func(value *ParamsValue,console IConsole)*promise.Promise)ICommand{
+	ret:=&Command{
+		name: name,
+		execFunc: f,
+		tips:tips,
+		console:nil,
 	}
 	return ret
 }
