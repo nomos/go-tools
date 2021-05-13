@@ -1,9 +1,0 @@
-object Layout: TLayout
-  Left = 0
-  Height = 417
-  Top = 0
-  Width = 583
-  TabOrder = 0
-  DesignLeft = 945
-  DesignTop = 519
-end

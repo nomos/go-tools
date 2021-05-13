@@ -1,8 +1,10 @@
 package excel2json_tz
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/360EntSecGroup-Skylar/excelize"
+	"github.com/iancoleman/orderedmap"
 	"github.com/nomos/go-log/log"
 	"github.com/nomos/go-lokas/util/stringutil"
 	"regexp"
@@ -90,6 +92,8 @@ func (this *SheetSource) Load()error {
 	if err != nil {
 		return err
 	}
+	this.GenerateGoString()
+	this.GenerateJson()
 	return nil
 }
 
@@ -206,12 +210,44 @@ func (this *SheetSource) readLine(row *RowSource)error{
 	return nil
 }
 
+const __gostr = `package data
+
+type {ClassName} struct {
+{ClassFields}
+}
+`
+
+
 func (this *SheetSource) GenerateGoString()string{
+	ret:=__gostr
+	ret = strings.Replace(ret,"{ClassName}",this.Name,-1)
+	ret = strings.Replace(ret,"ClassFields",this.generateGoFields(),-1)
+	log.Warnf("generateGoFields",ret)
+	return ret
+}
+
+func (this *SheetSource) generateGoFields()string{
 	ret:=""
+	for _,f:=range this.DataFields {
+		ret+="\t"
+		ret+=f.Name
+		ret+=" "
+		ret+=f.Typ.GoString()
+		ret+=" //"
+		ret+=f.Desc
+		ret+="\n"
+	}
+	ret = strings.TrimRight(ret,"\n")
 	return ret
 }
 
 func (this *SheetSource) GenerateJson()string{
-	ret:=""
+	m:=[]*orderedmap.OrderedMap{}
+	for _,l:=range this.Data {
+		m = append(m, l.Map)
+	}
+	data,_:=json.Marshal(m)
+	ret:=string(data)
+	log.Warnf("GenerateJson",ret)
 	return ret
 }

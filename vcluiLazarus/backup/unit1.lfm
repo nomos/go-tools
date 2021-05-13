@@ -1,7 +1,0 @@
-object Resource: TResource
-  OldCreateOrder = False
-  Height = 546
-  HorizontalOffset = 762
-  VerticalOffset = 445
-  Width = 758
-end

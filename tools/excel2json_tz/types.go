@@ -69,6 +69,19 @@ func (this FieldType) String() string {
 	}
 }
 
+func (this FieldType) GoString() string {
+	switch this {
+	case TypeString:
+		return "string"
+	case TypeInt:
+		return "int32"
+	case TypeFloat:
+		return "float64"
+	default:
+		return ""
+	}
+}
+
 func GetFieldType(s string)(FieldType,error){
 	switch s {
 	case TypeInt.String():
