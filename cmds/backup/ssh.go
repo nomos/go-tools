@@ -1,4 +1,4 @@
-package cmds
+package backup
 
 func init(){
 	RegisterCmd("sshx",sshexec)

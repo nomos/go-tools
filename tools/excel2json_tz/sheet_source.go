@@ -217,7 +217,6 @@ type {ClassName} struct {
 }
 `
 
-
 func (this *SheetSource) GenerateGoString()string{
 	ret:=__gostr
 	ret = strings.Replace(ret,"{ClassName}",this.Name,-1)
