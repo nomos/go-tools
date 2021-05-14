@@ -2,6 +2,8 @@ package excel2json_tz
 
 import (
 	"github.com/nomos/go-log/log"
+	"github.com/nomos/go-lokas/util/stringutil"
+	"path"
 	"runtime/debug"
 )
 
@@ -31,11 +33,14 @@ func (this *Generator) Load()error {
 	return nil
 }
 
-func (this *Generator) Generate()error{
-	err:=this.Load()
-	if err != nil {
-		log.Error(err.Error())
-		return err
+func (this *Generator) Generate(p string)error{
+	for _,f:=range this.dirSource.files {
+		for _,s:=range f.sheets {
+			goFilePath:=path.Join(p,stringutil.SplitCamelCaseLowerSlash(s.Name))+".go"
+			log.Warnf(goFilePath)
+			s.GenerateGoString()
+			s.GenerateJson()
+		}
 	}
 	return nil
 }

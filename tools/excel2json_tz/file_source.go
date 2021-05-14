@@ -59,7 +59,7 @@ func (this *fileSource) readMappingSource()error {
 
 func (this *fileSource) readSheetSource()error {
 	for k,v:=range this.mapping.Mapping {
-		this.sheets[k] = NewSheetSource(this.file,k,v)
+		this.sheets[k] = NewSheetSource(this.file,v,k)
 	}
 	for _,s:=range this.sheets {
 		err:=s.Load()

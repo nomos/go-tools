@@ -68,7 +68,7 @@ func (this *SheetSource) GetCellByName(name string)(*CellSource,error){
 
 func (this *SheetSource) Load()error {
 	log.Infof("SheetSource:Load:",this.Name,this.DescName)
-	rows,err:=this.file.Rows(this.Name)
+	rows,err:=this.file.Rows(this.DescName)
 	if err != nil {
 		log.Error(err.Error())
 		return err
@@ -92,8 +92,6 @@ func (this *SheetSource) Load()error {
 	if err != nil {
 		return err
 	}
-	this.GenerateGoString()
-	this.GenerateJson()
 	return nil
 }
 
@@ -219,7 +217,7 @@ type {ClassName} struct {
 
 func (this *SheetSource) GenerateGoString()string{
 	ret:=__gostr
-	ret = strings.Replace(ret,"{ClassName}",this.Name,-1)
+	ret = strings.Replace(ret,"{ClassName}",strings.Join(stringutil.SplitCamelCase(this.Name),""),-1)
 	ret = strings.Replace(ret,"ClassFields",this.generateGoFields(),-1)
 	log.Warnf("generateGoFields",ret)
 	return ret
