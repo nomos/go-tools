@@ -1,6 +1,10 @@
 package excel2json_tz
 
-import "github.com/360EntSecGroup-Skylar/excelize"
+import (
+	"github.com/360EntSecGroup-Skylar/excelize"
+	"github.com/nomos/go-lokas/util/stringutil"
+	"strings"
+)
 
 type DataField struct {
 	ColIndex   int
@@ -9,6 +13,7 @@ type DataField struct {
 	Typ        FieldType
 	Name       string
 	Desc       string
+	IsPercent bool
 	sheet      *SheetSource
 }
 
@@ -20,6 +25,7 @@ func NewDataField(sheet *SheetSource, colIndex int, index int) *DataField {
 		Typ:        0,
 		Name:       "",
 		Desc:       "",
+		IsPercent :false,
 		sheet:      sheet,
 	}
 	return ret
@@ -49,6 +55,9 @@ func (this *DataField) readIn(row int, cell *CellSource) (*Data, error) {
 		s, err := cell.Float()
 		if err != nil {
 			return nil, err
+		}
+		if this.IsPercent {
+			s = s/100
 		}
 		return NewData(this, cell, s), nil
 	case TypeInt:
@@ -83,7 +92,12 @@ func (this *DataField) Load() error {
 	if err != nil {
 		return err
 	}
-	this.Name = nameCell.String()
+	this.Name = strings.Join(stringutil.SplitCamelCaseCapitalize(nameCell.String()),"")
+	name := strings.Replace(this.Name,"%","",-1)
+	if name!=this.Name {
+		this.IsPercent = true
+		this.Name = name
+	}
 	descCell,err := this.sheet.GetCell(EXCEL_DESC_LINE, this.ColIndex)
 	if err != nil {
 		return err

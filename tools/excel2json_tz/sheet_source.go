@@ -23,7 +23,7 @@ type SheetSource struct {
 
 func NewSheetSource(file *excelize.File,name string,descName string)*SheetSource {
 	ret:=&SheetSource{
-		Name:       name,
+		Name:       strings.Join(stringutil.SplitCamelCaseCapitalize(name),""),
 		DescName:   descName,
 		DataFields: []*DataField{},
 		rows:       make([]*RowSource, 0),
@@ -208,7 +208,7 @@ func (this *SheetSource) readLine(row *RowSource)error{
 	return nil
 }
 
-const __gostr = `package data
+const __gostr = `package gamedata
 
 type {ClassName} struct {
 {ClassFields}
@@ -217,16 +217,32 @@ type {ClassName} struct {
 
 func (this *SheetSource) GenerateGoString()string{
 	ret:=__gostr
-	ret = strings.Replace(ret,"{ClassName}",strings.Join(stringutil.SplitCamelCase(this.Name),""),-1)
-	ret = strings.Replace(ret,"ClassFields",this.generateGoFields(),-1)
+	ret = strings.Replace(ret,"{ClassName}",strings.Join(stringutil.SplitCamelCaseCapitalize(this.Name),""),-1)
+	ret = strings.Replace(ret,"{ClassFields}",this.generateGoFields(),-1)
 	log.Warnf("generateGoFields",ret)
 	return ret
+}
+
+func (this *SheetSource) GetMainFieldType()string{
+	f:=this.DataFields[0]
+	return f.Typ.GoString()
+}
+
+func (this *SheetSource) GetDataFieldString()string{
+	return "\t"+this.Name+" map["+this.GetMainFieldType()+"]*"+this.Name
+}
+
+func (this *SheetSource) GetInitFieldString()string{
+	return "\t"+this.Name+":make(map["+this.GetMainFieldType()+"]*"+this.Name+"),"
 }
 
 func (this *SheetSource) generateGoFields()string{
 	ret:=""
 	for _,f:=range this.DataFields {
 		ret+="\t"
+		if f.ExportType == TypeIgnore||f.ExportType == TypeClient {
+			ret+="//"
+		}
 		ret+=f.Name
 		ret+=" "
 		ret+=f.Typ.GoString()
@@ -236,6 +252,14 @@ func (this *SheetSource) generateGoFields()string{
 	}
 	ret = strings.TrimRight(ret,"\n")
 	return ret
+}
+
+func (this *SheetSource) GetJsonMap()[]*orderedmap.OrderedMap{
+	m:=[]*orderedmap.OrderedMap{}
+	for _,l:=range this.Data {
+		m = append(m, l.Map)
+	}
+	return m
 }
 
 func (this *SheetSource) GenerateJson()string{
