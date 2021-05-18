@@ -40,7 +40,13 @@ func (this *Generator) Load()error {
 
 
 func (this *Generator) Generate(p string)error{
-	jsonMap:=map[string][]*orderedmap.OrderedMap{}
+	this.dirSource = newDirSource(this.dirSource.dir)
+	err:=this.dirSource.Load()
+	if err != nil {
+		log.Error(err.Error())
+		return err
+	}
+	jsonMap:=map[string]map[string]*orderedmap.OrderedMap{}
 	sheetArr:=[]*SheetSource{}
 	initFieldStr:=""
 	dataFieldStr:=""
@@ -70,22 +76,39 @@ import (
 	"github.com/nomos/go-log/log"
 )
 
-var DataMap = &dataMap{
-{InitFields}
-}
-
-type dataMap struct {
+type DataMap struct {
 {DataFields}
 }
 
-func (this *dataMap) LoadJsonData(data string)error{
-	err:=json.Unmarshal([]byte(data),this)
+func NewDataMap()*DataMap{
+	ret:=&DataMap{}
+	ret.Clear()
+	return ret
+}
+
+func (this *DataMap) Clear() {
+{InitFields}
+}
+
+func (this *DataMap) LoadJsonData(data []byte) error {
+	err := json.Unmarshal(data, this)
 	if err != nil {
 		log.Error(err.Error())
 		return err
 	}
 	return nil
-}`
+}
+
+func (this *DataMap) LoadFromDb() error {
+	return nil
+}
+
+func (this *DataMap) SaveToDb() error {
+	return nil
+}
+`
+
+
 	dataStr = strings.Replace(dataStr,"{InitFields}",initFieldStr,-1)
 	dataStr = strings.Replace(dataStr,"{DataFields}",dataFieldStr,-1)
 	jsonStr,err:=json.Marshal(jsonMap)

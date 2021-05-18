@@ -233,7 +233,7 @@ func (this *SheetSource) GetDataFieldString()string{
 }
 
 func (this *SheetSource) GetInitFieldString()string{
-	return "\t"+this.Name+":make(map["+this.GetMainFieldType()+"]*"+this.Name+"),"
+	return "\tthis."+this.Name+"=make(map["+this.GetMainFieldType()+"]*"+this.Name+")"
 }
 
 func (this *SheetSource) generateGoFields()string{
@@ -254,10 +254,11 @@ func (this *SheetSource) generateGoFields()string{
 	return ret
 }
 
-func (this *SheetSource) GetJsonMap()[]*orderedmap.OrderedMap{
-	m:=[]*orderedmap.OrderedMap{}
+func (this *SheetSource) GetJsonMap()map[string]*orderedmap.OrderedMap{
+	m:=map[string]*orderedmap.OrderedMap{}
 	for _,l:=range this.Data {
-		m = append(m, l.Map)
+		str,_:=l.line[0].String()
+		m[str] = l.Map
 	}
 	return m
 }
