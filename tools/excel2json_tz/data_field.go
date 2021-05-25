@@ -86,7 +86,7 @@ func (this *DataField) Load() error {
 	}
 	this.Typ, err = GetFieldType(typeCell.String())
 	if err != nil {
-		return err
+		return NewExcellError(EXCEL_TYPE_LINE, this.ColIndex, err.Error())
 	}
 	nameCell ,err:= this.sheet.GetCell(EXCEL_NAME_LINE, this.ColIndex)
 	if err != nil {

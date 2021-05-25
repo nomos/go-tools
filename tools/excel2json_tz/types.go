@@ -1,6 +1,9 @@
 package excel2json_tz
 
-import "errors"
+import (
+	"errors"
+	"strings"
+)
 
 const MappingTag = "Mapping"
 
@@ -50,6 +53,14 @@ func GetExportType(s string)(ExportType,error){
 	case TypeServer.String():
 		return TypeServer,nil
 	case TypeIgnore.String():
+		return TypeIgnore,nil
+	case strings.ToLower(TypeAll.String()):
+		return TypeAll,nil
+	case strings.ToLower(TypeClient.String()):
+		return TypeClient,nil
+	case strings.ToLower(TypeServer.String()):
+		return TypeServer,nil
+	case strings.ToLower(TypeIgnore.String()):
 		return TypeIgnore,nil
 	default:
 		return "",errors.New("type not exist:"+s)

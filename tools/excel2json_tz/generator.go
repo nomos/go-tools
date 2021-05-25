@@ -37,8 +37,6 @@ func (this *Generator) Load()error {
 	return nil
 }
 
-
-
 func (this *Generator) Generate(p string)error{
 	this.dirSource = newDirSource(this.dirSource.dir)
 	err:=this.dirSource.Load()

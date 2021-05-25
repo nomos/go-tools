@@ -97,6 +97,9 @@ func (this *SheetSource) Load()error {
 
 func (this *SheetSource) LoadDataFields()error{
 	for _,cell:=range this.rows[0].Cells {
+		if cell.String()=="" {
+			continue
+		}
 		index,err:=cell.Int()
 		if err != nil {
 			log.Error(err.Error())
