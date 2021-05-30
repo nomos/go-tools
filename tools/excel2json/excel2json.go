@@ -3,7 +3,7 @@ package excel2json
 import (
 	"encoding/json"
 	"errors"
-	"github.com/360EntSecGroup-Skylar/excelize"
+	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	"github.com/nomos/go-log/log"
 	"github.com/nomos/go-lokas/util"
 	"github.com/nomos/go-lokas/util/slice"
