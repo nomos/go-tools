@@ -3,7 +3,7 @@ package excel2json_tz
 import (
 	"encoding/json"
 	"errors"
-	"github.com/360EntSecGroup-Skylar/excelize"
+	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	"github.com/iancoleman/orderedmap"
 	"github.com/nomos/go-log/log"
 	"github.com/nomos/go-lokas/util/stringutil"

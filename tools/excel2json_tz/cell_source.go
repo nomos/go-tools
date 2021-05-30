@@ -1,7 +1,7 @@
 package excel2json_tz
 
 import (
-	"github.com/360EntSecGroup-Skylar/excelize"
+	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	"github.com/nomos/go-log/log"
 	"regexp"
 	"strconv"

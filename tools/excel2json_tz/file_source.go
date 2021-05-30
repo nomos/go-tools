@@ -2,7 +2,7 @@ package excel2json_tz
 
 import (
 	"errors"
-	"github.com/360EntSecGroup-Skylar/excelize"
+	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	"github.com/nomos/go-log/log"
 )
 
