@@ -37,7 +37,7 @@ func (this *Generator) Load()error {
 	return nil
 }
 
-func (this *Generator) Generate(p string)error{
+func (this *Generator) Generate(p string,jsonPath string)error{
 	this.dirSource = newDirSource(this.dirSource.dir)
 	err:=this.dirSource.Load()
 	if err != nil {
@@ -114,7 +114,7 @@ func (this *DataMap) SaveToDb() error {
 		log.Error(err.Error())
 		return err
 	}
-	jsonPath:=path.Join(p,"data.json")
+	jsonPath=path.Join(jsonPath,"data.json")
 	err = ioutil.WriteFile(jsonPath, jsonStr, 0644)
 	if err != nil {
 		log.Errorf(err.Error())
