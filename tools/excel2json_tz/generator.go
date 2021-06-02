@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/iancoleman/orderedmap"
 	"github.com/nomos/go-log/log"
+	"github.com/nomos/go-lokas/util"
 	"github.com/nomos/go-lokas/util/stringutil"
 	"io/ioutil"
 	"path"
@@ -76,15 +77,20 @@ import (
 
 type DataMap struct {
 {DataFields}
+	*DataMapImpl
 }
 
 func NewDataMap()*DataMap{
-	ret:=&DataMap{}
+	ret:=&DataMap{
+		DataMapImpl:&DataMapImpl{},
+	}
 	ret.Clear()
+	ret.OnCreate()
 	return ret
 }
 
 func (this *DataMap) Clear() {
+	this.OnClear()
 {InitFields}
 }
 
@@ -94,6 +100,7 @@ func (this *DataMap) LoadJsonData(data []byte) error {
 		log.Error(err.Error())
 		return err
 	}
+	this.OnLoad()
 	return nil
 }
 
@@ -106,6 +113,23 @@ func (this *DataMap) SaveToDb() error {
 }
 `
 
+	dataImplStr:=`package gamedata
+
+type DataMapImpl struct {
+
+}
+
+func (this *DataMapImpl) OnCreate(){
+
+}
+
+func (this *DataMapImpl) OnClear(){
+
+}
+
+func (this *DataMapImpl) OnLoad(){
+	
+}`
 
 	dataStr = strings.Replace(dataStr,"{InitFields}",initFieldStr,-1)
 	dataStr = strings.Replace(dataStr,"{DataFields}",dataFieldStr,-1)
@@ -123,6 +147,11 @@ func (this *DataMap) SaveToDb() error {
 	err = ioutil.WriteFile(dataPath, []byte(dataStr), 0644)
 	if err != nil {
 		log.Errorf(err.Error())
+	}
+	implPath:=path.Join(p,"data_impl.go")
+	log.Warnf("implPath",implPath,util.IsFileExist(implPath))
+	if !util.IsFileExist(implPath) {
+		err = ioutil.WriteFile(implPath, []byte(dataImplStr), 0644)
 	}
 	return nil
 }
