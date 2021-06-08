@@ -8,6 +8,7 @@ import (
 	"github.com/nomos/go-lokas/util/stringutil"
 	"io/ioutil"
 	"path"
+	"regexp"
 	"runtime/debug"
 	"strings"
 )
@@ -133,6 +134,7 @@ func (this *DataMapImpl) OnLoad(){
 
 	dataStr = strings.Replace(dataStr,"{InitFields}",initFieldStr,-1)
 	dataStr = strings.Replace(dataStr,"{DataFields}",dataFieldStr,-1)
+	dataStr = regexp.MustCompile(`[*]Chap.+Normal`).ReplaceAllString(dataStr,"*ChapterNormal")
 	jsonStr,err:=json.Marshal(jsonMap)
 	if err != nil {
 		log.Error(err.Error())
