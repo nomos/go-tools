@@ -56,9 +56,9 @@ func (this *DataField) readIn(row int, cell *CellSource) (*Data, error) {
 		if err != nil {
 			return nil, err
 		}
-		if this.IsPercent {
-			s = s/100
-		}
+		//if this.IsPercent {
+		//	s = s/100
+		//}
 		return NewData(this, cell, s), nil
 	case TypeInt:
 		s, err := cell.Int()
@@ -93,7 +93,7 @@ func (this *DataField) Load() error {
 		return err
 	}
 	this.Name = strings.Join(stringutil.SplitCamelCaseCapitalize(nameCell.String()),"")
-	name := strings.Replace(this.Name,"%","",-1)
+	name := strings.Replace(this.Name,"%","Percent",-1)
 	if name!=this.Name {
 		this.IsPercent = true
 		this.Name = name

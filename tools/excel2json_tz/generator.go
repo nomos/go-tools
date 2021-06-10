@@ -10,6 +10,7 @@ import (
 	"path"
 	"regexp"
 	"runtime/debug"
+	"strconv"
 	"strings"
 )
 
@@ -65,6 +66,9 @@ func (this *Generator) Generate(p string,jsonPath string)error{
 				log.Errorf(err.Error())
 			}
 			jsonMap[s.Name] = s.GetJsonMap()
+			if s.Name == "PropEnum"{
+				generatePropEnum(path.Join(p,"enum_prop.go"),s.Data)
+			}
 		}
 	}
 	initFieldStr = strings.TrimRight(initFieldStr,"\n")
@@ -158,4 +162,30 @@ func (this *DataMapImpl) OnLoad(){
 	return nil
 }
 
+func generatePropEnum(p string,lines []*DataLine){
+	str:=`package gamedata
 
+import "github.com/nomos/go-lokas/protocol"
+
+type PROP_RNUM protocol.Enum
+
+const (
+{enumline}
+)
+
+func (this PROP_RNUM) Int32()int32{
+	return int32(this)
+}
+`
+	lineStr:=""
+	for _,l:=range lines {
+		id:=l.line[0].Value.(int)
+		name:=l.line[2].Value.(string)
+		desc:=l.line[1].Value.(string)
+		name = strings.ReplaceAll(name,"%","Percent")
+		lineStr+="\t"+"PROP_"+stringutil.SplitCamelCaseUpperSlash(name)+" PROP_RNUM = "+strconv.Itoa(id)+" //"+desc+"\n"
+	}
+	lineStr = strings.TrimRight(lineStr,"\n")
+	str = strings.ReplaceAll(str,"{enumline}",lineStr)
+	ioutil.WriteFile(p,[]byte(str),0644)
+}
