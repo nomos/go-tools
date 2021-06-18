@@ -293,6 +293,40 @@ func (this *ParamsValue) IntOpt()int {
 	return ret
 }
 
+func (this *ParamsValue) Bool()bool {
+	if len(this.value)-1<this.offset {
+		panic(NewCmdError(CMD_ERROR_PARAM_LEN,this.cmd,this.offset,"bool"))
+	}
+	ret:=false
+	v:=this.value[this.offset]
+	if v=="true"||v=="True"||v=="TRUE"||v=="1" {
+		ret = true
+	} else if v=="false"||v=="False"||v=="FALSE"||v=="0" {
+		ret = false
+	} else {
+		panic(NewCmdError(CMD_ERROR_PARAM_TYPE,this.cmd,this.offset,"bool"))
+	}
+	this.offset++
+	return ret
+}
+
+func (this *ParamsValue) BoolOpt()bool {
+	if len(this.value)-1<this.offset {
+		return false
+	}
+	ret:=false
+	v:=this.value[this.offset]
+	if v=="true"||v=="True"||v=="TRUE"||v=="1" {
+		ret = true
+	} else if v=="false"||v=="False"||v=="FALSE"||v=="0" {
+		ret = false
+	} else {
+		panic(NewCmdError(CMD_ERROR_PARAM_TYPE,this.cmd,this.offset,"bool"))
+	}
+	this.offset++
+	return ret
+}
+
 func (this *ParamsValue) Float()float64 {
 	if len(this.value)-1<this.offset {
 		panic(NewCmdError(CMD_ERROR_PARAM_LEN,this.cmd,this.offset,"float"))

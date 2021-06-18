@@ -8,7 +8,7 @@ require (
 	github.com/kr/text v0.2.0 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/nomos/go-log v0.0.2
-	github.com/nomos/go-lokas v0.0.6
+	github.com/nomos/go-lokas v0.0.7
 	github.com/nomos/promise v0.0.1
 	github.com/tyler-smith/go-bip39 v1.1.0
 	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a
