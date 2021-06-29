@@ -36,7 +36,7 @@ type TJsonEditFrameFields struct {
 	lastTreeItem       *vcl.TTreeNode
 	schema             *pjson.Schema
 	selectedSchema     *pjson.Schema
-	textFrame          *TTextFrame
+	textFrame          *TMemoFrame
 	remodeling bool
 	clipSchema   *pjson.Schema
 	keyEditTag bool
@@ -55,7 +55,7 @@ func (this *TJsonEditFrame) OnDestroy() {
 }
 
 func (this *TJsonEditFrame) initTextFrame(){
-	this.textFrame = NewTextFrame(this)
+	this.textFrame = NewMemoFrame(this)
 	this.textFrame.OnCreate()
 	this.textFrame.SetParent(this.ParsePanel)
 	this.textFrame.SetOnChange(func(sender vcl.IObject) {

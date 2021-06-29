@@ -1,9 +1,0 @@
-object EmptyForm: TEmptyForm
-  Left = 720
-  Height = 287
-  Top = 686
-  Width = 588
-  Align = alClient
-  Caption = '未命名'
-  LCLVersion = '2.0.10.0'
-end
