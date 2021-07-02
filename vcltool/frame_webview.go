@@ -1,7 +1,7 @@
 package vcltool
 
 import (
-    "github.com/nomos/go-log/log"
+    "github.com/nomos/go-lokas/log"
     "github.com/ying32/govcl/vcl"
     "github.com/ying32/govcl/vcl/types"
 )

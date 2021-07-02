@@ -4,7 +4,7 @@
 package vcltool
 
 import (
-	"github.com/nomos/go-log/log"
+	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-tools/pics/img_png"
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"

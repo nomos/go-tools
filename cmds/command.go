@@ -3,7 +3,7 @@ package cmds
 import (
 	"errors"
 	"fmt"
-	"github.com/nomos/go-log/log"
+	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/promise"
 	"strconv"
 	"strings"

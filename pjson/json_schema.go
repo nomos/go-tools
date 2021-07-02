@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/iancoleman/orderedmap"
-	"github.com/nomos/go-log/log"
+	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-lokas/util/stringutil"
 	"math"
 	"reflect"

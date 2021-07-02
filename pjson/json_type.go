@@ -1,7 +1,7 @@
 package pjson
 
 import (
-	"github.com/nomos/go-log/log"
+	"github.com/nomos/go-lokas/log"
 	"strconv"
 	"strings"
 )

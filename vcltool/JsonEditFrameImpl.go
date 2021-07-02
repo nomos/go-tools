@@ -6,7 +6,7 @@ package vcltool
 import (
 	"encoding/json"
 	"github.com/iancoleman/orderedmap"
-	"github.com/nomos/go-log/log"
+	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-lokas/util"
 	"github.com/nomos/go-tools/pjson"
 	"github.com/ying32/govcl/vcl"

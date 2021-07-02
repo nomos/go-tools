@@ -3,7 +3,7 @@ package cocos
 import (
 	"bufio"
 	"fmt"
-	"github.com/nomos/go-log/log"
+	"github.com/nomos/go-lokas/log"
 	"io"
 	"os/exec"
 	"runtime"

@@ -2,7 +2,7 @@ package vcltool
 
 import (
 	"github.com/nomos/go-events"
-	"github.com/nomos/go-log/log"
+	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-lokas"
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
