@@ -303,6 +303,15 @@ func (this *TJsonEditFrame) buildPopMenuBySchema(s *pjson.Schema) *vcl.TPopupMen
 		this.ActionDel()
 	})
 	ret.Items().Add(delMenu)
+
+
+	collapseMenu:=vcl.NewMenuItem(this)
+	collapseMenu.SetCaption("收起")
+	collapseMenu.SetOnClick(func(sender vcl.IObject) {
+		this.ActionCollapse()
+	})
+	ret.Items().Add(collapseMenu)
+
 	if this.clipSchema!=nil {
 		parseMenu:=vcl.NewMenuItem(this)
 		parseMenu.SetCaption("粘贴[V]")
@@ -492,6 +501,18 @@ func (this *TJsonEditFrame) ActionParse(){
 			this.parseModel()
 			this.SetSelectSchema(s1)
 		}
+	}
+}
+
+func (this *TJsonEditFrame) ActionCollapse(){
+	if this.TreePanel.Selected()!=nil {
+		vcl.ThreadSync(func() {
+			this.TreePanel.Selected().Collapse(true)
+		})
+	} else {
+		vcl.ThreadSync(func() {
+			this.TreePanel.FullCollapse()
+		})
 	}
 }
 

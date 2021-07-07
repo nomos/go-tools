@@ -1,6 +1,3 @@
-// 由res2go自动生成。
-// 在这里写你的事件。
-
 package vcltool
 
 import (
@@ -9,8 +6,8 @@ import (
 	"fmt"
 	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-lokas/network/sshc"
-	"github.com/nomos/promise"
 	"github.com/nomos/go-tools/cmds"
+	"github.com/nomos/promise"
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
 	"github.com/ying32/govcl/vcl/types/keys"
@@ -20,9 +17,17 @@ import (
 	"strings"
 	"time"
 )
-var _ cmds.IConsole = (*TConsoleShell)(nil)
-//::private::
-type TConsoleShellFields struct {
+
+type TConsoleShell struct {
+	*vcl.TFrame
+	BottomPanel  *vcl.TPanel
+	CmdEdit      *vcl.TEdit
+	SendButton   *vcl.TButton
+	ShellSelect  *vcl.TComboBox
+	Panel1       *vcl.TPanel
+	Console      *vcl.TMemo
+
+
 	ConfigAble
 	*log.ComposeLogger
 	ssh            *sshc.SshClient
@@ -44,63 +49,63 @@ type TConsoleShellFields struct {
 	done chan struct{}
 }
 
-func (this *TConsoleShell) RegisterSender(s string,sender cmds.ICommandSender){
-	this.AddShellType(s)
-	this.senders[s] = sender
+var _ cmds.IConsole = (*TConsoleShell)(nil)
+
+func NewConsoleShell(owner vcl.IComponent) (root *TConsoleShell) {
+	vcl.CreateResFrame(owner, &root)
+	return
 }
 
-func (this *TConsoleShell) AddShellType(s string){
-	count:=this.ShellSelect.Items().Count()
-	for i :=int32(0);i<count;i++ {
-		str:=this.ShellSelect.Items().S(i)
-		if str== s {
-			return
-		}
-	}
-	this.ShellSelect.Items().Add(s)
-}
-
-func (this *TConsoleShell) RegisterCommonCmd(command cmds.ICommand){
-	this.commonCommands[command.Name()] = command
-}
-
-func (this *TConsoleShell) RegisterCommonCmdFunc(name string,tips string,f func(value *cmds.ParamsValue,console cmds.IConsole)*promise.Promise) {
-	command:=cmds.NewCommand(name,tips,f,this)
-	this.commonCommands[command.Name()] = command
-}
-
-func (this *TConsoleShell) RegisterCmd(typ string,command cmds.ICommand) {
-	this.AddShellType(typ)
-	if _,ok:=this.commands[typ];!ok {
-		this.commands[typ] = make(map[string]cmds.ICommand)
-	}
-	this.commands[typ][command.Name()] = command
-}
-
-func (this *TConsoleShell) RegisterCmdFunc (typ string,name string,tips string,f func (value *cmds.ParamsValue,console cmds.IConsole)*promise.Promise) {
-	this.AddShellType(typ)
-	command:=cmds.NewCommand(name,tips,f,this)
-	if _,ok:=this.commands[typ];!ok {
-		this.commands[typ] = make(map[string]cmds.ICommand)
-	}
-	this.commands[typ][name] = command
-}
-
-func loadCommands(shell *TConsoleShell){
-	shell.RegisterCmdFunc("shell",".makeSsh [name]",".makeSsh", func(value *cmds.ParamsValue, console cmds.IConsole) *promise.Promise {
-		name:=value.String()
-		cmdstr1:=`
-		#!/usr/bin/expect;
-		ssh-keygen -t rsa -C `+name+`;
-		
-		`
-		return shell.ssh.RunShellCmd(cmdstr1,false).Then(func(data interface{}) interface{} {
-			return shell.ssh.RunShellCmd("ssh-add ~/.ssh/id_rsa",false)
-		})
-	})
+func (this *TConsoleShell) setup(){
+	this.SetAlign(types.AlClient)
+	this.SetHeight(500)
+	this.SetWidth(700)
+	this.BottomPanel = vcl.NewPanel(this)
+	this.BottomPanel.SetParent(this)
+	this.BottomPanel.SetAlign(types.AlBottom)
+	this.BottomPanel.SetHeight(50)
+	this.CmdEdit = vcl.NewEdit(this.BottomPanel)
+	this.CmdEdit.SetParent(this.BottomPanel)
+	this.CmdEdit.SetAlign(types.AlClient)
+	this.CmdEdit.BorderSpacing().SetBottom(12)
+	this.CmdEdit.BorderSpacing().SetLeft(3)
+	this.CmdEdit.BorderSpacing().SetRight(10)
+	this.CmdEdit.BorderSpacing().SetTop(12)
+	this.CmdEdit.SetHeight(24)
+	this.CmdEdit.SetWidth(487)
+	this.SendButton = vcl.NewButton(this.BottomPanel)
+	this.SendButton.SetParent(this.BottomPanel)
+	this.SendButton.SetAlign(types.AlRight)
+	this.SendButton.BorderSpacing().SetRight(10)
+	this.SendButton.SetHeight(48)
+	this.SendButton.SetLeft(611)
+	this.SendButton.SetWidth(75)
+	this.SendButton.SetCaption("Send")
+	this.ShellSelect = vcl.NewComboBox(this.BottomPanel)
+	this.ShellSelect.SetParent(this.BottomPanel)
+	this.ShellSelect.SetAlign(types.AlLeft)
+	this.ShellSelect.BorderSpacing().SetLeft(10)
+	this.ShellSelect.BorderSpacing().SetTop(14)
+	this.ShellSelect.SetHeight(20)
+	this.ShellSelect.SetItemHeight(26)
+	this.ShellSelect.SetLeft(11)
+	this.ShellSelect.SetStyle(types.CsDropDownList)
+	this.ShellSelect.SetWidth(100)
+	this.Panel1 = vcl.NewPanel(this)
+	this.Panel1.SetParent(this)
+	this.Panel1.SetAlign(types.AlClient)
+	this.Console = vcl.NewMemo(this.Panel1)
+	this.Console.SetParent(this.Panel1)
+	this.Console.SetAlign(types.AlClient)
+	this.Console.SetColor(0x001D180F)
+	this.Console.Font().SetColor(0x00c6b7a9)
+	this.Console.Font().SetHeight(-13)
+	this.Console.SetScrollBars(types.SsAutoBoth)
+	this.Console.SetTop(1)
 }
 
 func (this *TConsoleShell) OnCreate(){
+	this.setup()
 	this.start()
 	this.ComposeLogger = log.NewComposeLogger(true,log.DefaultConfig(""),1)
 	this.ComposeLogger.SetConsoleWriter(this)
@@ -161,6 +166,64 @@ func (this *TConsoleShell) OnCreate(){
 	})
 	this.Console.Clear()
 }
+
+func (this *TConsoleShell) RegisterSender(s string,sender cmds.ICommandSender){
+	this.AddShellType(s)
+	this.senders[s] = sender
+}
+
+func (this *TConsoleShell) AddShellType(s string){
+	count:=this.ShellSelect.Items().Count()
+	for i :=int32(0);i<count;i++ {
+		str:=this.ShellSelect.Items().S(i)
+		if str== s {
+			return
+		}
+	}
+	this.ShellSelect.Items().Add(s)
+	this.ShellSelect.SetText(s)
+}
+
+func (this *TConsoleShell) RegisterCommonCmd(command cmds.ICommand){
+	this.commonCommands[command.Name()] = command
+}
+
+func (this *TConsoleShell) RegisterCommonCmdFunc(name string,tips string,f func(value *cmds.ParamsValue,console cmds.IConsole)*promise.Promise) {
+	command:=cmds.NewCommand(name,tips,f,this)
+	this.commonCommands[command.Name()] = command
+}
+
+func (this *TConsoleShell) RegisterCmd(typ string,command cmds.ICommand) {
+	this.AddShellType(typ)
+	if _,ok:=this.commands[typ];!ok {
+		this.commands[typ] = make(map[string]cmds.ICommand)
+	}
+	this.commands[typ][command.Name()] = command
+}
+
+func (this *TConsoleShell) RegisterCmdFunc (typ string,name string,tips string,f func (value *cmds.ParamsValue,console cmds.IConsole)*promise.Promise) {
+	this.AddShellType(typ)
+	command:=cmds.NewCommand(name,tips,f,this)
+	if _,ok:=this.commands[typ];!ok {
+		this.commands[typ] = make(map[string]cmds.ICommand)
+	}
+	this.commands[typ][name] = command
+}
+
+func loadCommands(shell *TConsoleShell){
+	shell.RegisterCmdFunc("shell",".makeSsh [name]",".makeSsh", func(value *cmds.ParamsValue, console cmds.IConsole) *promise.Promise {
+		name:=value.String()
+		cmdstr1:=`
+		#!/usr/bin/expect;
+		ssh-keygen -t rsa -C `+name+`;
+		
+		`
+		return shell.ssh.RunShellCmd(cmdstr1,false).Then(func(data interface{}) interface{} {
+			return shell.ssh.RunShellCmd("ssh-add ~/.ssh/id_rsa",false)
+		})
+	})
+}
+
 
 func (this *TConsoleShell) start(){
 	this.msgChan = make(chan string,1000)
