@@ -41,6 +41,7 @@ type TJsonEditFrameFields struct {
 	clipSchema   *pjson.Schema
 	keyEditTag bool
 	mutex sync.Mutex
+	editing bool
 }
 
 func (this *TJsonEditFrame) OnCreate() {
@@ -81,13 +82,27 @@ func (this *TJsonEditFrame) initValueEditor(){
 }
 
 func (this *TJsonEditFrame) initTreeOps (){
+	this.TreePanel.SetOnCollapsing(func(sender vcl.IObject, node *vcl.TTreeNode, allowCollapse *bool) {
+		log.Warnf("SetOnCollapsing")
+	})
+	this.TreePanel.SetOnCollapsed(func(sender vcl.IObject, node *vcl.TTreeNode) {
+		log.Warnf("SetOnCollapsed")
+	})
+	this.TreePanel.SetOnExpanded(func(sender vcl.IObject, node *vcl.TTreeNode) {
+		log.Warnf("SetOnExpanded")
+	})
 	this.TreePanel.SetOnChanging(func(sender vcl.IObject, node *vcl.TTreeNode, allowChange *bool) {
+		if this.editing == true {
+			this.editing = false
+			this.parseModel()
+		}
 		log.Warnf("changing", node.Text())
 		if node.SelectedIndex() == 2 {
 
 		}
 	})
 	this.TreePanel.SetOnEdited(func(sender vcl.IObject, node *vcl.TTreeNode, s *string) {
+		log.Warnf("edited 32")
 		if schema:=this.GetSchemaByNode(node);schema!=nil {
 			log.Warnf("edited", node.Text())
 			update:=false
@@ -95,9 +110,6 @@ func (this *TJsonEditFrame) initTreeOps (){
 				update=schema.TrySetKey(*s)
 			} else {
 				update=schema.TrySetValue(*s)
-			}
-			if update {
-				this.parseModel()
 			}
 			this.keyEditTag = false
 			go func() {
@@ -109,12 +121,17 @@ func (this *TJsonEditFrame) initTreeOps (){
 					if node!=nil {
 						node.SetText(schema.ToLineString())
 					}
+
+					if update {
+						this.parseModel()
+					}
 				})
 			}()
 		}
 	})
 	this.TreePanel.SetOnEditing(func(sender vcl.IObject, node *vcl.TTreeNode, allowEdit *bool) {
 		log.Warnf("editing", node.Text())
+		this.editing = true
 		if schema:=this.GetSchemaByNode(node);schema!=nil {
 			if this.keyEditTag {
 				if schema.Parent()!=nil&&schema.Parent().Type==pjson.Object {

@@ -1,7 +1,5 @@
 package pjson
 
-
-
 func (this *Schema) GetOtherTypes()[]Type {
 	types := this.AllTypes()
 	ret:=[]Type{}
