@@ -1,6 +1,9 @@
 package vcltool
 
-import "github.com/ying32/govcl/vcl"
+import (
+	"github.com/nomos/go-lokas/log"
+	"github.com/ying32/govcl/vcl"
+)
 
 type FrameContainer struct {
 	*vcl.TFrame
@@ -18,8 +21,9 @@ func (this *FrameContainer) setup(){
 
 func (this *FrameContainer) OnCreate(){
 	this.setup()
+	log.Warnf("OnCreate")
 }
 
 func (this *FrameContainer) OnDestroy(){
-
+	log.Warnf("OnDestroy")
 }

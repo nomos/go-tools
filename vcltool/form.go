@@ -2,7 +2,7 @@ package vcltool
 
 import (
 	"github.com/nomos/go-lokas"
-	"github.com/nomos/go-lokas/log"
+	"github.com/nomos/go-lokas/util"
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
 )
@@ -10,17 +10,17 @@ import (
 type Form struct {
 	*vcl.TForm
 	ConfigAble
-	frame IFrame
-	created bool
+	frame      IFrame
+	created    bool
+	relocating bool
 }
 
-func NewForm() *Form {
-	var form *Form
-	vcl.Application.CreateForm(&form)
-	return form
+func NewForm(component vcl.IComponent) (root *Form) {
+	vcl.Application.CreateForm(&root)
+	return
 }
 
-func (this *Form) AddFrame(frame IFrame){
+func (this *Form) AddFrame(frame IFrame) {
 	this.frame = frame
 	if this.created {
 		this.frame.SetParent(this)
@@ -28,37 +28,46 @@ func (this *Form) AddFrame(frame IFrame){
 	}
 }
 
-func (this *Form) setup(){
+func (this *Form) setup() {
 
 }
 
 func (this *Form) SetConfig(config lokas.IConfig) {
+	this.relocating = true
 	this.ConfigAble.SetConfig(config)
-	pos:=this.conf.GetInt("position")
-	log.Warnf("pos",pos)
-	if pos == 0 {
-	} else {
-	}
-
+	posX:=this.Config().GetInt("posX")
+	posY:=this.Config().GetInt("posY")
+	vcl.ThreadSync(func() {
+		this.SetLeft(int32(posX))
+		this.SetTop(int32(posY))
+		this.Show()
+		this.relocating = false
+	})
 }
 
 func (this *Form) OnFormCreate(sender vcl.IObject) {
-	log.Warnf("OnFormCreate")
 	this.setup()
 	this.SetAlign(types.AlClient)
 	if this.frame != nil {
 		this.frame.SetParent(this)
 		this.frame.OnCreate()
 	}
-	this.SetOnActivate(func(sender vcl.IObject) {
-		log.Warnf("SetOnActivate")
-	})
-	this.SetOnShow(func(sender vcl.IObject) {
-		log.Warnf("SetOnShow")
+	this.SetOnCloseQuery(func(sender vcl.IObject, canClose *bool) {
+		if util.IsNil(this.Config()) || this.relocating {
+			return
+		}
+		x := this.ClientOrigin().X
+		y := this.ClientOrigin().Y
+		if util.IsNil(this.Config()) {
+			this.Config().Set("posX", x)
+			this.Config().Set("posY", y)
+		}
 	})
 	this.created = true
 }
 
 func (this *Form) OnFormDestroy(sender vcl.IObject) {
-	this.frame.OnDestroy()
+	if this.frame != nil {
+		this.frame.OnDestroy()
+	}
 }
