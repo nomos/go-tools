@@ -1,8 +1,7 @@
-package vcltool
+package ui
 
 import (
 	"github.com/nomos/go-events"
-	"github.com/nomos/go-lokas"
 	"github.com/nomos/go-lokas/log"
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
@@ -18,14 +17,17 @@ type PageContainer struct {
 	log           log.ILogger
 	listener      events.EventEmmiter
 	iframes       map[string]IFrame
-	webviewFrames map[string]*TWebViewFrame
+	webviewFrames map[string]*WebViewFrame
 	pageControl   *vcl.TPageControl
 	component     vcl.IComponent
 	num           int
 }
 
-func NewPageContainer(owner vcl.IComponent) (root *PageContainer) {
+func NewPageContainer(owner vcl.IComponent,option... FrameOption) (root *PageContainer) {
 	vcl.CreateResFrame(owner, &root)
+	for _,o:=range option {
+		o(root)
+	}
 	return
 }
 
@@ -33,7 +35,7 @@ func (this *PageContainer) setup(){
 	this.SetAlign(types.AlClient)
 	this.SetColor(colors.ClSysDefault)
 	this.iframes = make(map[string]IFrame)
-	this.webviewFrames = make(map[string]*TWebViewFrame)
+	this.webviewFrames = make(map[string]*WebViewFrame)
 	this.pageControl = vcl.NewPageControl(this)
 	this.pageControl.SetParent(this)
 	this.pageControl.SetAlign(types.AlClient)
@@ -91,26 +93,13 @@ func (this *PageContainer) OnDestroy() {
 		frame.OnDestroy()
 		frame.Free()
 	}
-	this.webviewFrames = make(map[string]*TWebViewFrame)
+	this.webviewFrames = make(map[string]*WebViewFrame)
 }
 
 func (this *PageContainer) GetIFrame(s string) IFrame {
 	return this.iframes[s]
 }
 
-type FrameOption func(frame IFrame)
-
-func WithConfig(conf lokas.IConfig) FrameOption {
-	return func(frame IFrame) {
-		frame.SetConfig(conf)
-	}
-}
-
-func WithContent(s string, data interface{}) FrameOption {
-	return func(frame IFrame) {
-		frame.SetContent(s, data)
-	}
-}
 
 func (this *PageContainer) AddIFrame(name string, frame IFrame, opts ...FrameOption) IFrame {
 	defer func() {

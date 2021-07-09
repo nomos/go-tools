@@ -9,6 +9,7 @@ import (
 	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-lokas/util"
 	"github.com/nomos/go-tools/pjson"
+	"github.com/nomos/go-tools/ui"
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
 	"github.com/ying32/govcl/vcl/types/keys"
@@ -30,13 +31,13 @@ const (
 
 //::private::
 type TJsonEditFrameFields struct {
-	ConfigAble
+	ui.ConfigAble
 	jsonFormat         interface{}
 	jsonValueEditFrame *TJsonValueEditFrame
 	lastTreeItem       *vcl.TTreeNode
 	schema             *pjson.Schema
 	selectedSchema     *pjson.Schema
-	textFrame          *TMemoFrame
+	textFrame          *ui.MemoFrame
 	remodeling bool
 	clipSchema   *pjson.Schema
 	keyEditTag bool
@@ -56,7 +57,7 @@ func (this *TJsonEditFrame) OnDestroy() {
 }
 
 func (this *TJsonEditFrame) initTextFrame(){
-	this.textFrame = NewMemoFrame(this)
+	this.textFrame = ui.NewMemoFrame(this)
 	this.textFrame.OnCreate()
 	this.textFrame.SetParent(this.ParsePanel)
 	this.textFrame.SetOnChange(func(sender vcl.IObject) {
@@ -68,7 +69,7 @@ func (this *TJsonEditFrame) initTextFrame(){
 
 func (this *TJsonEditFrame) initValueEditor(){
 	this.jsonValueEditFrame = NewJsonValueEditFrame(this)
-	this.jsonValueEditFrame.conf =this.conf
+	this.jsonValueEditFrame.conf =this.Config()
 	this.jsonValueEditFrame.OnCreate()
 	this.jsonValueEditFrame.SetParent(this.EditPanel)
 	this.jsonValueEditFrame.SetOnSchemaChange(func() {
@@ -242,12 +243,12 @@ func (this *TJsonEditFrame) initFileActions () {
 	openDialog.SetFilter("Json文件(*.json)|*.json|所有文件(*.*)|*.*")
 	openDialog.SetTitle("打开Json文件")
 	this.OpenDirButton.SetOnClick(func(sender vcl.IObject) {
-		if this.conf.GetString("load_file_path") != "" {
-			openDialog.SetInitialDir(this.conf.GetString("load_file_path"))
+		if this.Config().GetString("load_file_path") != "" {
+			openDialog.SetInitialDir(this.Config().GetString("load_file_path"))
 		}
 		if openDialog.Execute() {
 			path := openDialog.FileName()
-			this.conf.Set("load_file_path", path)
+			this.Config().Set("load_file_path", path)
 			log.Warnf(path)
 			this.loadFile(path)
 		}
@@ -257,17 +258,17 @@ func (this *TJsonEditFrame) initFileActions () {
 	saveDialog.SetDefaultExt(".json")
 	saveDialog.SetTitle("保存到json文件")
 	this.SaveToButton.SetOnClick(func(sender vcl.IObject) {
-		if this.conf.GetString("load_file_path") != "" {
-			saveDialog.SetInitialDir(this.conf.GetString("load_file_path"))
+		if this.Config().GetString("load_file_path") != "" {
+			saveDialog.SetInitialDir(this.Config().GetString("load_file_path"))
 		}
 		if saveDialog.Execute() {
 			path := saveDialog.FileName()
-			this.conf.Set("load_file_path", path)
+			this.Config().Set("load_file_path", path)
 			this.saveFile(path)
 		}
 	})
 	this.SaveButton.SetOnClick(func(sender vcl.IObject) {
-		this.saveFile(this.conf.GetString("load_file_path"))
+		this.saveFile(this.Config().GetString("load_file_path"))
 	})
 }
 

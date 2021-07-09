@@ -1,4 +1,4 @@
-package vcltool
+package ui
 
 import (
 	"github.com/nomos/go-lokas/log"
@@ -11,8 +11,11 @@ type FrameContainer struct {
 	ConfigAble
 }
 
-func NewFrameContainer(owner vcl.IComponent) (root *FrameContainer) {
+func NewFrameContainer(owner vcl.IComponent,option... FrameOption) (root *FrameContainer) {
 	vcl.CreateResFrame(owner, &root)
+	for _,o:=range option {
+		o(root)
+	}
 	return
 }
 

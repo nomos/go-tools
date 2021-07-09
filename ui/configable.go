@@ -1,4 +1,4 @@
-package vcltool
+package ui
 
 import (
 	"github.com/nomos/go-events"
@@ -17,6 +17,14 @@ type ConfigAble struct {
 	index     int
 }
 
+func (this *ConfigAble) GetListener()events.EventEmmiter{
+	return this.listener
+}
+
+func (this *ConfigAble) SetListener(listener events.EventEmmiter){
+	this.listener = listener
+}
+
 func (this *ConfigAble) SetContent(s string, data interface{}) {
 	if this.content == nil {
 		this.content = map[string]interface{}{}
@@ -33,6 +41,10 @@ func (this *ConfigAble) GetContent(s string) interface{} {
 
 func (this *ConfigAble) setContainer(container IPageContainer) {
 	this.container = container
+}
+
+func (this *ConfigAble) Container()IPageContainer{
+	return this.container
 }
 
 func (this *ConfigAble) SetEventEmitter(listener events.EventEmmiter) {

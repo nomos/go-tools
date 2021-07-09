@@ -1,11 +1,30 @@
-package vcltool
+package ui
 
 import (
 	"github.com/nomos/go-events"
 	"github.com/nomos/go-lokas"
 	"github.com/nomos/go-lokas/log"
 	"github.com/ying32/govcl/vcl"
+	"sync"
 )
+
+type ITreeNode interface {
+	String()string
+	Key()string
+	Value()string
+}
+
+type ITree interface {
+	sync.Locker
+	UpdateTree(node ITreeNode)
+}
+
+type ITreeData interface {
+	Key()string
+	ValueString()string
+	String()string
+}
+
 
 type IConfigAble interface {
 	Config() lokas.IConfig
@@ -23,8 +42,9 @@ type IFrame interface {
 	OnCreate()
 	OnDestroy()
 	SetParent(vcl.IWinControl)
-	SetEventEmitter(emmiter events.EventEmmiter)
+	SetEventEmitter(listener events.EventEmmiter)
 	SetLogger(logger log.ILogger)
+	SetListener(listener events.EventEmmiter)
 	Free()
 	SetIndex(num int)
 	GetIndex() int

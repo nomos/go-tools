@@ -6,6 +6,7 @@ package vcltool
 import (
 	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-lokas/protocol"
+	"github.com/nomos/go-tools/ui"
 	"github.com/nomos/promise"
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
@@ -13,7 +14,7 @@ import (
 
 //::private::
 type TCodeGenCSharpFields struct {
-	ConfigAble
+	ui.ConfigAble
 
 }
 
@@ -38,7 +39,7 @@ func (this *TCodeGenCSharp) OnCreate(){
 		}
 		if openDirDialog.Execute() {
 			p := openDirDialog.FileName()
-			this.log.Warn("选择Model路径"+p)
+			this.GetLogger().Warn("选择Model路径"+p)
 			this.setModelPath(p)
 		}
 	})
@@ -48,7 +49,7 @@ func (this *TCodeGenCSharp) OnCreate(){
 		}
 		if openDirDialog.Execute() {
 			p := openDirDialog.FileName()
-			this.log.Warn("选择导出路径"+p)
+			this.GetLogger().Warn("选择导出路径"+p)
 			this.setCSharpPath(p)
 		}
 	})
@@ -61,7 +62,7 @@ func (this *TCodeGenCSharp) OnCreate(){
 			this.DistDirLabel.SetFocus()
 			return
 		}
-		this.log.Info("开始生成C#文件...")
+		this.GetLogger().Info("开始生成C#文件...")
 		g := protocol.NewGenerator(protocol.GEN_GO)
 		_,err:=g.LoadModelFolder(this.getModelPath()).Then(func(data interface{}) interface{} {
 			g.LoadCsFolder(this.getCSharpPath())
@@ -84,36 +85,36 @@ func (this *TCodeGenCSharp) OnCreate(){
 		}).Await()
 		if err != nil {
 			log.Error(err.Error())
-			this.log.Error("生成出错:"+err.Error())
+			this.GetLogger().Error("生成出错:"+err.Error())
 		} else {
-			this.log.Info("生成C#文件成功!")
+			this.GetLogger().Info("生成C#文件成功!")
 		}
 		//excel2json.Excel2JsonMiniGame(this.getExcelPath(),this.getDistPath(),this.log,this.getEmbed())
 	})
 	this.HelpButton.SetOnClick(func(sender vcl.IObject) {
-		this.log.Info("施工中.....")
+		this.GetLogger().Info("施工中.....")
 	})
 }
 func (this *TCodeGenCSharp) getModelPath()string {
-	return this.conf.GetString("model_path")
+	return this.Config().GetString("model_path")
 }
 
 func (this *TCodeGenCSharp) getCSharpPath()string {
-	return this.conf.GetString("csharp_path")
+	return this.Config().GetString("csharp_path")
 }
 
 func (this *TCodeGenCSharp) setModelPath(p string){
 	this.ModelDirLabel.SetText(p)
-	this.conf.Set("model_path",p)
+	this.Config().Set("model_path",p)
 }
 
 func (this *TCodeGenCSharp) setCSharpPath(p string){
 	this.DistDirLabel.SetText(p)
-	this.conf.Set("csharp_path",p)
+	this.Config().Set("csharp_path",p)
 }
 
-func (this *TCodeGenCSharp) SetConsole(logger *TConsoleShell) {
-	this.log = logger
+func (this *TCodeGenCSharp) SetConsole(logger *ui.ConsoleShell) {
+	this.SetLogger(logger)
 }
 
 func (this *TCodeGenCSharp) OnDestroy(){

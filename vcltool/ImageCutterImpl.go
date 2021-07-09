@@ -6,6 +6,7 @@ package vcltool
 import (
 	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-tools/pics/img_png"
+	"github.com/nomos/go-tools/ui"
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
 	"strconv"
@@ -13,7 +14,7 @@ import (
 
 //::private::
 type TImageCutterFields struct {
-	ConfigAble
+	ui.ConfigAble
 }
 
 func (this *TImageCutter) OnCreate(){
@@ -21,25 +22,25 @@ func (this *TImageCutter) OnCreate(){
 	openDialog.SetOptions(openDialog.Options().Include(types.OfShowHelp, types.OfAllowMultiSelect)) //rtl.Include(, types.OfShowHelp))
 	openDialog.SetFilter("图片(*.png,*.*)|*.png;*.*|所有文件(*.*)|*.*")
 	openDialog.SetTitle("打开文件")
-	if this.conf.GetString("png_path") != "" {
-		this.PngPath.SetText(this.conf.GetString("png_path"))
+	if this.Config().GetString("png_path") != "" {
+		this.PngPath.SetText(this.Config().GetString("png_path"))
 	}
 	this.OpenPngButton.SetOnClick(func(sender vcl.IObject) {
-		if this.conf.GetString("png_path") != "" {
-			openDialog.SetInitialDir(this.conf.GetString("png_path"))
+		if this.Config().GetString("png_path") != "" {
+			openDialog.SetInitialDir(this.Config().GetString("png_path"))
 		}
 		if openDialog.Execute() {
 			p := openDialog.FileName()
-			this.conf.Set("png_path", p)
+			this.Config().Set("png_path", p)
 			log.Warnf(p)
 			this.PngPath.SetText(p)
 		}
 	})
-	if this.conf.GetString("png_width") != "" {
-		this.ImageWidth.SetText(this.conf.GetString("png_width"))
+	if this.Config().GetString("png_width") != "" {
+		this.ImageWidth.SetText(this.Config().GetString("png_width"))
 	}
-	if this.conf.GetString("png_height") != "" {
-		this.ImageHeight.SetText(this.conf.GetString("png_height"))
+	if this.Config().GetString("png_height") != "" {
+		this.ImageHeight.SetText(this.Config().GetString("png_height"))
 	}
 	this.ImageWidth.SetOnChange(func(sender vcl.IObject) {
 		text:=this.ImageWidth.Text()
@@ -48,7 +49,7 @@ func (this *TImageCutter) OnCreate(){
 			this.ImageWidth.SetText("0")
 			return
 		}
-		this.conf.Set("png_width",text)
+		this.Config().Set("png_width",text)
 	})
 	this.ImageHeight.SetOnChange(func(sender vcl.IObject) {
 		text:=this.ImageHeight.Text()
@@ -57,16 +58,16 @@ func (this *TImageCutter) OnCreate(){
 			this.ImageHeight.SetText("0")
 			return
 		}
-		this.conf.Set("png_height",text)
+		this.Config().Set("png_height",text)
 	})
 	this.GenerateButton.SetOnClick(func(sender vcl.IObject) {
-		p:=this.conf.GetString("png_path")
-		width,err := strconv.Atoi(this.conf.GetString("png_width"))
+		p:=this.Config().GetString("png_path")
+		width,err := strconv.Atoi(this.Config().GetString("png_width"))
 		if err != nil||width<=0 {
 			log.Errorf("width is not fit",width)
 			return
 		}
-		height,err := strconv.Atoi(this.conf.GetString("png_height"))
+		height,err := strconv.Atoi(this.Config().GetString("png_height"))
 		if err != nil||width<=0 {
 			log.Errorf("height is not fit",height)
 			return

@@ -6,6 +6,7 @@ package vcltool
 import (
     "github.com/atotto/clipboard"
     "github.com/nomos/go-tools/pics/img_png"
+    "github.com/nomos/go-tools/ui"
     "github.com/ying32/govcl/vcl"
     _ "github.com/ying32/govcl/vcl/types"
     "path"
@@ -14,32 +15,32 @@ import (
 
 //::private::
 type TImage2ArrayBufferFields struct {
-    ConfigAble
+    ui.ConfigAble
 }
 
 func (this *TImage2ArrayBuffer) OnCreate(){
-    this.listener.On("DropFile", func(i ...interface{}) {
-        if this.container.IsFrameSelected(this) {
+    this.GetListener().On("DropFile", func(i ...interface{}) {
+        if this.Container().IsFrameSelected(this) {
             paths:=i[0].([]string)
-            this.log.Warnf("DropFile",paths)
+            this.GetLogger().Warnf("DropFile",paths)
             filePath:=paths[0]
 
             w,h,data,err:=img_png.Png2CompressedBase64(filePath)
             if err != nil {
-                this.log.Error(err.Error())
+                this.GetLogger().Error(err.Error())
                 return
             }
-            this.log.Infof("width:",w)
-            this.log.Infof("height:",h)
-            this.log.Infof("data:",data)
+            this.GetLogger().Infof("width:",w)
+            this.GetLogger().Infof("height:",h)
+            this.GetLogger().Infof("data:",data)
             fileName:=strings.Replace(path.Base(filePath),".png","",-1)
             clipboard.WriteAll(fileName+" : `"+data+"`,")
-            this.log.Info("已拷贝到剪切板")
+            this.GetLogger().Info("已拷贝到剪切板")
             //if path.Ext(filePath) == ".png" {
             //    outPath:= strings.Replace(filePath,".png",".txt",1)
             //    err:=ioutil.WriteFile(outPath,[]byte(strconv.Itoa(w)+" "+strconv.Itoa(h)+"\n"+data),0666)
             //    if err != nil {
-            //        this.log.Error(err.Error())
+            //        this.GetLogger().Error(err.Error())
             //    }
             //}
         }

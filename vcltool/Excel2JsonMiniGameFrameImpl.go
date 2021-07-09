@@ -6,13 +6,14 @@ package vcltool
 import (
 	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-tools/tools/excel2json"
+	"github.com/nomos/go-tools/ui"
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
 )
 
 //::private::
 type TExcel2JsonMiniGameFrameFields struct {
-	ConfigAble
+	ui.ConfigAble
 }
 
 func (this *TExcel2JsonMiniGameFrame) OnCreate(){
@@ -33,7 +34,7 @@ func (this *TExcel2JsonMiniGameFrame) OnCreate(){
 		}
 		if openDirDialog.Execute() {
 			p := openDirDialog.FileName()
-			this.log.Warn("选择Excel路径"+p)
+			this.GetLogger().Warn("选择Excel路径"+p)
 			this.setExcelPath(p)
 		}
 	})
@@ -43,7 +44,7 @@ func (this *TExcel2JsonMiniGameFrame) OnCreate(){
 		}
 		if openDirDialog.Execute() {
 			p := openDirDialog.FileName()
-			this.log.Warn("选择导出路径"+p)
+			this.GetLogger().Warn("选择导出路径"+p)
 			this.setDistPath(p)
 		}
 	})
@@ -60,55 +61,55 @@ func (this *TExcel2JsonMiniGameFrame) OnCreate(){
 			this.DistDirLabel.SetFocus()
 			return
 		}
-		this.log.Info("开始生成Json配置...")
-		excel2json.Excel2JsonMiniGame(this.getExcelPath(),this.getDistPath(),this.log,this.getEmbed())
+		this.GetLogger().Info("开始生成Json配置...")
+		excel2json.Excel2JsonMiniGame(this.getExcelPath(),this.getDistPath(),this.GetLogger(),this.getEmbed())
 	})
 	this.HelpButton.SetOnClick(func(sender vcl.IObject) {
-		this.log.Info("excel的前三行分别为:类型,描述,属性名")
-		this.log.Info("excel表名首字母大写为导出的数据类,默认和其他表名不导出")
-		this.log.Info("属性名必须为英文,且必须包括id字段")
-		this.log.Info("目前支持的类型及类型格式:")
-		this.log.Info("基本类型int,float,string")
-		this.log.Info("数组:[]int,[]float,[]string")
-		this.log.Info("数组格式 [1,2,3,4,5] 或 [1.1,3.4,5.66] 或 [aa,bbb,ccc]")
-		this.log.Info("字符字典类型:[string]string,[string]int,[string]float")
-		this.log.Info("字符字典格式 [aaa:a1,bbb:b2,ccc:c3] 或 [a:1,b:2,c:3] 或 [e:0.5,b:0.6,c:9.3]")
-		this.log.Info("数字字典类型:[int]string,[int]int,[int]float")
-		this.log.Info("数字字典格式 [1:a1,2:b2,3:c3] 或 [1:1,2:2,3:3] 或 [1:0.5,2:0.6,3:9.3]")
-		this.log.Info("导出到cocos勾选嵌入Ts")
+		this.GetLogger().Info("excel的前三行分别为:类型,描述,属性名")
+		this.GetLogger().Info("excel表名首字母大写为导出的数据类,默认和其他表名不导出")
+		this.GetLogger().Info("属性名必须为英文,且必须包括id字段")
+		this.GetLogger().Info("目前支持的类型及类型格式:")
+		this.GetLogger().Info("基本类型int,float,string")
+		this.GetLogger().Info("数组:[]int,[]float,[]string")
+		this.GetLogger().Info("数组格式 [1,2,3,4,5] 或 [1.1,3.4,5.66] 或 [aa,bbb,ccc]")
+		this.GetLogger().Info("字符字典类型:[string]string,[string]int,[string]float")
+		this.GetLogger().Info("字符字典格式 [aaa:a1,bbb:b2,ccc:c3] 或 [a:1,b:2,c:3] 或 [e:0.5,b:0.6,c:9.3]")
+		this.GetLogger().Info("数字字典类型:[int]string,[int]int,[int]float")
+		this.GetLogger().Info("数字字典格式 [1:a1,2:b2,3:c3] 或 [1:1,2:2,3:3] 或 [1:0.5,2:0.6,3:9.3]")
+		this.GetLogger().Info("导出到cocos勾选嵌入Ts")
 	})
 }
 
 func (this *TExcel2JsonMiniGameFrame) getEmbed()bool {
-	return this.conf.GetBool("embbed")
+	return this.Config().GetBool("embbed")
 }
 
 func (this *TExcel2JsonMiniGameFrame) setEmbed(v bool) {
-	this.conf.Set("embbed",v)
+	this.Config().Set("embbed",v)
 	this.IndieFolderCheck.SetChecked(v)
 }
 
 
 func (this *TExcel2JsonMiniGameFrame) getExcelPath()string {
-	return this.conf.GetString("excel_path")
+	return this.Config().GetString("excel_path")
 }
 
 func (this *TExcel2JsonMiniGameFrame) getDistPath()string {
-	return this.conf.GetString("dist_path")
+	return this.Config().GetString("dist_path")
 }
 
 func (this *TExcel2JsonMiniGameFrame) setExcelPath(p string){
 	this.ExcelDirLabel.SetText(p)
-	this.conf.Set("excel_path",p)
+	this.Config().Set("excel_path",p)
 }
 
 func (this *TExcel2JsonMiniGameFrame) setDistPath(p string){
 	this.DistDirLabel.SetText(p)
-	this.conf.Set("dist_path",p)
+	this.Config().Set("dist_path",p)
 }
 
-func (this *TExcel2JsonMiniGameFrame) SetConsole(logger *TConsoleShell) {
-	this.log = logger
+func (this *TExcel2JsonMiniGameFrame) SetConsole(logger *ui.ConsoleShell) {
+	this.SetLogger(logger)
 }
 
 func (this *TExcel2JsonMiniGameFrame) OnDestroy(){

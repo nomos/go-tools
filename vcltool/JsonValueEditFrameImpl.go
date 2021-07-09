@@ -8,6 +8,7 @@ import (
     "github.com/nomos/go-lokas/log"
     "github.com/nomos/go-lokas"
     "github.com/nomos/go-tools/pjson"
+    "github.com/nomos/go-tools/ui"
     "github.com/ying32/govcl/vcl"
     "github.com/ying32/govcl/vcl/types"
     "github.com/ying32/govcl/vcl/types/keys"
@@ -17,7 +18,7 @@ import (
 
 //::private::
 type TJsonValueEditFrameFields struct {
-    ConfigAble
+    ui.ConfigAble
     events.EventEmmiter
     schema *pjson.Schema
     onSchemaChange func()

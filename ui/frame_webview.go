@@ -1,4 +1,4 @@
-package vcltool
+package ui
 
 import (
     "github.com/nomos/go-lokas/log"
@@ -6,7 +6,7 @@ import (
     "github.com/ying32/govcl/vcl/types"
 )
 
-type TWebViewFrame struct {
+type WebViewFrame struct {
     *vcl.TFrame
     Main         *vcl.TPanel
     
@@ -17,29 +17,32 @@ type TWebViewFrame struct {
 }
 
 
-func NewWebViewFrame(owner vcl.IComponent) (root *TWebViewFrame)  {
+func NewWebViewFrame(owner vcl.IComponent,option... FrameOption) (root *WebViewFrame)  {
     vcl.CreateResFrame(owner, &root)
+    for _,o:=range option {
+        o(root)
+    }
     return
 }
 
 
-func (this *TWebViewFrame) SetUrl(url string) {
+func (this *WebViewFrame) SetUrl(url string) {
     this.url = url
 }
 
-func (this *TWebViewFrame) Refresh(){
+func (this *WebViewFrame) Refresh(){
     this.webview.Refresh()
 }
 
-func (this *TWebViewFrame) setup(){
-    log.Errorf("TWebViewFrame setup")
+func (this *WebViewFrame) setup(){
+    log.Errorf("WebViewFrame setup")
     this.SetAlign(types.AlClient)
     this.Main = vcl.NewPanel(this)
     this.Main.SetParent(this)
     this.Main.SetAlign(types.AlClient)
 }
 
-func (this *TWebViewFrame) OnCreate(){
+func (this *WebViewFrame) OnCreate(){
     this.setup()
     this.webview = vcl.NewMiniWebview(this)
     this.webview.SetParent(this.Main)
@@ -55,6 +58,6 @@ func (this *TWebViewFrame) OnCreate(){
     })
 }
 
-func (this *TWebViewFrame) OnDestroy(){
+func (this *WebViewFrame) OnDestroy(){
 
 }

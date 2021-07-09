@@ -1,4 +1,4 @@
-package vcltool
+package ui
 
 import (
 	"github.com/nomos/go-lokas"
@@ -36,9 +36,19 @@ func (this *Form) SetConfig(config lokas.IConfig) {
 	this.ConfigAble.SetConfig(config)
 	posX:=this.Config().GetInt("posX")
 	posY:=this.Config().GetInt("posY")
+	w:=this.Config().GetInt("width")
+	h:=this.Config().GetInt("height")
+	if w<420 {
+		w = 420
+	}
+	if h<270 {
+		h = 270
+	}
 	vcl.ThreadSync(func() {
 		this.SetLeft(int32(posX))
 		this.SetTop(int32(posY))
+		this.SetWidth(int32(w))
+		this.SetHeight(int32(h))
 		this.Show()
 		this.relocating = false
 	})
@@ -55,6 +65,8 @@ func (this *Form) OnFormCreate(sender vcl.IObject) {
 		y := this.ClientOrigin().Y
 		this.Config().Set("posX", x)
 		this.Config().Set("posY", y)
+		this.Config().Set("width",this.Width())
+		this.Config().Set("height",this.Height())
 	})
 	this.created = true
 }
