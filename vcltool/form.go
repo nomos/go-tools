@@ -10,26 +10,25 @@ import (
 type Form struct {
 	*vcl.TForm
 	ConfigAble
-	frame      IFrame
+	frames      []IFrame
 	created    bool
 	relocating bool
 }
 
-func NewForm(component vcl.IComponent) (root *Form) {
+func NewForm() (root *Form) {
 	vcl.Application.CreateForm(&root)
 	return
 }
 
-func (this *Form) AddFrame(frame IFrame) {
-	this.frame = frame
-	if this.created {
-		this.frame.SetParent(this)
-		this.frame.OnCreate()
-	}
+func (this *Form) AddFrame(frame IFrame)IFrame {
+	this.frames = append(this.frames, frame)
+	frame.SetParent(this)
+	frame.OnCreate()
+	return frame
 }
 
 func (this *Form) setup() {
-
+	this.frames = []IFrame{}
 }
 
 func (this *Form) SetConfig(config lokas.IConfig) {
@@ -48,26 +47,20 @@ func (this *Form) SetConfig(config lokas.IConfig) {
 func (this *Form) OnFormCreate(sender vcl.IObject) {
 	this.setup()
 	this.SetAlign(types.AlClient)
-	if this.frame != nil {
-		this.frame.SetParent(this)
-		this.frame.OnCreate()
-	}
 	this.SetOnCloseQuery(func(sender vcl.IObject, canClose *bool) {
 		if util.IsNil(this.Config()) || this.relocating {
 			return
 		}
 		x := this.ClientOrigin().X
 		y := this.ClientOrigin().Y
-		if util.IsNil(this.Config()) {
-			this.Config().Set("posX", x)
-			this.Config().Set("posY", y)
-		}
+		this.Config().Set("posX", x)
+		this.Config().Set("posY", y)
 	})
 	this.created = true
 }
 
 func (this *Form) OnFormDestroy(sender vcl.IObject) {
-	if this.frame != nil {
-		this.frame.OnDestroy()
+	for _,f:=range this.frames {
+		f.OnDestroy()
 	}
 }
