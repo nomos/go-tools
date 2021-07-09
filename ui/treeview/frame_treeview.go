@@ -2,6 +2,8 @@ package treeview
 
 import (
 	"github.com/nomos/go-lokas/log"
+	"github.com/nomos/go-lokas/util"
+	"github.com/nomos/go-tools/pjson"
 	"github.com/nomos/go-tools/ui"
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
@@ -12,7 +14,8 @@ type Frame struct {
 	*vcl.TFrame
 	Tree *vcl.TTreeView
 	ui.ConfigAble
-	Root ui.ITreeNode
+	Root ui.ITreeSchema
+	selectedSchema ui.ITreeSchema
 	mu sync.Mutex
 }
 
@@ -34,8 +37,51 @@ func (this *Frame) setup() {
 }
 
 func (this *Frame) bindCallbacks(){
+	this.Tree.SetOnMouseDown(func(sender vcl.IObject, button types.TMouseButton, shift types.TShiftState, x, y int32) {
+		for {
+			if util.IsNil(this.Root) {
+				log.Error("root is empty")
+				break
+			}
+			if button == types.MbRight {
+				node:=this.Tree.GetNodeAt(x,y)
+				if node == nil {
+					break
+				}
+			} else if button == types.MbLeft {
+				node:=this.Tree.GetNodeAt(x,y)
+				if this.selectedSchema != nil {
+					next_node := this.GetNode
+				}
+
+			}
+			break
+		}
+
+	})
 	//完成tree->node抽象->update
 	//testcase tree.update node
+}
+
+func (this *Frame) GetNodeBySchema(s ui.ITreeSchema)*vcl.TTreeNode {
+	defer this.Unlock()
+	this.Lock()
+	if this.Root!=nil {
+		rootTree:=s.GetRootTree()
+		item:=this.Tree.TopItem()
+		index:=0
+		for {
+			if index>len(rootTree)-1 {
+				return item
+			}
+			if int32(rootTree[index])>item.Count()-1 {
+				return nil
+			}
+			item = item.Item(int32(rootTree[index]))
+			index++
+		}
+	}
+	return nil
 }
 
 func (this *Frame) Lock(){
@@ -46,9 +92,9 @@ func (this *Frame) Unlock() {
 	this.mu.Unlock()
 }
 
-func (this *Frame) UpdateTree(node ui.ITreeNode){
-	if node!=nil&&this.Root!=node {
-		this.Root = node
+func (this *Frame) UpdateTree(schema ui.ITreeSchema){
+	if schema!=nil&&this.Root!=schema {
+		this.Root = schema
 	}
 	this.rebuildTree()
 }

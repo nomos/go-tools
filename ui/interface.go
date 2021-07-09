@@ -8,15 +8,19 @@ import (
 	"sync"
 )
 
-type ITreeNode interface {
+type ITreeSchema interface {
 	String()string
 	Key()string
 	Value()string
+	GetRootTree()[]int
+	InnerIdx()int
+	Parent()ITreeSchema
+	Children()[]ITreeSchema
 }
 
 type ITree interface {
 	sync.Locker
-	UpdateTree(node ITreeNode)
+	UpdateTree(schema ITreeSchema)
 }
 
 type ITreeData interface {
