@@ -6,9 +6,13 @@ import (
 	"github.com/ying32/govcl/vcl/types"
 )
 
+var _ IFrame = (*FrameContainer)(nil)
+
 type FrameContainer struct {
 	*vcl.TFrame
 	ConfigAble
+
+	frames []IFrame
 }
 
 func NewFrameContainer(owner vcl.IComponent,option... FrameOption) (root *FrameContainer) {
@@ -19,7 +23,14 @@ func NewFrameContainer(owner vcl.IComponent,option... FrameOption) (root *FrameC
 	return
 }
 
+func (this *FrameContainer) AddFrame(frame IFrame){
+	frame.SetParent(this)
+	frame.OnCreate()
+	this.frames = append(this.frames, frame)
+}
+
 func (this *FrameContainer) setup(){
+	this.frames = []IFrame{}
 	this.SetAlign(types.AlClient)
 }
 
@@ -29,5 +40,8 @@ func (this *FrameContainer) OnCreate(){
 }
 
 func (this *FrameContainer) OnDestroy(){
+	for _,f:=range this.frames {
+		f.OnDestroy()
+	}
 	log.Warnf("OnDestroy")
 }
