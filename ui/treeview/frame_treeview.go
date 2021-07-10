@@ -3,7 +3,6 @@ package treeview
 import (
 	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-lokas/util"
-	"github.com/nomos/go-tools/pjson"
 	"github.com/nomos/go-tools/ui"
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
@@ -51,7 +50,13 @@ func (this *Frame) bindCallbacks(){
 			} else if button == types.MbLeft {
 				node:=this.Tree.GetNodeAt(x,y)
 				if this.selectedSchema != nil {
-					next_node := this.GetNode
+					next_node := this.GetNodeBySchema(this.selectedSchema)
+					if node == nil {
+						return
+					}
+					if next_node==node {
+						return
+					}
 				}
 
 			}
