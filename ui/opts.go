@@ -7,7 +7,6 @@ import (
 	"github.com/ying32/govcl/vcl"
 )
 
-
 type FrameOption func(frame IFrame)
 
 func WithConfig(conf lokas.IConfig) FrameOption {

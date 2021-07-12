@@ -11,7 +11,7 @@ require (
 	github.com/lestrrat-go/strftime v1.0.4 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/nomos/go-events v0.0.3
-	github.com/nomos/go-lokas v0.1.6
+	github.com/nomos/go-lokas v0.1.7
 	github.com/nomos/promise v0.0.1
 	github.com/tyler-smith/go-bip39 v1.1.0
 	github.com/ying32/dylib v0.0.0-20210414124638-bf395b2d391a // indirect
@@ -19,6 +19,6 @@ require (
 	github.com/ying32/liblclbinres v0.0.0-20210305091625-aea78f1f52c0 // indirect
 	go.uber.org/zap v1.17.0
 	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a
+	golang.org/x/image v0.0.0-20210220032944-ac19c3e999fb
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 )
-

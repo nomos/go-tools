@@ -9,7 +9,7 @@ import (
 	"sync"
 )
 
-type Frame struct {
+type TreeView struct {
 	*vcl.TFrame
 	Tree *vcl.TTreeView
 	ui.ConfigAble
@@ -18,7 +18,7 @@ type Frame struct {
 	mu sync.Mutex
 }
 
-func New(owner vcl.IComponent,option... ui.FrameOption) (root *Frame) {
+func New(owner vcl.IComponent,option... ui.FrameOption) (root *TreeView) {
 	vcl.CreateResFrame(owner, &root)
 	for _,o:=range option {
 		o(root)
@@ -26,8 +26,8 @@ func New(owner vcl.IComponent,option... ui.FrameOption) (root *Frame) {
 	return
 }
 
-func (this *Frame) setup() {
-	log.Errorf("Frame setup")
+func (this *TreeView) setup() {
+	log.Errorf("TreeView setup")
 	this.SetAlign(types.AlClient)
 	this.Tree = vcl.NewTreeView(this)
 	this.Tree.SetParent(this)
@@ -35,7 +35,7 @@ func (this *Frame) setup() {
 	this.bindCallbacks()
 }
 
-func (this *Frame) bindCallbacks(){
+func (this *TreeView) bindCallbacks(){
 	this.Tree.SetOnMouseDown(func(sender vcl.IObject, button types.TMouseButton, shift types.TShiftState, x, y int32) {
 		for {
 			if util.IsNil(this.Root) {
@@ -68,7 +68,7 @@ func (this *Frame) bindCallbacks(){
 	//testcase tree.update node
 }
 
-func (this *Frame) GetNodeBySchema(s ui.ITreeSchema)*vcl.TTreeNode {
+func (this *TreeView) GetNodeBySchema(s ui.ITreeSchema)*vcl.TTreeNode {
 	defer this.Unlock()
 	this.Lock()
 	if this.Root!=nil {
@@ -89,15 +89,15 @@ func (this *Frame) GetNodeBySchema(s ui.ITreeSchema)*vcl.TTreeNode {
 	return nil
 }
 
-func (this *Frame) Lock(){
+func (this *TreeView) Lock(){
 	this.mu.Lock()
 }
 
-func (this *Frame) Unlock() {
+func (this *TreeView) Unlock() {
 	this.mu.Unlock()
 }
 
-func (this *Frame) UpdateTree(schema ui.ITreeSchema){
+func (this *TreeView) UpdateTree(schema ui.ITreeSchema){
 	if schema!=nil&&this.Root!=schema {
 		this.Root = schema
 	}
@@ -105,7 +105,7 @@ func (this *Frame) UpdateTree(schema ui.ITreeSchema){
 }
 
 //重新生成树
-func (this *Frame) rebuildTree(){
+func (this *TreeView) rebuildTree(){
 	if this.Root == nil {
 		this.Tree.Items().Clear()
 		return
@@ -113,10 +113,10 @@ func (this *Frame) rebuildTree(){
 
 }
 
-func (this *Frame) OnCreate() {
+func (this *TreeView) OnCreate() {
 	this.setup()
 }
 
-func (this *Frame) OnDestroy() {
+func (this *TreeView) OnDestroy() {
 
 }

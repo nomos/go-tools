@@ -116,7 +116,6 @@ func (this *PageContainer) AddIFrame(name string, frame IFrame, opts ...FrameOpt
 		opt(frame)
 	}
 	frame.SetEventEmitter(this.listener)
-	frame.SetLogger(this.log)
 	frame.setSheetName(name)
 	frame.setContainer(this)
 	this.iframes[name] = frame
