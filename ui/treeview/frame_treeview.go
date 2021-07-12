@@ -27,7 +27,6 @@ func New(owner vcl.IComponent,option... ui.FrameOption) (root *TreeView) {
 }
 
 func (this *TreeView) setup() {
-	log.Errorf("TreeView setup")
 	this.SetAlign(types.AlClient)
 	this.Tree = vcl.NewTreeView(this)
 	this.Tree.SetParent(this)
@@ -58,11 +57,9 @@ func (this *TreeView) bindCallbacks(){
 						return
 					}
 				}
-
 			}
 			break
 		}
-
 	})
 	//完成tree->node抽象->update
 	//testcase tree.update node
@@ -110,7 +107,6 @@ func (this *TreeView) rebuildTree(){
 		this.Tree.Items().Clear()
 		return
 	}
-
 }
 
 func (this *TreeView) OnCreate() {

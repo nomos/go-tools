@@ -7,31 +7,87 @@ import (
 	"github.com/iancoleman/orderedmap"
 	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-lokas/util/stringutil"
+	"github.com/nomos/go-tools/ui"
 	"math"
 	"reflect"
 	"strconv"
 )
 
+var _ ui.ITreeSchema = (*Schema)(nil)
+
 type Schema struct {
-	Type      Type
-	Index     int
+	Type       Type
+	index      int
 	innerIndex int
-	Key       string
-	Value     string
-	parent    *Schema
-	Container []*Schema
+	key        string
+	value      string
+	parent     *Schema
+	children   []ui.ITreeSchema
+	collapse bool
+
+	tree ui.ITree
+}
+
+func (this *Schema) Collapse() bool {
+	return this.collapse
+}
+
+func (this *Schema) SetCollapse(b bool) {
+	if this.collapse!= b {
+		this.tree.UpdateTree(this.Root())
+	}
 }
 
 func NewSchema() *Schema {
 	return &Schema{
-		Type:      0,
-		Index:     -1,
+		Type:       0,
+		index:      -1,
 		innerIndex: -1,
-		Key:       "",
-		Value:     "",
-		parent:    nil,
-		Container: make([]*Schema, 0),
+		key:        "",
+		value:      "",
+		parent:     nil,
+		children:   make([]ui.ITreeSchema, 0),
 	}
+}
+
+func (this *Schema) SetKey(s string) {
+	this.key = s
+}
+
+func (this *Schema) Key()string {
+	return this.key
+}
+
+func (this *Schema) Value()string {
+	return this.value
+}
+
+func (this *Schema) Idx()int{
+	return this.index
+}
+
+func (this *Schema) SetIdx(id int){
+	this.index = id
+}
+
+func (this *Schema) InnerIdx()int{
+	return this.innerIndex
+}
+
+func (this *Schema) SetInnerIdx(id int){
+	this.innerIndex = id
+}
+
+func (this *Schema) Parent()ui.ITreeSchema {
+	return this.parent
+}
+
+func (this *Schema) Children()[]ui.ITreeSchema {
+	return this.children
+}
+
+func (this *Schema) String()string {
+	return ""
 }
 
 func (this *Schema) typeof(d interface{}) Type {
@@ -61,10 +117,10 @@ func (this *Schema) Unmarshal(key string,index int, d interface{}) (*Schema, err
 		return nil, errors.New("parent cant be " + t.String())
 	}
 	if key!="" {
-		this.Key = key
+		this.key = key
 	}
 	if index>=0 {
-		this.Index = index
+		this.index = index
 	}
 	this.Type = t
 	switch t {
@@ -86,54 +142,51 @@ func (this *Schema) Unmarshal(key string,index int, d interface{}) (*Schema, err
 		}
 		break
 	case String:
-		this.Value = d.(string)
+		this.value = d.(string)
 		break
 	case Number:
 		if math.IsNaN(d.(float64)) {
-			this.Value = "NaN"
+			this.value = "NaN"
 			break
 		}
-		this.Value = strconv.FormatFloat(d.(float64),'f', -1, 64)
+		this.value = strconv.FormatFloat(d.(float64),'f', -1, 64)
 	case Boolean:
 		if d.(bool) {
-			this.Value = "true"
+			this.value = "true"
 		} else {
-			this.Value = "false"
+			this.value = "false"
 		}
 		break
 	case Null:
-		this.Value = "null"
+		this.value = "null"
 		break
 	}
 	return this,nil
 }
 
-func (this *Schema) AddChild(s *Schema)*Schema {
-	s.parent = this
-	this.Container = append(this.Container, s)
-	s.innerIndex = len(this.Container)-1
+func (this *Schema) AddChild(s ui.ITreeSchema)ui.ITreeSchema {
+	child:=s.(*Schema)
+	child.parent = this
+	this.children = append(this.children, s)
+	child.innerIndex = len(this.children)-1
 	return s
 }
 
 func (this *Schema) AppendChild()*Schema {
 	s:=NewSchema()
 	s.parent = this
-	this.Container = append(this.Container, s)
-	s.innerIndex = len(this.Container)-1
+	this.children = append(this.children, s)
+	s.innerIndex = len(this.children)-1
 	return s
 }
 
-func (this *Schema) Parent()*Schema {
-	return this.parent
-}
-
-func (this *Schema) Root()*Schema {
+func (this *Schema) Root()ui.ITreeSchema {
 	root:=this
 	for {
 		if root.Parent()==nil {
 			return root
 		}
-		root = root.Parent()
+		root = root.parent
 	}
 }
 
@@ -153,7 +206,7 @@ func (this *Schema) GetRootTree()[]int {
 			return make([]int,0)
 		}
 		ret = append(ret, root.innerIndex)
-		root = root.Parent()
+		root = root.parent
 	}
 	ret1:=make([]int,0)
 	for i:=len(ret)-1;i>=0;i-- {
@@ -164,11 +217,11 @@ func (this *Schema) GetRootTree()[]int {
 
 func (this *Schema) ToLineString()string {
 	ret:=""
-	if this.Index!= -1 {
-		ret+="[Item"+strconv.Itoa(this.Index)+"]:   "
+	if this.index != -1 {
+		ret+="[Item"+strconv.Itoa(this.index)+"]:   "
 	}
-	if this.Key!="" {
-		ret+=`"`+this.Key+`":`
+	if this.key !="" {
+		ret+=`"`+this.key +`":`
 	}
 	ret = stringutil.AddStringGap(ret,10,6)
 
@@ -178,9 +231,9 @@ func (this *Schema) ToLineString()string {
 	case Array:
 		return ret+"array"
 	case String:
-		return ret+`"`+this.Value+`"`
+		return ret+`"`+this.value +`"`
 	default:
-		return ret+this.Value
+		return ret+this.value
 	}
 }
 
@@ -188,27 +241,27 @@ func (this *Schema) ToObj()interface{} {
 	switch this.Type {
 	case Object:
 		ret:=orderedmap.New()
-		for _,container:=range this.Container {
-			ret.Set(container.Key,container.ToObj())
+		for _,container:=range this.children {
+			ret.Set(container.Key(),container.ToObj())
 		}
 		return ret
 	case Array:
 		ret:=make([]interface{},0)
-		for _,container:=range this.Container {
+		for _,container:=range this.children {
 			ret = append(ret, container.ToObj())
 		}
 		return ret
 	case String:
-		return this.Value
+		return this.value
 	case Number:
-		ret,err:= strconv.ParseFloat(this.Value,64)
+		ret,err:= strconv.ParseFloat(this.value,64)
 		if err != nil {
 			log.Error(err.Error())
 			return nil
 		}
 		return ret
 	case Boolean:
-		if this.Value == "true" {
+		if this.value == "true" {
 			return true
 		} else {
 			return false
@@ -220,10 +273,10 @@ func (this *Schema) ToObj()interface{} {
 }
 
 func (this *Schema) ToKeyString()string {
-	if this.Index!= -1 {
-		return "["+strconv.Itoa(this.Index)+"]"
+	if this.index != -1 {
+		return "["+strconv.Itoa(this.index)+"]"
 	}
-	return this.Key
+	return this.key
 }
 
 func (this *Schema) ToValueString()string {
@@ -233,7 +286,7 @@ func (this *Schema) ToValueString()string {
 	case Array:
 		return "[array]"
 	default:
-		return this.Value
+		return this.value
 	}
 }
 
@@ -244,18 +297,18 @@ func (this *Schema) Clone()*Schema {
 func (this *Schema) clone(root bool)*Schema {
 	schema:=NewSchema()
 	schema.Type = this.Type
-	schema.Value = this.Value
-	schema.Key = this.Key
+	schema.value = this.value
+	schema.key = this.key
 	schema.parent = nil
 	if !root {
-		schema.Index = schema.Index
+		schema.index = schema.index
 		schema.innerIndex = schema.innerIndex
 	} else {
-		schema.Index = -1
+		schema.index = -1
 		schema.innerIndex = -1
 	}
-	for _,s:=range this.Container{
-		s1:=s.clone(false)
+	for _,s:=range this.children {
+		s1:=s.(*Schema).clone(false)
 		schema.AddChild(s1)
 	}
 	return schema
@@ -266,11 +319,11 @@ func (this *Schema) IsRoot()bool {
 }
 
 func (this *Schema) IsObjectElem()bool {
-	return !this.IsRoot()&&this.Index == -1
+	return !this.IsRoot()&&this.index == -1
 }
 
 func (this *Schema) IsArrayElem()bool {
-	return !this.IsRoot()&&this.Index != -1
+	return !this.IsRoot()&&this.index != -1
 }
 
 func (this *Schema) ToString(format bool)string {
@@ -289,36 +342,36 @@ func (this *Schema) ToString(format bool)string {
 			return string(ret)
 		}
 	default:
-		return this.Value
+		return this.value
 	}
 }
 
-func (this *Schema) Detach(s *Schema)*Schema {
+func (this *Schema) Detach(s ui.ITreeSchema)ui.ITreeSchema {
 	index:=-1
-	newContainer:=make([]*Schema,0)
-	for i,v:=range this.Container {
+	newContainer:=make([]ui.ITreeSchema,0)
+	for i,v:=range this.children {
 		if v== s {
 			index = i
 			continue
 		}
 		newContainer = append(newContainer, v)
-		v.innerIndex = len(newContainer)-1
+		v.SetInnerIdx(len(newContainer)-1)
 		if this.Type == Array {
-			v.Index = v.innerIndex
+			v.SetIdx(v.InnerIdx())
 		}
 	}
-	this.Container = newContainer
+	this.children = newContainer
 	if index!= -1 {
 		this.parent = nil
-		if this.Index!= -1 {
-			this.Index = -1
+		if this.index != -1 {
+			this.index = -1
 		}
 		this.innerIndex = -1
 	}
 	return this
 }
 
-func (this *Schema) Insert(s *Schema)*Schema {
+func (this *Schema) Insert(s ui.ITreeSchema)ui.ITreeSchema {
 	parent:=this
 	index:=0
 	if this.Type.IsValue() {
@@ -326,34 +379,34 @@ func (this *Schema) Insert(s *Schema)*Schema {
 		index = this.innerIndex+1
 	}
 	if parent.Type == Array {
-		s.Key = ""
+		s.SetKey("")
 	}
-	parent.insert(index,s)
+	parent.insert(index,s.(*Schema))
 	return s
 }
 
 func (this *Schema) insert(pos int,s *Schema) {
-	newC := make([]*Schema,0)
-	for _,v:=range this.Container[0:pos] {
+	newC := make([]ui.ITreeSchema,0)
+	for _,v:=range this.children[0:pos] {
 		newC = append(newC, v)
-		v.innerIndex = len(newC)-1
+		v.SetInnerIdx(len(newC)-1)
 		if this.Type == Array {
-			v.Index = v.innerIndex
+			v.SetIdx(v.InnerIdx())
 		}
 	}
 	newC = append(newC,s)
 	s.innerIndex = len(newC)-1
 	if this.Type == Array {
-		s.Index = s.innerIndex
+		s.index = s.innerIndex
 	}
-	for _,v:=range this.Container[pos:] {
+	for _,v:=range this.children[pos:] {
 		newC = append(newC, v)
-		v.innerIndex = len(newC)-1
+		v.SetInnerIdx(len(newC)-1)
 		if this.Type == Array {
-			v.Index = v.innerIndex
+			v.SetIdx(v.InnerIdx())
 		}
 	}
-	this.Container = newC
+	this.children = newC
 	s.parent = this
 }
 
@@ -362,12 +415,12 @@ func (this *Schema) ChangeType(t Type)bool {
 		return false
 	}
 	if this.Type == Object || this.Type == Array {
-		if len(this.Container)>0 {
+		if len(this.children)>0 {
 			return false
 		}
 	}
 	this.Type = t
-	this.Value = t.Default()
+	this.value = t.Default()
 	return true
 }
 
@@ -375,7 +428,7 @@ func (this *Schema) TrySetKey(s string) bool {
 	if this.IsRoot()||(this.parent!=nil&&this.parent.Type==Array) {
 		return false
 	}
-	this.Key = s
+	this.key = s
 	return true
 }
 
@@ -386,7 +439,7 @@ func (this *Schema) TrySetValue(s string) bool {
 	default:
 		s,ok:=this.Type.CheckValue(s)
 		if ok {
-			this.Value = s
+			this.value = s
 			return true
 		}
 	}
@@ -406,37 +459,37 @@ func (this *Schema) MoveUp()bool {
 
 func (this *Schema) moveUp(s *Schema){
 	innerIndex := s.innerIndex
-	newContainer:=make([]*Schema,0)
-	for _,v:=range this.Container[0:innerIndex-1] {
+	newContainer:=make([]ui.ITreeSchema,0)
+	for _,v:=range this.children[0:innerIndex-1] {
 		newContainer = append(newContainer, v)
-		v.innerIndex = len(newContainer) -1
+		v.SetInnerIdx(len(newContainer) -1)
 		if this.Type == Array {
-			v.Index = v.innerIndex
+			v.SetIdx(v.InnerIdx())
 		}
 	}
 	newContainer = append(newContainer,s)
 	s.innerIndex = len(newContainer) -1
 	if this.Type == Array {
-		s.Index = s.innerIndex
+		s.index = s.innerIndex
 	}
-	for _,v:=range this.Container[innerIndex-1:] {
+	for _,v:=range this.children[innerIndex-1:] {
 		if v == s {
 			continue
 		}
 		newContainer = append(newContainer, v)
-		v.innerIndex = len(newContainer) -1
+		v.SetInnerIdx(len(newContainer) -1)
 		if this.Type == Array {
-			v.Index = v.innerIndex
+			v.SetIdx(v.InnerIdx())
 		}
 	}
-	this.Container = newContainer
+	this.children = newContainer
 }
 
 func (this *Schema) MoveDown()bool {
 	if this.parent==nil {
 		return false
 	}
-	if this.innerIndex == len(this.parent.Container)-1 {
+	if this.innerIndex == len(this.parent.children)-1 {
 		return false
 	}
 	this.parent.moveDown(this)
@@ -445,28 +498,28 @@ func (this *Schema) MoveDown()bool {
 
 func (this *Schema) moveDown(s *Schema){
 	innerIndex := s.innerIndex
-	newContainer:=make([]*Schema,0)
-	for _,v:=range this.Container[0:innerIndex+2] {
+	newContainer:=make([]ui.ITreeSchema,0)
+	for _,v:=range this.children[0:innerIndex+2] {
 		if v == s {
 			continue
 		}
 		newContainer = append(newContainer, v)
-		v.innerIndex = len(newContainer) -1
+		v.SetInnerIdx(len(newContainer) -1)
 		if this.Type == Array {
-			v.Index = v.innerIndex
+			v.SetIdx(v.InnerIdx())
 		}
 	}
 	newContainer = append(newContainer,s)
 	s.innerIndex = len(newContainer) -1
 	if this.Type == Array {
-		s.Index = s.innerIndex
+		s.index = s.innerIndex
 	}
-	for _,v:=range this.Container[innerIndex+2:] {
+	for _,v:=range this.children[innerIndex+2:] {
 		newContainer = append(newContainer, v)
-		v.innerIndex = len(newContainer) -1
+		v.SetInnerIdx(len(newContainer) -1)
 		if this.Type == Array {
-			v.Index = v.innerIndex
+			v.SetIdx(v.InnerIdx())
 		}
 	}
-	this.Container = newContainer
+	this.children = newContainer
 }

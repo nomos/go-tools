@@ -451,6 +451,12 @@ func (this *ConsoleShell) OnCmdEditChange(sender vcl.IObject) {
 
 }
 
+func (this *ConsoleShell) RegisterCommands(commands []cmds.ICommand){
+	for _,c:=range commands {
+		this.RegisterCmd("shell",c)
+	}
+}
+
 
 func (this *ConsoleShell) OnSendButtonClick(sender vcl.IObject) {
 

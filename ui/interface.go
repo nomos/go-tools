@@ -10,11 +10,22 @@ import (
 
 type ITreeSchema interface {
 	String()string
+	SetKey(s string)
 	Key()string
 	Value()string
 	GetRootTree()[]int
+	Idx()int
+	ToObj()interface{}
+	Collapse()bool
+	SetCollapse(bool)
+	SetIdx(id int)
 	InnerIdx()int
+	SetInnerIdx(id int)
+	Insert(s ITreeSchema)ITreeSchema
+	Detach(s ITreeSchema)ITreeSchema
+	Root()ITreeSchema
 	Parent()ITreeSchema
+	AddChild(schema ITreeSchema)ITreeSchema
 	Children()[]ITreeSchema
 }
 

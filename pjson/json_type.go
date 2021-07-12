@@ -51,7 +51,7 @@ func GetTypeByString(s string)Type {
 func (this Type) CreateDefaultSchema()*Schema {
 	ret:=NewSchema()
 	ret.Type = this
-	ret.Value = this.Default()
+	ret.value = this.Default()
 	return ret
 }
 

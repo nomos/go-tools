@@ -5,7 +5,6 @@ import (
 	"github.com/nomos/go-tools/ui"
 	"github.com/nomos/go-tools/ui/icons"
 	"github.com/ying32/govcl/vcl"
-	"github.com/ying32/govcl/vcl/types"
 	"runtime"
 )
 
@@ -36,23 +35,23 @@ func (this *Excel2JsonFrame) setup(){
 		this.BringToFront()
 	})
 	imgList:=icons.GetImageList(32,32)
-	line5:=this.createLine(32)
-	this.createLine(10)
-	line4:=this.createLine(32)
-	line3:=this.createLine(24)
-	this.createLine(10)
-	line2:=this.createLine(32)
-	line1:=this.createLine(24)
-	this.createText("Excel路径",line1)
-	this.createText("Ts路径",line3)
-	this.ExcelEdit=this.createEdit(line2)
-	this.TsEdit=this.createEdit(line4)
-	this.ExcelButton=this.createSpeedBtn("folder",imgList,line2)
-	this.TsButton=this.createSpeedBtn("folder",imgList,line4)
-	this.HelpButton = this.createSpeedBtn("help",imgList,line5)
-	this.createSeg(120,line5)
-	this.GenerateButton = this.createButton("生成",line5)
-	this.IndieFolderCheck = this.createCheckBox("嵌入",line5)
+	line5:=ui.CreateLine(32,this)
+	ui.CreateLine(10,this)
+	line4:=ui.CreateLine(32,this)
+	line3:=ui.CreateLine(24,this)
+	ui.CreateLine(10,this)
+	line2:=ui.CreateLine(32,this)
+	line1:=ui.CreateLine(24,this)
+	ui.CreateText("Excel路径",line1)
+	ui.CreateText("Ts路径",line3)
+	this.ExcelEdit=ui.CreateEdit(line2)
+	this.TsEdit=ui.CreateEdit(line4)
+	this.ExcelButton=ui.CreateSpeedBtn("folder",imgList,line2)
+	this.TsButton=ui.CreateSpeedBtn("folder",imgList,line4)
+	this.HelpButton = ui.CreateSpeedBtn("help",imgList,line5)
+	ui.CreateSeg(120,line5)
+	this.GenerateButton = ui.CreateButton("生成",line5)
+	this.IndieFolderCheck = ui.CreateCheckBox("嵌入",line5)
 
 }
 
@@ -173,76 +172,4 @@ func (this *Excel2JsonFrame) OnDestroy(){
 
 func (this *Excel2JsonFrame) Name()string{
 	return "Excel2JsonFrame"
-}
-
-func (this *Excel2JsonFrame) createSeg(width int32,parent vcl.IWinControl){
-	frame:=vcl.NewPanel(this)
-	frame.SetAlign(types.AlLeft)
-	frame.SetWidth(width)
-	frame.SetParent(parent)
-	frame.SetBevelInner(0)
-	frame.SetBevelOuter(0)
-}
-
-func (this *Excel2JsonFrame) createCheckBox(s string,parent vcl.IWinControl)*vcl.TCheckBox{
-	ret:=vcl.NewCheckBox(parent)
-	ret.SetParent(parent)
-	ret.SetCaption(s)
-	ret.BorderSpacing().SetTop(4)
-	ret.BorderSpacing().SetBottom(4)
-	ret.SetAlign(types.AlLeft)
-	return ret
-}
-
-func (this *Excel2JsonFrame) createLine(height int32)*vcl.TPanel{
-	frame:=vcl.NewPanel(this)
-	frame.SetAlign(types.AlTop)
-	frame.SetHeight(height)
-	frame.BorderSpacing().SetAround(6)
-	frame.BorderSpacing().SetLeft(6)
-	frame.SetBevelInner(0)
-	frame.SetBevelOuter(0)
-	frame.SetCaption("")
-	frame.SetParent(this)
-	return frame
-}
-
-func (this *Excel2JsonFrame) createText(c string,parent vcl.IWinControl){
-	t:=vcl.NewLabel(this)
-	t.SetCaption(c)
-	t.SetAlign(types.AlLeft)
-	t.SetParent(parent)
-}
-
-func (this *Excel2JsonFrame) createButton(s string,parent vcl.IWinControl)*vcl.TButton{
-	btn:=vcl.NewButton(this)
-	btn.SetAlign(types.AlLeft)
-	btn.SetParent(parent)
-	btn.SetCaption(s)
-	btn.SetWidth(80)
-	btn.SetHeight(32)
-	return btn
-}
-
-func (this *Excel2JsonFrame) createSpeedBtn(s string,img *icons.ImageList,parent vcl.IWinControl)*vcl.TSpeedButton{
-	btn:=vcl.NewSpeedButton(this)
-	btn.SetAlign(types.AlLeft)
-	btn.SetParent(parent)
-	btn.SetImages(img.ImageList())
-	btn.SetWidth(32)
-	btn.SetHeight(32)
-	btn.SetImageIndex(img.GetImageIndex(s))
-	return btn
-}
-
-func (this *Excel2JsonFrame) createEdit(parent vcl.IWinControl)*vcl.TLabeledEdit{
-	ret:=vcl.NewLabeledEdit(parent)
-	ret.SetParent(parent)
-	ret.BorderSpacing().SetLeft(12)
-	ret.BorderSpacing().SetTop(2)
-	ret.BorderSpacing().SetBottom(2)
-	ret.SetWidth(250)
-	ret.SetAlign(types.AlLeft)
-	ret.SetText("")
-	return ret
 }

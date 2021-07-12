@@ -1,7 +1,6 @@
 package ui
 
 import (
-    "github.com/nomos/go-lokas/log"
     "github.com/ying32/govcl/vcl"
     "github.com/ying32/govcl/vcl/types"
 )
@@ -35,7 +34,6 @@ func (this *WebViewFrame) Refresh(){
 }
 
 func (this *WebViewFrame) setup(){
-    log.Errorf("WebViewFrame setup")
     this.SetAlign(types.AlClient)
     this.Main = vcl.NewPanel(this)
     this.Main.SetParent(this)
