@@ -19,6 +19,8 @@ func CreateCheckBox(s string, parent vcl.IWinControl) *vcl.TCheckBox {
 
 func CreateLine(align types.TAlign,size types.TConstraintSize,component vcl.IWinControl)*vcl.TPanel{
 	frame:=vcl.NewPanel(component)
+	frame.SetBevelOuter(0)
+	frame.SetBevelInner(0)
 	frame.SetAlign(align)
 	if align==types.AlTop||align==types.AlBottom {
 		frame.Constraints().SetMinHeight(size)
