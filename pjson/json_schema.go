@@ -34,6 +34,10 @@ func (this *Schema) SetNode(node *vcl.TTreeNode){
 	this.node = node
 }
 
+func (this *Schema) Node()*vcl.TTreeNode{
+	return this.node
+}
+
 func (this *Schema) Collapse() bool {
 	return this.collapse
 }

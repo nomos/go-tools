@@ -47,7 +47,9 @@ func (this *JsonEditor) setup(){
 	this.textEdit.BorderSpacing().SetRight(6)
 	rightPanel:=ui.CreatePanel(types.AlClient,this)
 	line2:=ui.CreateLine(types.AlTop,0,0,32,rightPanel)
+	line2.BorderSpacing().SetBottom(3)
 	line3:=ui.CreateLine(types.AlTop,6,0,32,leftPanel)
+	line3.BorderSpacing().SetBottom(3)
 	ui.CreateSeg(3,line2)
 	ui.CreateSpeedBtn("sort_up",icons.GetImageList(32,32),line2)
 	ui.CreateSeg(3,line2)
@@ -92,6 +94,8 @@ func (this *JsonEditor) OnCreate(){
 	this.textEdit.SetOnChange(func(sender vcl.IObject) {
 		this.parseString()
 	})
+
+	this.tree.SetOnUpdate(this.ParseNode)
 }
 
 func (this *JsonEditor) OnDestroy() {
@@ -111,14 +115,7 @@ func (this *JsonEditor) parseString() {
 	this.textEdit.Font().SetColor(colors.ClSysDefault)
 	this.schema = NewSchema()
 	this.schema.Unmarshal("", -1, *i)
-	this.Clear()
-	this.tree.Tree.Items().BeginUpdate()
 	this.tree.UpdateTree(this.schema)
-	this.tree.Tree.Items().EndUpdate()
-	//this.TreePanel.Items().BeginUpdate()
-	//this.ParseTree(nil, this.schema)
-	//this.TreePanel.FullExpand()
-	//this.TreePanel.Items().EndUpdate()
 }
 
 
@@ -128,21 +125,21 @@ func (this *JsonEditor) Clear() {
 }
 
 
-func (this *JsonEditor) ParseNode(parent *vcl.TTreeNode, schema *Schema) {
-	switch schema.Type {
+func (this *JsonEditor) ParseNode(view *treeview.TreeView,parent *vcl.TTreeNode, schema ui.ITreeSchema) {
+	switch schema.(*Schema).Type {
 	case Object, Array:
-		node := this.tree.AddNode(parent, schema)
-		for _, v := range schema.children {
-			this.ParseNode(node, v.(*Schema))
+		node := view.AddNode(parent, schema)
+		for _, v := range schema.Children() {
+			this.ParseNode(view,node, v)
 		}
 	case String:
-		this.tree.AddNode(parent, schema)
+		view.AddNode(parent, schema)
 	case Number:
-		this.tree.AddNode(parent, schema)
+		view.AddNode(parent, schema)
 	case Boolean:
-		this.tree.AddNode(parent, schema)
+		view.AddNode(parent, schema)
 	case Null:
-		this.tree.AddNode(parent, schema)
+		view.AddNode(parent, schema)
 	default:
 
 	}

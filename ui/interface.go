@@ -11,6 +11,7 @@ import (
 type ITreeSchema interface {
 	String()string
 	SetKey(s string)
+	Node()*vcl.TTreeNode
 	SetNode(node *vcl.TTreeNode)
 	Image()string
 	Key()string
