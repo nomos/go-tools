@@ -17,6 +17,18 @@ func CreateCheckBox(s string, parent vcl.IWinControl) *vcl.TCheckBox {
 	return ret
 }
 
+
+func CreatePanel(align types.TAlign,component vcl.IWinControl)*vcl.TPanel{
+	frame:=vcl.NewPanel(component)
+	frame.SetBevelOuter(0)
+	frame.SetBevelInner(0)
+	frame.SetAlign(align)
+	frame.SetBevelInner(0)
+	frame.SetBevelOuter(0)
+	frame.SetCaption("")
+	frame.SetParent(component)
+	return frame
+}
 func CreateLine(align types.TAlign,size types.TConstraintSize,component vcl.IWinControl)*vcl.TPanel{
 	frame:=vcl.NewPanel(component)
 	frame.SetBevelOuter(0)
@@ -41,8 +53,6 @@ func CreateLine(align types.TAlign,size types.TConstraintSize,component vcl.IWin
 	return frame
 }
 
-
-
 func CreateText(c string,parent vcl.IWinControl)*vcl.TLabel{
 	t:=vcl.NewLabel(parent)
 	t.SetCaption(c)
@@ -50,9 +60,6 @@ func CreateText(c string,parent vcl.IWinControl)*vcl.TLabel{
 	t.SetParent(parent)
 	return t
 }
-
-
-
 
 func CreateButton(s string,parent vcl.IWinControl)*vcl.TButton{
 	btn:=vcl.NewButton(parent)
@@ -79,7 +86,6 @@ func CreateSplitter(parent vcl.IWinControl,align types.TAlign, size types.TConst
 	}
 	return splitter
 }
-
 
 func CreateEdit(parent vcl.IWinControl)*vcl.TLabeledEdit{
 	ret:=vcl.NewLabeledEdit(parent)
