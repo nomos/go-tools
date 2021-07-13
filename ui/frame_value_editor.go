@@ -27,7 +27,7 @@ func NewValueEditorFrame(owner vcl.IComponent,option... FrameOption) (root *Valu
 }
 
 func (this *ValueEditorFrame) setup(){
-	line1:=CreateLine(types.AlTop,24,this)
+	line1:=CreateLine(types.AlTop,0,6,24,this)
 
 	this.keyEdit = NewMemoFrame(line1)
 	this.keyEdit.BorderSpacing().SetLeft(6)

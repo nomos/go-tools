@@ -8,6 +8,7 @@ import (
 	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-lokas/util/stringutil"
 	"github.com/nomos/go-tools/ui"
+	"github.com/ying32/govcl/vcl"
 	"math"
 	"reflect"
 	"strconv"
@@ -25,7 +26,12 @@ type Schema struct {
 	children   []ui.ITreeSchema
 	collapse bool
 
+	node *vcl.TTreeNode
 	tree ui.ITree
+}
+
+func (this *Schema) SetNode(node *vcl.TTreeNode){
+	this.node = node
 }
 
 func (this *Schema) Collapse() bool {
@@ -86,7 +92,21 @@ func (this *Schema) Children()[]ui.ITreeSchema {
 	return this.children
 }
 
-func (this *Schema) String()string {
+func (this *Schema) Image()string{
+	switch this.Type {
+	case Null:
+		return "null_icon"
+	case Number:
+		return "number_icon"
+	case Boolean:
+		return "boolean_icon"
+	case String:
+		return "string_icon"
+	case Object:
+		return "object_box"
+	case Array:
+		return "array_box"
+	}
 	return ""
 }
 
@@ -215,7 +235,7 @@ func (this *Schema) GetRootTree()[]int {
 	return ret1
 }
 
-func (this *Schema) ToLineString()string {
+func (this *Schema) String()string {
 	ret:=""
 	if this.index != -1 {
 		ret+="[Item"+strconv.Itoa(this.index)+"]:   "

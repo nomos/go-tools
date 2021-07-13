@@ -65,6 +65,12 @@ func (this *TreeView) bindCallbacks(){
 	//testcase tree.update node
 }
 
+func (this *TreeView) AddNode(node *vcl.TTreeNode,schema ui.ITreeSchema)*vcl.TTreeNode{
+	newNode:= this.Tree.Items().AddChild(node,schema.String())
+	schema.SetNode(newNode)
+	return newNode
+}
+
 func (this *TreeView) GetNodeBySchema(s ui.ITreeSchema)*vcl.TTreeNode {
 	defer this.Unlock()
 	this.Lock()
@@ -115,4 +121,8 @@ func (this *TreeView) OnCreate() {
 
 func (this *TreeView) OnDestroy() {
 
+}
+
+func (this *TreeView) Clear(){
+	this.Tree.Items().Clear()
 }

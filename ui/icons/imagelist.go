@@ -18,6 +18,18 @@ func init(){
 	icon_assets.Assign(iconList)
 }
 
+func GetImage(control vcl.IWinControl,s string)*vcl.TImage{
+	ret:=vcl.NewImage(control)
+	ret.Picture().LoadFromBytes(iconList[s])
+	return ret
+}
+
+func LoadData(img *vcl.TImage,s string){
+	img.Picture().LoadFromBytes(iconList[s])
+}
+
+
+
 var _mu sync.Mutex
 
 

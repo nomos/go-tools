@@ -23,7 +23,7 @@ type PageContainer struct {
 	num           int
 }
 
-func NewPageContainer(owner vcl.IComponent,option... FrameOption) (root *PageContainer) {
+func NewPageContainer(owner vcl.IWinControl,option... FrameOption) (root *PageContainer) {
 	vcl.CreateResFrame(owner, &root)
 	for _,o:=range option {
 		o(root)

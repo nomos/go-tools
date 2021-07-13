@@ -11,6 +11,8 @@ import (
 type ITreeSchema interface {
 	String()string
 	SetKey(s string)
+	SetNode(node *vcl.TTreeNode)
+	Image()string
 	Key()string
 	Value()string
 	GetRootTree()[]int

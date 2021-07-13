@@ -60,8 +60,8 @@ func NewConsoleShell(owner vcl.IComponent,option... FrameOption) (root *ConsoleS
 }
 
 func (this *ConsoleShell) setup(){
-	this.SetHeight(500)
-	this.SetWidth(700)
+	this.SetHeight(200)
+	this.SetWidth(500)
 	this.BottomPanel = vcl.NewPanel(this)
 	this.BottomPanel.SetParent(this)
 	this.BottomPanel.SetAlign(types.AlBottom)

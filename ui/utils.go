@@ -29,7 +29,7 @@ func CreatePanel(align types.TAlign,component vcl.IWinControl)*vcl.TPanel{
 	frame.SetParent(component)
 	return frame
 }
-func CreateLine(align types.TAlign,size types.TConstraintSize,component vcl.IWinControl)*vcl.TPanel{
+func CreateLine(align types.TAlign,offset int32,around int32,size types.TConstraintSize,component vcl.IWinControl)*vcl.TPanel{
 	frame:=vcl.NewPanel(component)
 	frame.SetBevelOuter(0)
 	frame.SetBevelInner(0)
@@ -37,15 +37,16 @@ func CreateLine(align types.TAlign,size types.TConstraintSize,component vcl.IWin
 	if align==types.AlTop||align==types.AlBottom {
 		frame.Constraints().SetMinHeight(size)
 		frame.Constraints().SetMaxHeight(size)
+		frame.BorderSpacing().SetLeft(offset)
 	} else if align==types.AlLeft||align==types.AlRight {
 		frame.Constraints().SetMinWidth(size)
 		frame.Constraints().SetMaxWidth(size)
+		frame.BorderSpacing().SetTop(offset)
 	} else {
 		frame.SetWidth(int32(size))
 		frame.SetHeight(int32(size))
 	}
-	frame.BorderSpacing().SetAround(6)
-	frame.BorderSpacing().SetLeft(6)
+	frame.BorderSpacing().SetAround(around)
 	frame.SetBevelInner(0)
 	frame.SetBevelOuter(0)
 	frame.SetCaption("")
@@ -87,13 +88,14 @@ func CreateSplitter(parent vcl.IWinControl,align types.TAlign, size types.TConst
 	return splitter
 }
 
-func CreateEdit(parent vcl.IWinControl)*vcl.TLabeledEdit{
-	ret:=vcl.NewLabeledEdit(parent)
+func CreateEdit(width types.TConstraintSize,parent vcl.IWinControl)*vcl.TEdit{
+	ret:=vcl.NewEdit(parent)
 	ret.SetParent(parent)
 	ret.BorderSpacing().SetLeft(12)
 	ret.BorderSpacing().SetTop(2)
 	ret.BorderSpacing().SetBottom(2)
-	ret.SetWidth(250)
+	ret.Constraints().SetMaxWidth(width)
+	ret.Constraints().SetMinWidth(width)
 	ret.SetAlign(types.AlLeft)
 	ret.SetText("")
 	return ret
@@ -117,4 +119,13 @@ func CreateSpeedBtn(s string,img *icons.ImageList,parent vcl.IWinControl)*vcl.TS
 	btn.SetHeight(32)
 	btn.SetImageIndex(img.GetImageIndex(s))
 	return btn
+}
+
+func CreateImage(s string,parent vcl.IWinControl)*vcl.TImage{
+	ret :=icons.GetImage(parent,s)
+	ret.SetAlign(types.AlLeft)
+	ret.SetParent(parent)
+	ret.SetWidth(32)
+	ret.SetHeight(32)
+	return ret
 }
