@@ -5,6 +5,7 @@ import (
 	"github.com/nomos/go-tools/ui"
 	"github.com/nomos/go-tools/ui/icons"
 	"github.com/ying32/govcl/vcl"
+	"github.com/ying32/govcl/vcl/types"
 	"runtime"
 )
 
@@ -35,13 +36,13 @@ func (this *Excel2JsonFrame) setup(){
 		this.BringToFront()
 	})
 	imgList:=icons.GetImageList(32,32)
-	line5:=ui.CreateLine(32,this)
-	ui.CreateLine(10,this)
-	line4:=ui.CreateLine(32,this)
-	line3:=ui.CreateLine(24,this)
-	ui.CreateLine(10,this)
-	line2:=ui.CreateLine(32,this)
-	line1:=ui.CreateLine(24,this)
+	line5:=ui.CreateLine(types.AlLeft,32,this)
+	ui.CreateLine(types.AlLeft,10,this)
+	line4:=ui.CreateLine(types.AlLeft,32,this)
+	line3:=ui.CreateLine(types.AlLeft,24,this)
+	ui.CreateLine(types.AlLeft,10,this)
+	line2:=ui.CreateLine(types.AlLeft,32,this)
+	line1:=ui.CreateLine(types.AlLeft,24,this)
 	ui.CreateText("Excel路径",line1)
 	ui.CreateText("Ts路径",line3)
 	this.ExcelEdit=ui.CreateEdit(line2)

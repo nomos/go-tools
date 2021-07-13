@@ -19,7 +19,7 @@
         <ComponentName Value="JsonEditFrame"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="2"/>
         <CursorPos Y="46"/>
         <UsageCount Value="348"/>
         <Loaded Value="True"/>
@@ -30,8 +30,11 @@
         <ComponentName Value="JsonValueEditFrame"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
-        <EditorIndex Value="-1"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
         <UsageCount Value="348"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="text_frame.pas"/>
@@ -41,12 +44,6 @@
         <UsageCount Value="348"/>
       </Unit3>
       <Unit4>
-        <Filename Value="web_view_frame.pas"/>
-        <HasResources Value="True"/>
-        <EditorIndex Value="-1"/>
-        <UsageCount Value="348"/>
-      </Unit4>
-      <Unit5>
         <Filename Value="console_shell_frame.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="ConsoleShell"/>
@@ -55,15 +52,15 @@
         <EditorIndex Value="-1"/>
         <CursorPos X="3" Y="42"/>
         <UsageCount Value="348"/>
-      </Unit5>
-      <Unit6>
+      </Unit4>
+      <Unit5>
         <Filename Value="chart_frame.pas"/>
         <IsPartOfProject Value="True"/>
         <HasResources Value="True"/>
         <EditorIndex Value="-1"/>
         <UsageCount Value="348"/>
-      </Unit6>
-      <Unit7>
+      </Unit5>
+      <Unit6>
         <Filename Value="auto_deploy_frame.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="AutoDeploy"/>
@@ -73,8 +70,8 @@
         <TopLine Value="12"/>
         <CursorPos X="105" Y="57"/>
         <UsageCount Value="333"/>
-      </Unit7>
-      <Unit8>
+      </Unit6>
+      <Unit7>
         <Filename Value="form_list_frame.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FormListFrame"/>
@@ -82,8 +79,8 @@
         <ResourceBaseClass Value="Frame"/>
         <EditorIndex Value="-1"/>
         <UsageCount Value="330"/>
-      </Unit8>
-      <Unit9>
+      </Unit7>
+      <Unit8>
         <Filename Value="deploy_frame.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="DeployFrame"/>
@@ -91,8 +88,8 @@
         <ResourceBaseClass Value="Frame"/>
         <EditorIndex Value="-1"/>
         <UsageCount Value="310"/>
-      </Unit9>
-      <Unit10>
+      </Unit8>
+      <Unit9>
         <Filename Value="excel2jsonminigame.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="Excel2JsonMiniGameFrame"/>
@@ -100,8 +97,8 @@
         <ResourceBaseClass Value="Frame"/>
         <EditorIndex Value="-1"/>
         <UsageCount Value="310"/>
-      </Unit10>
-      <Unit11>
+      </Unit9>
+      <Unit10>
         <Filename Value="image2arraybuffer.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="Image2ArrayBuffer"/>
@@ -110,16 +107,16 @@
         <EditorIndex Value="-1"/>
         <CursorPos X="3" Y="32"/>
         <UsageCount Value="225"/>
-      </Unit11>
-      <Unit12>
+      </Unit10>
+      <Unit11>
         <Filename Value="imagecutter.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="ImageCutter"/>
         <ResourceBaseClass Value="Frame"/>
         <EditorIndex Value="-1"/>
         <UsageCount Value="368"/>
-      </Unit12>
-      <Unit13>
+      </Unit11>
+      <Unit12>
         <Filename Value="empty.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="EmptyForm"/>
@@ -128,8 +125,8 @@
         <EditorIndex Value="-1"/>
         <CursorPos X="96" Y="26"/>
         <UsageCount Value="367"/>
-      </Unit13>
-      <Unit14>
+      </Unit12>
+      <Unit13>
         <Filename Value="model_gen.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="ModelGenFrame"/>
@@ -138,18 +135,23 @@
         <EditorIndex Value="-1"/>
         <CursorPos X="109" Y="33"/>
         <UsageCount Value="367"/>
-      </Unit14>
-      <Unit15>
+      </Unit13>
+      <Unit14>
         <Filename Value="codegen_csharp.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="CodeGenCSharp"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Frame"/>
-        <IsVisibleTab Value="True"/>
         <CursorPos X="48" Y="8"/>
         <UsageCount Value="21"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
+      </Unit14>
+      <Unit15>
+        <Filename Value="web_view_frame.pas"/>
+        <HasResources Value="True"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="348"/>
       </Unit15>
       <Unit16>
         <Filename Value="excel2json_tz.pas"/>

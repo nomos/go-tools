@@ -60,7 +60,6 @@ func NewConsoleShell(owner vcl.IComponent,option... FrameOption) (root *ConsoleS
 }
 
 func (this *ConsoleShell) setup(){
-	this.SetAlign(types.AlClient)
 	this.SetHeight(500)
 	this.SetWidth(700)
 	this.BottomPanel = vcl.NewPanel(this)

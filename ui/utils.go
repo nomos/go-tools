@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-tools/ui/icons"
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
@@ -16,10 +17,19 @@ func CreateCheckBox(s string, parent vcl.IWinControl) *vcl.TCheckBox {
 	return ret
 }
 
-func CreateLine(height int32,component vcl.IWinControl)*vcl.TPanel{
+func CreateLine(align types.TAlign,size types.TConstraintSize,component vcl.IWinControl)*vcl.TPanel{
 	frame:=vcl.NewPanel(component)
-	frame.SetAlign(types.AlTop)
-	frame.SetHeight(height)
+	frame.SetAlign(align)
+	if align==types.AlTop||align==types.AlBottom {
+		frame.Constraints().SetMinHeight(size)
+		frame.Constraints().SetMaxHeight(size)
+	} else if align==types.AlLeft||align==types.AlRight {
+		frame.Constraints().SetMinWidth(size)
+		frame.Constraints().SetMaxWidth(size)
+	} else {
+		frame.SetWidth(int32(size))
+		frame.SetHeight(int32(size))
+	}
 	frame.BorderSpacing().SetAround(6)
 	frame.BorderSpacing().SetLeft(6)
 	frame.SetBevelInner(0)
@@ -50,6 +60,22 @@ func CreateButton(s string,parent vcl.IWinControl)*vcl.TButton{
 	btn.SetWidth(80)
 	btn.SetHeight(32)
 	return btn
+}
+
+func CreateSplitter(parent vcl.IWinControl,align types.TAlign, size types.TConstraintSize)*vcl.TSplitter{
+	splitter:=vcl.NewSplitter(parent)
+	splitter.SetParent(parent)
+	splitter.SetAlign(align)
+	if align==types.AlLeft||align==types.AlRight {
+		splitter.Constraints().SetMaxWidth(size)
+		splitter.Constraints().SetMinWidth(size)
+	} else if align==types.AlTop||align==types.AlBottom{
+		splitter.Constraints().SetMaxHeight(size)
+		splitter.Constraints().SetMinHeight(size)
+	} else {
+		log.Panic("wrong align")
+	}
+	return splitter
 }
 
 
