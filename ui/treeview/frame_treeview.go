@@ -18,6 +18,9 @@ type TreeView struct {
 	selectedSchema ui.ITreeSchema
 	onUpdate       func(view *TreeView,parent *vcl.TTreeNode, schema ui.ITreeSchema)
 	mu             sync.Mutex
+	menus map[string]*vcl.TMenuItem
+	buildMenuFunc func(schema ui.ITreeSchema)*vcl.TPopupMenu
+	KeyEditTag bool
 }
 
 func New(owner vcl.IComponent, option ...ui.FrameOption) (root *TreeView) {
@@ -39,29 +42,43 @@ func (this *TreeView) setup() {
 
 func (this *TreeView) bindCallbacks() {
 	this.Tree.SetOnMouseDown(func(sender vcl.IObject, button types.TMouseButton, shift types.TShiftState, x, y int32) {
-		for {
-			if util.IsNil(this.Root) {
-				log.Error("root is empty")
-				break
+		log.Warnf("SetOnMouseDown")
+		if util.IsNil(this.Root) {
+			log.Error("root is empty")
+			return
+		}
+		log.Warnf("SetOnMouseDown1")
+		if button == types.MbRight {
+			log.Warnf("SetOnMouseDown2")
+			//根据点击位置获取节点
+			node := this.Tree.GetNodeAt(x, y)
+			if node == nil {
+				log.Warnf("node nil")
+				return
 			}
-			if button == types.MbRight {
-				node := this.Tree.GetNodeAt(x, y)
-				if node == nil {
-					break
-				}
-			} else if button == types.MbLeft {
-				node := this.Tree.GetNodeAt(x, y)
-				if this.selectedSchema != nil {
-					next_node := this.GetNodeBySchema(this.selectedSchema)
-					if node == nil {
-						return
-					}
-					if next_node == node {
-						return
-					}
+			log.Warnf("SetOnMouseDown2 32" )
+			this.selectedSchema = this.GetSchemaByNode(node)
+			node.SetSelected(true)
+			//TODO:设置编辑器
+			p:=vcl.Mouse.CursorPos()
+			menu:=this.buildMenuFunc(this.selectedSchema)
+			menu.Popup(p.X,p.Y)
+		} else if button == types.MbLeft {
+			log.Warnf("SetOnMouseDown3")
+			node := this.Tree.GetNodeAt(x, y)
+			if node == nil {
+				log.Warnf("SetOnMouseDown3 nil")
+				return
+			}
+			if this.selectedSchema != nil {
+				next_node := this.GetNodeBySchema(this.selectedSchema)
+				if next_node == node {
+					return
 				}
 			}
-			break
+			this.selectedSchema = this.GetSchemaByNode(node)
+			node.SetText(this.selectedSchema.String())
+			//TODO:设置编辑器
 		}
 	})
 	//完成tree->node抽象->update
@@ -105,6 +122,22 @@ func (this *TreeView) Lock() {
 
 func (this *TreeView) Unlock() {
 	this.mu.Unlock()
+}
+
+func (this *TreeView) GetSchemaByNode(node *vcl.TTreeNode) ui.ITreeSchema {
+	rootTree := make([]int, 0)
+	for {
+		if node.Parent() == nil {
+			break
+		}
+		rootTree = append(rootTree, int(node.Index()))
+		node = node.Parent()
+	}
+	schema := this.Root
+	for i := len(rootTree) - 1; i >= 0; i-- {
+		schema = schema.Children()[rootTree[i]]
+	}
+	return schema
 }
 
 func (this *TreeView) ContainSchema(parent ui.ITreeSchema, schema ui.ITreeSchema) bool {
@@ -158,6 +191,24 @@ func (this *TreeView) UpdateTree(schema ui.ITreeSchema) {
 
 func (this *TreeView) SetOnUpdate(f func(view *TreeView,parent *vcl.TTreeNode, schema ui.ITreeSchema)) {
 	this.onUpdate = f
+}
+
+func (this *TreeView) SetBuildMenu(f func(schema ui.ITreeSchema)*vcl.TPopupMenu){
+	this.buildMenuFunc = f
+}
+
+
+func (this *TreeView) GetSelectSchema()ui.ITreeSchema{
+	return this.selectedSchema
+}
+
+func (this *TreeView) SetSelectSchema(s ui.ITreeSchema){
+	this.selectedSchema = s
+	//TODO编辑器
+	node:=this.GetNodeBySchema(s)
+	if node!=nil&&!node.Selected() {
+		node.SetSelected(true)
+	}
 }
 
 func (this *TreeView) OnCreate() {

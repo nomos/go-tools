@@ -314,7 +314,7 @@ func (this *Schema) ToValueString()string {
 	}
 }
 
-func (this *Schema) Clone()*Schema {
+func (this *Schema) Clone()ui.ITreeSchema {
 	return this.clone(true)
 }
 

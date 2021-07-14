@@ -9,8 +9,10 @@ import (
 )
 
 type ITreeSchema interface {
+	IsRoot()bool
 	String()string
 	SetKey(s string)
+	Clone() ITreeSchema
 	Node()*vcl.TTreeNode
 	SetNode(node *vcl.TTreeNode)
 	Image()string
