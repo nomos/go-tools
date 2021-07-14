@@ -92,12 +92,19 @@ func (this *JsonEditor) setup(){
 
 func (this *JsonEditor) OnCreate(){
 	this.setup()
-	this.addPopMenu()
+
+	this.tree.BuildMenuFunc = this.buildMenu
+	this.tree.OnEditedFunc = this.onEdited
 	this.textEdit.SetOnChange(func(sender vcl.IObject) {
 		this.parseString()
 	})
 
 	this.tree.SetOnUpdate(this.ParseNode)
+}
+
+func (this *JsonEditor) onEdited(schema ui.ITreeSchema){
+	//TODO
+	
 }
 
 func (this *JsonEditor) OnDestroy() {
@@ -186,10 +193,6 @@ func (this *JsonEditor) buildMenu(s ui.ITreeSchema)*vcl.TPopupMenu{
 		this.ActionCollapse()
 	}))
 	return ret
-}
-
-func (this *JsonEditor) addPopMenu(){
-	this.tree.SetBuildMenu(this.buildMenu)
 }
 
 func (this *JsonEditor) ParseNode(view *treeview.TreeView,parent *vcl.TTreeNode, schema ui.ITreeSchema) {

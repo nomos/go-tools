@@ -18,9 +18,10 @@ type TreeView struct {
 	selectedSchema ui.ITreeSchema
 	onUpdate       func(view *TreeView,parent *vcl.TTreeNode, schema ui.ITreeSchema)
 	mu             sync.Mutex
-	menus map[string]*vcl.TMenuItem
-	buildMenuFunc func(schema ui.ITreeSchema)*vcl.TPopupMenu
-	KeyEditTag bool
+	menus          map[string]*vcl.TMenuItem
+	BuildMenuFunc  func(schema ui.ITreeSchema)*vcl.TPopupMenu
+	OnEditedFunc   func(schema ui.ITreeSchema)
+	KeyEditTag     bool
 }
 
 func New(owner vcl.IComponent, option ...ui.FrameOption) (root *TreeView) {
@@ -61,7 +62,7 @@ func (this *TreeView) bindCallbacks() {
 			node.SetSelected(true)
 			//TODO:设置编辑器
 			p:=vcl.Mouse.CursorPos()
-			menu:=this.buildMenuFunc(this.selectedSchema)
+			menu:=this.BuildMenuFunc(this.selectedSchema)
 			menu.Popup(p.X,p.Y)
 		} else if button == types.MbLeft {
 			log.Warnf("SetOnMouseDown3")
@@ -192,11 +193,6 @@ func (this *TreeView) UpdateTree(schema ui.ITreeSchema) {
 func (this *TreeView) SetOnUpdate(f func(view *TreeView,parent *vcl.TTreeNode, schema ui.ITreeSchema)) {
 	this.onUpdate = f
 }
-
-func (this *TreeView) SetBuildMenu(f func(schema ui.ITreeSchema)*vcl.TPopupMenu){
-	this.buildMenuFunc = f
-}
-
 
 func (this *TreeView) GetSelectSchema()ui.ITreeSchema{
 	return this.selectedSchema
