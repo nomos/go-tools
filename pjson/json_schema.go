@@ -6,11 +6,13 @@ import (
 	"errors"
 	"github.com/iancoleman/orderedmap"
 	"github.com/nomos/go-lokas/log"
+	"github.com/nomos/go-lokas/util/slice"
 	"github.com/nomos/go-lokas/util/stringutil"
 	"github.com/nomos/go-tools/ui"
 	"github.com/ying32/govcl/vcl"
 	"math"
 	"reflect"
+	"regexp"
 	"strconv"
 )
 
@@ -28,6 +30,8 @@ type Schema struct {
 
 	node *vcl.TTreeNode
 	tree ui.ITree
+	collapsed bool
+
 }
 
 func (this *Schema) SetNode(node *vcl.TTreeNode){
@@ -36,6 +40,31 @@ func (this *Schema) SetNode(node *vcl.TTreeNode){
 
 func (this *Schema) Node()*vcl.TTreeNode{
 	return this.node
+}
+
+func (this *Schema) SetExpanded(){
+	this.collapse = false
+}
+
+func (this *Schema) SetCollapsed(){
+	this.collapse = true
+}
+
+func (this *Schema) UpdateNode()bool{
+	if this.node!=nil {
+		log.Warnf("UpdateNode",this.Image(),this.Key(),this.Value(),this.String())
+		go func() {
+			vcl.ThreadSync(func() {
+				if this.node!=nil {
+					this.node.SetText(this.String())
+				}
+				log.Warnf(this.node,"setText",this.node.ToString())
+			})
+		}()
+
+		return true
+	}
+	return false
 }
 
 func (this *Schema) Collapse() bool {
@@ -395,6 +424,28 @@ func (this *Schema) Detach(s ui.ITreeSchema)ui.ITreeSchema {
 	return this
 }
 
+func (this *Schema) defaultKey(key string)string{
+	if key == "" {
+		key = "default"
+	}
+	keys:=[]string{}
+	for _,c:=range this.children {
+		keys = append(keys, c.Key())
+	}
+	log.Warnf("keys",keys)
+	dupNum:=1
+	r:=regexp.MustCompile(`\([0-9]+\)$`)
+	for slice.HasString(keys,key) {
+		if  r.MatchString(key){
+			key = r.ReplaceAllString(key,"("+strconv.Itoa(dupNum)+")")
+		} else {
+			key = key+"("+strconv.Itoa(dupNum)+")"
+		}
+		dupNum++
+	}
+	return key
+}
+
 func (this *Schema) Insert(s ui.ITreeSchema)ui.ITreeSchema {
 	parent:=this
 	index:=0
@@ -402,8 +453,12 @@ func (this *Schema) Insert(s ui.ITreeSchema)ui.ITreeSchema {
 		parent = this.parent
 		index = this.innerIndex+1
 	}
+	log.Warnf(parent.Type.String())
 	if parent.Type == Array {
 		s.SetKey("")
+	} else {
+		log.Warnf("SetKey",parent.Type.String(),this.defaultKey(s.Key()))
+		s.SetKey(parent.defaultKey(s.Key()))
 	}
 	parent.insert(index,s.(*Schema))
 	return s

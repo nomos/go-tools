@@ -10,6 +10,9 @@ import (
 
 type ITreeSchema interface {
 	IsRoot()bool
+	SetExpanded()
+	SetCollapsed()
+	UpdateNode()bool
 	String()string
 	SetKey(s string)
 	Clone() ITreeSchema

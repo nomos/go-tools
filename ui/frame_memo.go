@@ -32,6 +32,7 @@ func (this *MemoFrame) setup(){
     this.Memo = vcl.NewMemo(this)
     this.Memo.SetAlign(types.AlClient)
     this.Memo.SetParent(this)
+    this.Memo.SetScrollBars(types.SsAutoBoth)
 }
 
 func (this *MemoFrame) OnCreate() {

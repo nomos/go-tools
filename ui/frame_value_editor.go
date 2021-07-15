@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"github.com/nomos/go-lokas/util"
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
 )
@@ -15,7 +16,11 @@ type ValueEditorFrame struct {
 	valueEdit *MemoFrame
 	keyEdit   *MemoFrame
 
+	schema ITreeSchema
+
 	prettyCheck *vcl.TCheckBox
+
+	OnSetSchema func(schema ITreeSchema)
 }
 
 func NewValueEditorFrame(owner vcl.IComponent,option... FrameOption) (root *ValueEditorFrame)  {
@@ -46,16 +51,53 @@ func (this *ValueEditorFrame) setup(){
 	this.valueEdit = NewMemoFrame(this)
 	this.valueEdit.BorderSpacing().SetAround(6)
 	this.valueEdit.OnCreate()
-
+	CreateSeg(3,line1)
 	this.prettyCheck = CreateCheckBox("",line1)
 	this.prettyCheck.BorderSpacing().SetBottom(4)
 }
 
 func (this *ValueEditorFrame) OnCreate() {
 	this.setup()
+	this.setCallbacks()
+}
+
+func (this *ValueEditorFrame) setCallbacks(){
+	this.prettyCheck.SetChecked(this.conf.GetBool("value_edit_format"))
+	this.prettyCheck.SetOnChange(func(sender vcl.IObject) {
+		this.conf.Set("value_edit_format",this.Pretty())
+		if !util.IsNil(this.schema) {
+			this.SetSchema(this.schema)
+		}
+	})
+}
+
+func (this *ValueEditorFrame) SetSchema(s ITreeSchema){
+	this.OnSetSchema(s)
 }
 
 func (this *ValueEditorFrame) OnDestroy() {
 	this.valueEdit.OnDestroy()
 	this.keyEdit.OnDestroy()
+}
+
+func (this *ValueEditorFrame) Clear(){
+	this.keyEdit.SetText("")
+	this.valueEdit.SetText("")
+	this.dropDown.SetText("")
+}
+
+func (this *ValueEditorFrame) SetKey(s string){
+	this.keyEdit.SetText(s)
+}
+
+func (this *ValueEditorFrame) SetType(s string){
+	this.dropDown.SetText(s)
+}
+
+func (this *ValueEditorFrame) SetValue(s string){
+	this.valueEdit.SetText(s)
+}
+
+func (this *ValueEditorFrame) Pretty()bool{
+	return this.prettyCheck.Checked()
 }
