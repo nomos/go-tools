@@ -7,10 +7,11 @@ import (
 	"github.com/nomos/go-lokas/util"
 	"github.com/nomos/go-tools/ui"
 	"github.com/nomos/go-tools/ui/icons"
-	"github.com/nomos/go-tools/ui/treeview"
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
 	"github.com/ying32/govcl/vcl/types/colors"
+	"github.com/ying32/govcl/vcl/types/keys"
+	"io/ioutil"
 	"runtime"
 	"strconv"
 	"sync"
@@ -26,17 +27,18 @@ type JsonEditor struct {
 	lastTreeItem *vcl.TTreeNode
 	textEdit     *ui.MemoFrame
 	valueEditor  *ui.ValueEditorFrame
-	tree         *treeview.TreeView
+	tree         *ui.TreeView
 
-	clipSchema *Schema
-	schema     *Schema
+	clipSchema    *Schema
+	schema        *Schema
 	editingSchema *Schema
 
-	keyEditTag bool
-	remodeling bool
-	editing    bool
-	assigning bool
-	mutex      sync.Mutex
+	keyEditTag   bool
+	remodeling   bool
+	editing      bool
+	valueEditing bool
+	assigning    bool
+	mutex        sync.Mutex
 }
 
 func NewEditor(owner vcl.IComponent, option ...ui.FrameOption) (root *JsonEditor) {
@@ -65,9 +67,29 @@ func (this *JsonEditor) setup() {
 	line3 := ui.CreateLine(types.AlTop, 6, 0, 32, leftPanel)
 	line3.BorderSpacing().SetBottom(3)
 	ui.CreateSeg(3, line2)
-	ui.CreateSpeedBtn("sort_up", icons.GetImageList(32, 32), line2)
+	ui.CreateSpeedBtn("sort_up", icons.GetImageList(32, 32), line2).SetOnClick(func(sender vcl.IObject) {
+		schema:=this.tree.GetSelectSchema()
+		if !util.IsNil(schema) {
+			s:=schema.(*Schema)
+			update:=s.MoveUp()
+			if update {
+				this.parseModel()
+				this.tree.SetSelectSchema(s)
+			}
+		}
+	})
 	ui.CreateSeg(3, line2)
-	ui.CreateSpeedBtn("sort_down", icons.GetImageList(32, 32), line2)
+	ui.CreateSpeedBtn("sort_down", icons.GetImageList(32, 32), line2).SetOnClick(func(sender vcl.IObject) {
+		schema:=this.tree.GetSelectSchema()
+		if !util.IsNil(schema) {
+			s:=schema.(*Schema)
+			update:=s.MoveDown()
+			if update {
+				this.parseModel()
+				this.tree.SetSelectSchema(s)
+			}
+		}
+	})
 	ui.CreateSeg(3, line2)
 	ui.CreateSpeedBtn("null_icon", icons.GetImageList(32, 32), line2).SetOnClick(func(sender vcl.IObject) {
 		this.AddNewSchemaAtSelected(Null)
@@ -93,12 +115,53 @@ func (this *JsonEditor) setup() {
 		this.AddNewSchemaAtSelected(String)
 	})
 
-	ui.CreateSpeedBtn("cancel", icons.GetImageList(32, 32), line3)
+
+
+	ui.CreateSpeedBtn("cancel", icons.GetImageList(32, 32), line3).SetOnClick(func(sender vcl.IObject) {
+		this.Clear()
+	})
 	ui.CreateSeg(3, line3)
-	ui.CreateSpeedBtn("save", icons.GetImageList(32, 32), line3)
+
+	saveDialog:=vcl.NewSaveDialog(this)
+	saveDialog.SetOptions(saveDialog.Options().Include(types.OfShowHelp,types.OfAllowMultiSelect))
+	saveDialog.SetDefaultExt(".json")
+	saveDialog.SetTitle("保存到json文件")
+	ui.CreateSpeedBtn("save", icons.GetImageList(32, 32), line3).SetOnClick(func(sender vcl.IObject) {
+		if this.Config().GetString("load_file_path") != "" {
+			saveDialog.SetInitialDir(this.Config().GetString("load_file_path"))
+		}
+		if saveDialog.Execute() {
+			path := saveDialog.FileName()
+			this.Config().Set("load_file_path", path)
+			err:=ioutil.WriteFile(path,[]byte(this.schema.ToString(true)),0644)
+			if err != nil {
+				log.Errorf(err.Error())
+			}
+		}
+	})
 	ui.CreateSeg(3, line3)
-	ui.CreateSpeedBtn("folder", icons.GetImageList(32, 32), line3)
-	this.tree = treeview.New(rightPanel)
+
+	openDialog := vcl.NewOpenDialog(this)
+	openDialog.SetOptions(openDialog.Options().Include(types.OfShowHelp, types.OfAllowMultiSelect)) //rtl.Include(, types.OfShowHelp))
+	openDialog.SetFilter("Json文件(*.json)|*.json|所有文件(*.*)|*.*")
+	openDialog.SetTitle("打开Json文件")
+	ui.CreateSpeedBtn("folder", icons.GetImageList(32, 32), line3).SetOnClick(func(sender vcl.IObject) {
+		if this.Config().GetString("load_file_path") != "" {
+			openDialog.SetInitialDir(this.Config().GetString("load_file_path"))
+		}
+		if openDialog.Execute() {
+			path := openDialog.FileName()
+			this.Config().Set("load_file_path", path)
+			log.Warnf(path)
+			data,err:=ioutil.ReadFile(path)
+			if err != nil {
+				log.Errorf(err.Error())
+				return
+			}
+			this.textEdit.SetText(string(data))
+		}
+	})
+	this.tree = ui.NewTreeView(rightPanel)
 	this.tree.OnCreate()
 	this.tree.SetAlign(types.AlClient)
 	this.tree.SetParent(rightPanel)
@@ -106,11 +169,14 @@ func (this *JsonEditor) setup() {
 	this.tree.BorderSpacing().SetRight(6)
 	rightPanel.Constraints().SetMinWidth(400)
 	rightPanel.SetWidth(400)
-	this.valueEditor = ui.NewValueEditorFrame(leftPanel,ui.WithConfig(this.Config()))
+	this.valueEditor = ui.NewValueEditorFrame(leftPanel, ui.WithConfig(this.Config()))
 	this.valueEditor.SetHeight(200)
 	this.valueEditor.OnCreate()
 	this.valueEditor.SetParent(leftPanel)
 	this.valueEditor.SetAlign(types.AlBottom)
+	for _, t := range Types {
+		this.valueEditor.AddType(t.String())
+	}
 	ui.CreateSplitter(leftPanel, types.AlBottom, 6)
 }
 
@@ -122,35 +188,218 @@ func (this *JsonEditor) OnCreate() {
 	this.tree.OnEditingFunc = this.onEditing
 	this.tree.OnChangingFunc = this.onChanging
 	this.tree.OnUpdateFunc = this.onUpdate
-	this.valueEditor.OnSetSchema = this.onSetSchema
+	this.tree.OnSelectFunc = this.onSelect
+	this.valueEditor.OnSetSchema = this.onEditorSetSchema
+	this.valueEditor.OnKeyChange = this.onEditorKeyChange
+	this.valueEditor.OnValueChange = this.onEditorValueChange
+	this.valueEditor.OnKeyKeyDown = this.onEditorKeyKeyDown
+	this.valueEditor.OnValueKeyDown = this.onEditorValueKeyDown
+	this.valueEditor.OnSelect = this.onEditorSelect
+	this.valueEditor.OnKeyExit = this.onEditorKeyExit
+	this.valueEditor.OnValueExit = this.onEditorValueExit
+
 	this.textEdit.SetOnChange(func(sender vcl.IObject) {
-		if !this.remodeling {
-			log.Warn("textEdit SetOnChange parseString")
+		if !this.remodeling && !this.valueEditing {
 			this.tree.Clear()
 			this.parseString()
 		}
 	})
+}
+
+func (this *JsonEditor) setEditorKey(s string) {
+	vcl.ThreadSync(func() {
+		this.valueEditing = true
+		this.valueEditor.SetKey(s)
+		this.valueEditing = false
+	})
+}
+
+func (this *JsonEditor) setEditorValue(s string) {
+	vcl.ThreadSync(func() {
+		this.valueEditing = true
+		this.valueEditor.SetValue(s)
+		this.valueEditing = false
+	})
 
 }
 
-func (this *JsonEditor) onSetSchema(s ui.ITreeSchema){
+func (this *JsonEditor) onEditorKeyChange(schema ui.ITreeSchema) {
+	if this.valueEditing {
+		return
+	}
+	if schema == nil {
+		if !this.assigning {
+			vcl.ThreadSync(func() {
+				this.setEditorKey("")
+			})
+		}
+		return
+	}
+	if schema.IsRoot() {
+		vcl.ThreadSync(func() {
+			this.setEditorKey("")
+		})
+		return
+	}
+	if schema.(*Schema).IsArrayElem() {
+		vcl.ThreadSync(func() {
+			this.setEditorKey(schema.(*Schema).ToKeyString())
+		})
+		return
+	}
+	if schema.(*Schema).IsObjectElem() {
+		schema.SetKey(this.valueEditor.Key())
+		schema.(*Schema).key = this.valueEditor.Key()
+		schema.UpdateNode()
+		this.parseModelTextOnly()
+		return
+	}
+	schema.SetKey(this.valueEditor.Key())
+	schema.UpdateNode()
+	this.parseModelTextOnly()
+}
+
+func (this *JsonEditor) onEditorValueChange(schema ui.ITreeSchema) {
+	if this.valueEditing {
+		return
+	}
+	if schema == nil {
+		return
+	}
+	switch schema.(*Schema).Type {
+	case String:
+		schema.SetValue(this.valueEditor.Value())
+		schema.UpdateNode()
+		this.parseModelTextOnly()
+		this.valueEditing = false
+	case Number:
+		if s, ok := Number.CheckValue(this.valueEditor.Value()); ok {
+			schema.SetValue(s)
+			schema.UpdateNode()
+			this.parseModelTextOnly()
+			return
+		}
+		this.valueEditing = false
+	case Boolean:
+		if s, ok := Boolean.CheckValue(this.valueEditor.Value()); ok {
+			schema.SetValue(s)
+			this.valueEditor.SetSchema(schema)
+			schema.UpdateNode()
+			this.parseModelTextOnly()
+			return
+		}
+		this.valueEditing = false
+	default:
+		this.valueEditing = false
+	}
+}
+
+func (this *JsonEditor) onEditorKeyKeyDown(key types.Char, shift types.TShiftState, schema ui.ITreeSchema) {
+	if key == keys.VkReturn {
+
+	}
+}
+
+func (this *JsonEditor) onEditorValueKeyDown(key types.Char, shift types.TShiftState, schema ui.ITreeSchema) {
+	if key == keys.VkReturn {
+
+	}
+}
+
+func (this *JsonEditor) onEditorSelect(schema ui.ITreeSchema, s string) {
+	if schema == nil {
+		return
+	}
+	t := GetTypeByString(this.valueEditor.GetType())
+	if t == -1 {
+		this.valueEditor.SetType(schema.(*Schema).Type.String())
+	}
+	success := schema.(*Schema).ChangeType(t)
+	schema.UpdateNode()
+	if success {
+		this.valueEditor.SetSchema(schema)
+	}
+}
+
+func (this *JsonEditor) onEditorKeyExit(schema ui.ITreeSchema) {
+	defer func() {
+		if r := recover(); r != nil {
+			if err, ok := r.(error); ok {
+				log.Error(err.Error())
+				buf := make([]byte, 1<<16)
+				runtime.Stack(buf, true)
+				log.Error(string(buf))
+			}
+		}
+	}()
+
+}
+
+func (this *JsonEditor) onEditorValueExit(schema ui.ITreeSchema) {
+	defer func() {
+		if r := recover(); r != nil {
+			if err, ok := r.(error); ok {
+				log.Error(err.Error())
+				buf := make([]byte, 1<<16)
+				runtime.Stack(buf, true)
+				log.Error(string(buf))
+			}
+		}
+	}()
+	if schema == nil {
+		log.Warnf("nil schema")
+		this.setEditorValue("")
+		return
+	}
+	switch schema.(*Schema).Type {
+	case Object, Array:
+		this.setEditorValue(schema.(*Schema).ToString(this.valueEditor.Pretty()))
+		return
+	default:
+		s, ok := schema.(*Schema).Type.CheckValue(this.valueEditor.Value())
+		log.Warnf("s ok", ok, s)
+		if ok {
+			this.setEditorValue(schema.Value())
+			schema.(*Schema).value = s
+			schema.UpdateNode()
+			this.parseModelTextOnly()
+		} else {
+			this.setEditorValue(schema.Value())
+		}
+	}
+}
+
+func (this *JsonEditor) onEditorSetSchema(s ui.ITreeSchema) {
+	defer func() {
+		if r := recover(); r != nil {
+			if err, ok := r.(error); ok {
+				log.Error(err.Error())
+				buf := make([]byte, 1<<16)
+				runtime.Stack(buf, true)
+				log.Error(string(buf))
+			}
+		}
+	}()
 	this.editingSchema = nil
 	this.assigning = true
-	if s== nil {
+	if util.IsNil(s) {
 		this.valueEditor.Clear()
 		this.assigning = false
 		return
 	}
-	log.Warnf("Type",s.(*Schema).Type.String())
 	this.valueEditor.SetType(s.(*Schema).Type.String())
-	if s.Idx() !=-1 {
-		this.valueEditor.SetKey("[item"+strconv.Itoa(s.Idx())+"]")
+	if s.Idx() != -1 {
+		this.setEditorKey("[item" + strconv.Itoa(s.Idx()) + "]")
 	} else {
-		this.valueEditor.SetKey(s.Key())
+		this.setEditorKey(s.Key())
 	}
-	this.valueEditor.SetValue(s.(*Schema).ToString(this.valueEditor.Pretty()))
+	this.setEditorValue(s.(*Schema).ToString(this.valueEditor.Pretty()))
 	this.editingSchema = s.(*Schema)
 	this.assigning = false
+}
+
+func (this *JsonEditor) onSelect(schema ui.ITreeSchema) {
+	this.valueEditor.SetSchema(schema)
 }
 
 func (this *JsonEditor) onChanging() {
@@ -165,8 +414,8 @@ func (this *JsonEditor) onEditing(schema ui.ITreeSchema) {
 	if util.IsNil(schema.Parent()) {
 		return
 	}
-	node:=schema.Node()
-	if this.keyEditTag||schema.(*Schema).Type==Array||schema.(*Schema).Type==Object {
+	node := schema.Node()
+	if this.keyEditTag || schema.(*Schema).Type == Array || schema.(*Schema).Type == Object {
 		if schema.Parent() != nil {
 			node.SetText(schema.Key())
 		}
@@ -178,28 +427,27 @@ func (this *JsonEditor) onEditing(schema ui.ITreeSchema) {
 func (this *JsonEditor) onEdited(schema ui.ITreeSchema, s *string) {
 	if util.IsNil(schema.Parent()) {
 		this.keyEditTag = false
-		log.Warnf("onEdited",schema.Image(),schema.String())
 		schema.UpdateNode()
 		return
 	}
-	log.Warnf("start edit")
 	if schema != nil {
 		update := false
-		if this.keyEditTag||schema.(*Schema).Type==Array||schema.(*Schema).Type==Object {
+		if this.keyEditTag || schema.(*Schema).Type == Array || schema.(*Schema).Type == Object {
 			update = schema.(*Schema).TrySetKey(*s)
 		} else {
 			update = schema.(*Schema).TrySetValue(*s)
 		}
-		log.Warnf(update,"edited",schema.Image())
-		this.parseModel()
 		this.tree.Tree.SetSelected(nil)
-		schema.UpdateNode()
+		if update {
+			this.parseModel()
+			schema.UpdateNode()
+		}
 	}
 	this.keyEditTag = false
 
 }
 
-func (this *JsonEditor) onUpdate(view *treeview.TreeView, parent *vcl.TTreeNode, schema ui.ITreeSchema) {
+func (this *JsonEditor) onUpdate(view *ui.TreeView, parent *vcl.TTreeNode, schema ui.ITreeSchema) {
 	switch schema.(*Schema).Type {
 	case Object, Array:
 		node := view.AddNode(parent, schema)
@@ -227,6 +475,9 @@ func (this *JsonEditor) OnDestroy() {
 
 func (this *JsonEditor) parseString() {
 	text := this.textEdit.Text()
+	if text=="" {
+		return
+	}
 	i := orderedmap.New()
 	err := json.Unmarshal([]byte(text), i)
 	if err != nil {
@@ -239,7 +490,28 @@ func (this *JsonEditor) parseString() {
 	this.tree.UpdateTree(this.schema)
 }
 
-func (this *JsonEditor) Clear() {
+func (this *JsonEditor) Clear(){
+	this.schema = nil
+	defer func() {
+		if r := recover(); r != nil {
+			if err,ok:=r.(error);ok {
+				log.Error(err.Error())
+				buf := make([]byte, 1<<16)
+				runtime.Stack(buf, true)
+				log.Error(string(buf))
+			}
+		}
+	}()
+	vcl.ThreadSync(func() {
+		this.tree.Clear()
+		this.textEdit.Memo.Clear()
+		this.valueEditing = true
+		this.valueEditor.Clear()
+		this.valueEditing = false
+	})
+}
+
+func (this *JsonEditor) ClearTree() {
 	this.tree.ClearTreeNodes()
 	this.lastTreeItem = nil
 }
@@ -267,10 +539,9 @@ func (this *JsonEditor) createNewFunc(t Type) func(schema ui.ITreeSchema) {
 	}
 }
 func (this *JsonEditor) buildMenu(s ui.ITreeSchema) *vcl.TPopupMenu {
-	types := []Type{Object, Array, String, Number, Boolean, Null}
 	iconTypes := []string{"object_box", "array_box", "string_icon", "number_icon", "boolean_icon", "null_icon"}
 	funcTypes := []func(schema ui.ITreeSchema){}
-	for _, t := range types {
+	for _, t := range Types {
 		funcTypes = append(funcTypes, this.createNewFunc(t))
 	}
 
@@ -278,7 +549,7 @@ func (this *JsonEditor) buildMenu(s ui.ITreeSchema) *vcl.TPopupMenu {
 	ret.SetImages(icons.GetImageList(16, 16).ImageList())
 
 	newMenu := this.newDropMenuItem("", "新建[N]", "N", ret, nil)
-	for idx, t := range types {
+	for idx, t := range Types {
 		newMenu.Add(this.newDropMenuItem(iconTypes[idx], t.String(), "", ret, funcTypes[idx]))
 	}
 	ret.Items().Add(newMenu)
@@ -289,7 +560,7 @@ func (this *JsonEditor) buildMenu(s ui.ITreeSchema) *vcl.TPopupMenu {
 		}))
 	}
 
-	if !util.IsNil(s.Parent())&&s.(*Schema).Type!=Object&&s.(*Schema).Type!=Array {
+	if !util.IsNil(s.Parent()) && s.(*Schema).Type != Object && s.(*Schema).Type != Array {
 		ret.Items().Add(this.newDropMenuItem("", "修改值:"+s.Value(), "", ret, func(schema ui.ITreeSchema) {
 			schema.Node().EditText()
 		}))
@@ -318,26 +589,25 @@ func (this *JsonEditor) buildMenu(s ui.ITreeSchema) *vcl.TPopupMenu {
 	return ret
 }
 
-func (this *JsonEditor) parseModel() {
-	if this.tree.Root != nil {
-		defer func() {
-			if r := recover(); r != nil {
-				if err,ok:=r.(error);ok {
-					log.Error(err.Error())
-					buf := make([]byte, 1<<16)
-					runtime.Stack(buf, true)
-					log.Error(string(buf))
-				}
+func (this *JsonEditor) parseModelTextOnly() {
+	defer func() {
+		if r := recover(); r != nil {
+			if err, ok := r.(error); ok {
+				log.Error(err.Error())
+				buf := make([]byte, 1<<16)
+				runtime.Stack(buf, true)
+				log.Error(string(buf))
 			}
-		}()
-		this.remodeling = true
+		}
+	}()
+	if this.tree.Root != nil {
 		text := this.schema.ToString(true)
 		go func() {
 			time.Sleep(time.Millisecond*100)
 			vcl.ThreadSync(func() {
 				defer func() {
 					if r := recover(); r != nil {
-						if err,ok:=r.(error);ok {
+						if err, ok := r.(error); ok {
 							log.Error(err.Error())
 							buf := make([]byte, 1<<16)
 							runtime.Stack(buf, true)
@@ -345,7 +615,42 @@ func (this *JsonEditor) parseModel() {
 						}
 					}
 				}()
-				this.textEdit.Clear()
+				this.remodeling = true
+				this.textEdit.SetText(text)
+				this.remodeling = false
+			})
+		}()
+		this.textEdit.Font().SetColor(colors.ClSysDefault)
+	}
+}
+
+func (this *JsonEditor) parseModel() {
+	if this.tree.Root != nil {
+		defer func() {
+			if r := recover(); r != nil {
+				if err, ok := r.(error); ok {
+					log.Error(err.Error())
+					buf := make([]byte, 1<<16)
+					runtime.Stack(buf, true)
+					log.Error(string(buf))
+				}
+			}
+		}()
+		text := this.schema.ToString(true)
+		go func() {
+			time.Sleep(time.Millisecond * 100)
+			vcl.ThreadSync(func() {
+				defer func() {
+					if r := recover(); r != nil {
+						if err, ok := r.(error); ok {
+							log.Error(err.Error())
+							buf := make([]byte, 1<<16)
+							runtime.Stack(buf, true)
+							log.Error(string(buf))
+						}
+					}
+				}()
+				this.remodeling = true
 				this.textEdit.SetText(text)
 				this.remodeling = false
 			})
@@ -365,7 +670,7 @@ func (this *JsonEditor) ActionClip() {
 	if this.tree.GetSelectSchema() != nil {
 		this.clipSchema = this.tree.GetSelectSchema().Clone().(*Schema)
 		if this.tree.GetSelectSchema().IsRoot() {
-			this.Clear()
+			this.ClearTree()
 			this.schema = nil
 			this.textEdit.Clear()
 			this.tree.SetSelectSchema(nil)
@@ -384,7 +689,7 @@ func (this *JsonEditor) ActionClip() {
 func (this *JsonEditor) ActionDel() {
 	if this.tree.GetSelectSchema() != nil {
 		if this.tree.GetSelectSchema().IsRoot() {
-			this.Clear()
+			this.ClearTree()
 			this.schema = nil
 			this.textEdit.Clear()
 			this.tree.SetSelectSchema(nil)

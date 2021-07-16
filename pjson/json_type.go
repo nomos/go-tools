@@ -17,6 +17,8 @@ const (
 	Boolean
 )
 
+var Types = []Type{Object, Array, String, Number, Boolean, Null}
+
 var default_map = make(map[Type]string)
 var name_map = make(map[Type]string)
 
@@ -94,10 +96,10 @@ func(this Type) CheckValue(s string)(string,bool) {
 	case Boolean:
 		s = strings.TrimSpace(s)
 		log.Warnf("check bool",s)
-		if s=="True"||s=="TRUE"||s=="true" {
+		if s=="True"||s=="TRUE"||s=="true"||s=="1" {
 			return "true",true
 		}
-		if s=="False"||s=="FALSE"||s=="false" {
+		if s=="False"||s=="FALSE"||s=="false"||s=="0" {
 			return "false",true
 		}
 		return "",false

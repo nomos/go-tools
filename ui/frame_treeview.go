@@ -1,9 +1,8 @@
-package treeview
+package ui
 
 import (
 	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-lokas/util"
-	"github.com/nomos/go-tools/ui"
 	"github.com/nomos/go-tools/ui/icons"
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
@@ -14,21 +13,21 @@ import (
 type TreeView struct {
 	*vcl.TFrame
 	Tree *vcl.TTreeView
-	ui.ConfigAble
-	Root           ui.ITreeSchema
-	selectedSchema ui.ITreeSchema
+	ConfigAble
+	Root           ITreeSchema
+	selectedSchema ITreeSchema
 	mu             sync.Mutex
 	menus          map[string]*vcl.TMenuItem
-	OnUpdateFunc   func(view *TreeView, parent *vcl.TTreeNode, schema ui.ITreeSchema)
-	BuildMenuFunc  func(schema ui.ITreeSchema) *vcl.TPopupMenu
-	OnEditedFunc   func(schema ui.ITreeSchema, s *string)
-	OnEditingFunc  func(schema ui.ITreeSchema)
+	OnUpdateFunc   func(view *TreeView, parent *vcl.TTreeNode, schema ITreeSchema)
+	BuildMenuFunc  func(schema ITreeSchema) *vcl.TPopupMenu
+	OnEditedFunc   func(schema ITreeSchema, s *string)
+	OnEditingFunc  func(schema ITreeSchema)
 	OnChangingFunc func()
-	OnSelectFunc   func(schema ui.ITreeSchema)
+	OnSelectFunc   func(schema ITreeSchema)
 	building       bool
 }
 
-func New(owner vcl.IComponent, option ...ui.FrameOption) (root *TreeView) {
+func NewTreeView(owner vcl.IComponent, option ...FrameOption) (root *TreeView) {
 	vcl.CreateResFrame(owner, &root)
 	for _, o := range option {
 		o(root)
@@ -55,7 +54,6 @@ func (this *TreeView) bindCallbacks() {
 		}
 		schema := this.GetSchemaByNode(node)
 		if schema != nil {
-			log.Warnf("SetOnCollapsed", node.ToString(), schema.Image(), schema.Collapse(), schema.Key(), schema.Value())
 			schema.SetCollapsed()
 		}
 	})
@@ -65,7 +63,6 @@ func (this *TreeView) bindCallbacks() {
 		}
 		schema := this.GetSchemaByNode(node)
 		if schema != nil {
-			log.Warnf("SetOnExpanded", node.ToString(), schema.Image(), schema.Collapse(), schema.Key(), schema.Value())
 			schema.SetExpanded()
 		}
 	})
@@ -92,27 +89,24 @@ func (this *TreeView) bindCallbacks() {
 			log.Error("root is empty")
 			return
 		}
-		log.Warnf("SetOnMouseDown1")
 		if button == types.MbRight {
-			log.Warnf("SetOnMouseDown2")
 			//根据点击位置获取节点
 			node := this.Tree.GetNodeAt(x, y)
 			if node == nil {
 				log.Warnf("node nil")
+				this.OnSelectFunc(nil)
 				return
 			}
-			log.Warnf("SetOnMouseDown2 32")
 			this.selectedSchema = this.GetSchemaByNode(node)
 			node.SetSelected(true)
-			//TODO:设置编辑器
+			this.OnSelectFunc(this.selectedSchema)
 			p := vcl.Mouse.CursorPos()
 			menu := this.BuildMenuFunc(this.selectedSchema)
 			menu.Popup(p.X, p.Y)
 		} else if button == types.MbLeft {
-			log.Warnf("SetOnMouseDown3")
 			node := this.Tree.GetNodeAt(x, y)
 			if node == nil {
-				log.Warnf("SetOnMouseDown3 nil")
+				this.OnSelectFunc(nil)
 				return
 			}
 			if this.selectedSchema != nil {
@@ -123,28 +117,26 @@ func (this *TreeView) bindCallbacks() {
 			}
 			this.selectedSchema = this.GetSchemaByNode(node)
 			//node.SetText(this.selectedSchema.String())
-			//TODO:设置编辑器
+			this.OnSelectFunc(this.selectedSchema)
 		}
 	})
 	//完成tree->node抽象->update
 	//testcase tree.update node
 }
 
-func (this *TreeView) AddNode(node *vcl.TTreeNode, schema ui.ITreeSchema) *vcl.TTreeNode {
-	log.Warn(schema.String())
+func (this *TreeView) AddNode(node *vcl.TTreeNode, schema ITreeSchema) *vcl.TTreeNode {
 	newNode := this.Tree.Items().AddChild(node, schema.String())
 	schema.SetNode(newNode)
 	newNode.SetImageIndex(icons.GetImageList(16, 16).GetImageIndex(schema.Image()))
 	newNode.SetSelectedIndex(icons.GetImageList(16, 16).GetImageIndex(schema.Image()))
 	newNode.SetStateIndex(icons.GetImageList(16, 16).GetImageIndex(schema.Image()))
-	log.Warnf("AddNode", newNode.ToString(), schema.Image(), schema.Collapse(), schema.Key(), schema.Value(), schema.String())
 	if node == nil {
 		schema.SetExpanded()
 	}
 	return newNode
 }
 
-func (this *TreeView) GetNodeBySchema(s ui.ITreeSchema) *vcl.TTreeNode {
+func (this *TreeView) GetNodeBySchema(s ITreeSchema) *vcl.TTreeNode {
 	return s.Node()
 	defer this.Unlock()
 	this.Lock()
@@ -174,7 +166,7 @@ func (this *TreeView) Unlock() {
 	this.mu.Unlock()
 }
 
-func (this *TreeView) GetSchemaByNode(node *vcl.TTreeNode) ui.ITreeSchema {
+func (this *TreeView) GetSchemaByNode(node *vcl.TTreeNode) ITreeSchema {
 	if node == nil {
 		return nil
 	}
@@ -193,7 +185,7 @@ func (this *TreeView) GetSchemaByNode(node *vcl.TTreeNode) ui.ITreeSchema {
 	return schema
 }
 
-func (this *TreeView) ContainSchema(parent ui.ITreeSchema, schema ui.ITreeSchema) bool {
+func (this *TreeView) ContainSchema(parent ITreeSchema, schema ITreeSchema) bool {
 	if parent == nil {
 		parent = this.Root
 		return false
@@ -213,7 +205,7 @@ func (this *TreeView) ContainSchema(parent ui.ITreeSchema, schema ui.ITreeSchema
 	return false
 }
 
-func (this *TreeView) UpdateTree(schema ui.ITreeSchema) {
+func (this *TreeView) UpdateTree(schema ITreeSchema) {
 	log.Warnf("UpdateTree")
 	defer func() {
 		if r := recover(); r != nil {
@@ -266,12 +258,11 @@ func (this *TreeView) UpdateTree(schema ui.ITreeSchema) {
 	this.RefreshExpand(this.Root)
 }
 
-func (this *TreeView) RefreshExpand(schema ui.ITreeSchema) {
+func (this *TreeView) RefreshExpand(schema ITreeSchema) {
 	if schema == nil {
 		schema = this.Root
 	}
 	if !schema.Collapse() {
-		log.Warnf("expand2", schema.Image(), schema.Key(), schema.Value())
 		if schema.Node() != nil {
 			schema.Node().Expand(false)
 		}
@@ -281,17 +272,17 @@ func (this *TreeView) RefreshExpand(schema ui.ITreeSchema) {
 	}
 }
 
-func (this *TreeView) GetSelectSchema() ui.ITreeSchema {
+func (this *TreeView) GetSelectSchema() ITreeSchema {
 	return this.selectedSchema
 }
 
-func (this *TreeView) SetSelectSchema(s ui.ITreeSchema) {
+func (this *TreeView) SetSelectSchema(s ITreeSchema) {
 	if util.IsNil(s) {
 		this.Tree.SetSelected(nil)
 		return
 	}
 	this.selectedSchema = s
-	//TODO编辑器
+	this.OnSelectFunc(this.selectedSchema)
 	node := this.GetNodeBySchema(s)
 	if node != nil && !node.Selected() {
 		node.SetSelected(true)
@@ -306,7 +297,7 @@ func (this *TreeView) OnDestroy() {
 
 }
 
-func (this *TreeView) clearNodes(schema ui.ITreeSchema) {
+func (this *TreeView) clearNodes(schema ITreeSchema) {
 	if schema == nil {
 		schema = this.Root
 	}
@@ -320,7 +311,7 @@ func (this *TreeView) clearNodes(schema ui.ITreeSchema) {
 }
 
 func (this *TreeView) Clear() {
-	this.ClearTreeNodes()
+	this.Tree.Items().Clear()
 	this.Root = nil
 }
 

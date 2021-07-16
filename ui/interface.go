@@ -15,6 +15,7 @@ type ITreeSchema interface {
 	UpdateNode()bool
 	String()string
 	SetKey(s string)
+	SetValue(s string)
 	Clone() ITreeSchema
 	Node()*vcl.TTreeNode
 	SetNode(node *vcl.TTreeNode)

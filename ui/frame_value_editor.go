@@ -6,7 +6,6 @@ import (
 	"github.com/ying32/govcl/vcl/types"
 )
 
-var _ IFrame = (*ValueEditorFrame)(nil)
 
 type ValueEditorFrame struct {
 	*vcl.TFrame
@@ -21,6 +20,13 @@ type ValueEditorFrame struct {
 	prettyCheck *vcl.TCheckBox
 
 	OnSetSchema func(schema ITreeSchema)
+	OnKeyChange func(schema ITreeSchema)
+	OnValueChange func(schema ITreeSchema)
+	OnKeyKeyDown func(key types.Char, shift types.TShiftState,schema ITreeSchema)
+	OnValueKeyDown func(key types.Char, shift types.TShiftState,schema ITreeSchema)
+	OnSelect func(schema ITreeSchema,s string)
+	OnKeyExit func(schema ITreeSchema)
+	OnValueExit func(schema ITreeSchema)
 }
 
 func NewValueEditorFrame(owner vcl.IComponent,option... FrameOption) (root *ValueEditorFrame)  {
@@ -46,7 +52,6 @@ func (this *ValueEditorFrame) setup(){
 	this.dropDown.SetLeft(11)
 	this.dropDown.SetStyle(types.CsDropDownList)
 	this.dropDown.SetWidth(100)
-	this.dropDown.Items().Add("Json")
 
 	this.valueEdit = NewMemoFrame(this)
 	this.valueEdit.BorderSpacing().SetAround(6)
@@ -69,9 +74,45 @@ func (this *ValueEditorFrame) setCallbacks(){
 			this.SetSchema(this.schema)
 		}
 	})
+	this.keyEdit.Memo.SetOnKeyDown(func(sender vcl.IObject, key *types.Char, shift types.TShiftState) {
+		this.OnKeyKeyDown(*key,shift,this.schema)
+	})
+	this.keyEdit.Memo.SetOnKeyDown(func(sender vcl.IObject, key *types.Char, shift types.TShiftState) {
+		this.OnValueKeyDown(*key,shift,this.schema)
+	})
+	this.keyEdit.Memo.SetOnExit(func(sender vcl.IObject) {
+		this.OnKeyExit(this.schema)
+	})
+	this.keyEdit.Memo.SetOnChange(func(sender vcl.IObject) {
+		this.OnKeyChange(this.schema)
+	})
+	this.valueEdit.Memo.SetOnKeyDown(func(sender vcl.IObject, key *types.Char, shift types.TShiftState) {
+		this.OnValueKeyDown(*key,shift,this.schema)
+	})
+	this.valueEdit.Memo.SetOnExit(func(sender vcl.IObject) {
+		this.OnValueExit(this.schema)
+	})
+	this.valueEdit.Memo.SetOnChange(func(sender vcl.IObject) {
+		this.OnValueChange(this.schema)
+	})
+	this.dropDown.SetOnSelect(func(sender vcl.IObject) {
+		if this.schema == nil {
+			return
+		}
+		this.OnSelect(this.schema,this.dropDown.Text())
+	})
+}
+
+func (this *ValueEditorFrame) GetType()string{
+	return this.dropDown.Text()
+}
+
+func (this *ValueEditorFrame) AddType(s string){
+	this.dropDown.Items().Add(s)
 }
 
 func (this *ValueEditorFrame) SetSchema(s ITreeSchema){
+	this.schema = s
 	this.OnSetSchema(s)
 }
 
@@ -81,6 +122,7 @@ func (this *ValueEditorFrame) OnDestroy() {
 }
 
 func (this *ValueEditorFrame) Clear(){
+	this.schema = nil
 	this.keyEdit.SetText("")
 	this.valueEdit.SetText("")
 	this.dropDown.SetText("")
@@ -91,11 +133,21 @@ func (this *ValueEditorFrame) SetKey(s string){
 }
 
 func (this *ValueEditorFrame) SetType(s string){
-	this.dropDown.SetText(s)
+	vcl.ThreadSync(func() {
+		this.dropDown.SetText(s)
+	})
 }
 
 func (this *ValueEditorFrame) SetValue(s string){
 	this.valueEdit.SetText(s)
+}
+
+func (this *ValueEditorFrame) Value()string {
+	return this.valueEdit.Text()
+}
+
+func (this *ValueEditorFrame) Key()string {
+	return this.keyEdit.Text()
 }
 
 func (this *ValueEditorFrame) Pretty()bool{

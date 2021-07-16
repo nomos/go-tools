@@ -9,10 +9,12 @@ import (
 	"github.com/nomos/go-lokas/util/slice"
 	"github.com/nomos/go-lokas/util/stringutil"
 	"github.com/nomos/go-tools/ui"
+	"github.com/nomos/go-tools/ui/icons"
 	"github.com/ying32/govcl/vcl"
 	"math"
 	"reflect"
 	"regexp"
+	"runtime"
 	"strconv"
 )
 
@@ -52,13 +54,24 @@ func (this *Schema) SetCollapsed(){
 
 func (this *Schema) UpdateNode()bool{
 	if this.node!=nil {
-		log.Warnf("UpdateNode",this.Image(),this.Key(),this.Value(),this.String())
 		go func() {
+			this.node.SetImageIndex(icons.GetImageList(16, 16).GetImageIndex(this.Image()))
+			this.node.SetSelectedIndex(icons.GetImageList(16, 16).GetImageIndex(this.Image()))
+			this.node.SetStateIndex(icons.GetImageList(16, 16).GetImageIndex(this.Image()))
 			vcl.ThreadSync(func() {
+				defer func() {
+					if r := recover(); r != nil {
+						if err,ok:=r.(error);ok {
+							log.Error(err.Error())
+							buf := make([]byte, 1<<16)
+							runtime.Stack(buf, true)
+							log.Error(string(buf))
+						}
+					}
+				}()
 				if this.node!=nil {
 					this.node.SetText(this.String())
 				}
-				log.Warnf(this.node,"setText",this.node.ToString())
 			})
 		}()
 
@@ -91,6 +104,10 @@ func NewSchema() *Schema {
 
 func (this *Schema) SetKey(s string) {
 	this.key = s
+}
+
+func (this *Schema) SetValue(s string) {
+	this.value = s
 }
 
 func (this *Schema) Key()string {
@@ -432,7 +449,6 @@ func (this *Schema) defaultKey(key string)string{
 	for _,c:=range this.children {
 		keys = append(keys, c.Key())
 	}
-	log.Warnf("keys",keys)
 	dupNum:=1
 	r:=regexp.MustCompile(`\([0-9]+\)$`)
 	for slice.HasString(keys,key) {
@@ -453,11 +469,9 @@ func (this *Schema) Insert(s ui.ITreeSchema)ui.ITreeSchema {
 		parent = this.parent
 		index = this.innerIndex+1
 	}
-	log.Warnf(parent.Type.String())
 	if parent.Type == Array {
 		s.SetKey("")
 	} else {
-		log.Warnf("SetKey",parent.Type.String(),this.defaultKey(s.Key()))
 		s.SetKey(parent.defaultKey(s.Key()))
 	}
 	parent.insert(index,s.(*Schema))
@@ -498,8 +512,23 @@ func (this *Schema) ChangeType(t Type)bool {
 			return false
 		}
 	}
+	switch this.Type {
+	case Object,Array:
+		if len(this.children)>0 {
+			return false
+		} else {
+			this.value = t.Default()
+		}
+	case Number,String,Boolean,Null:
+		if t==Object||t==Array {
+			this.value = t.Default()
+		} else if s,ok:=t.CheckValue(this.value);!ok {
+			this.value = t.Default()
+		}  else {
+			this.value = s
+		}
+	}
 	this.Type = t
-	this.value = t.Default()
 	return true
 }
 
