@@ -206,7 +206,6 @@ func (this *TreeView) ContainSchema(parent ITreeSchema, schema ITreeSchema) bool
 }
 
 func (this *TreeView) UpdateTree(schema ITreeSchema) {
-	log.Warnf("UpdateTree")
 	defer func() {
 		if r := recover(); r != nil {
 			if err, ok := r.(error); ok {
@@ -218,29 +217,6 @@ func (this *TreeView) UpdateTree(schema ITreeSchema) {
 		}
 	}()
 	var parent *vcl.TTreeNode
-	//if schema == nil || schema == this.Root {
-	//	if this.Root == nil {
-	//		return
-	//	}
-	//	this.Clear()
-	//	schema = this.Root
-	//	parent = this.Root.Node()
-	//} else if this.Root == nil {
-	//	this.Clear()
-	//	this.Root = schema
-	//	parent = this.Root.Node()
-	//} else {
-	//	if this.ContainSchema(this.Root, schema) {
-	//		parent=schema.Parent().Node()
-	//		if schema.Node()!=nil {
-	//			schema.Node().Free()
-	//		}
-	//	} else {
-	//		this.Clear()
-	//		this.Root = schema
-	//		parent = this.Root.Node()
-	//	}
-	//}
 	this.Lock()
 	defer this.Unlock()
 	this.building = true
