@@ -88,6 +88,22 @@ func CreateSplitter(parent vcl.IWinControl,align types.TAlign, size types.TConst
 	return splitter
 }
 
+func CreateSeparator(parent vcl.IWinControl,align types.TAlign)*vcl.TBevel{
+	splitter:=vcl.NewBevel(parent)
+	splitter.SetParent(parent)
+	splitter.SetAlign(align)
+	if align==types.AlLeft||align==types.AlRight {
+		splitter.Constraints().SetMaxWidth(2)
+		splitter.Constraints().SetMinWidth(2)
+	} else if align==types.AlTop||align==types.AlBottom{
+		splitter.Constraints().SetMaxHeight(2)
+		splitter.Constraints().SetMinHeight(2)
+	} else {
+		log.Panic("wrong align")
+	}
+	return splitter
+}
+
 func CreateEdit(width types.TConstraintSize,parent vcl.IWinControl)*vcl.TEdit{
 	ret:=vcl.NewEdit(parent)
 	ret.SetParent(parent)
