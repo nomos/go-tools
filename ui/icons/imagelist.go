@@ -1,6 +1,7 @@
 package icons
 
 import (
+	"github.com/nomos/go-tools/pics"
 	"github.com/nomos/go-tools/pics/img_bmp"
 	"github.com/nomos/go-tools/ui/icons/icon_assets"
 	"github.com/nomos/go-tools/ui/icons/pix_icon_assets"
@@ -18,11 +19,14 @@ func init(){
 	icon_assets.Assign(iconList)
 }
 
-func GetImage(control vcl.IWinControl,s string)*vcl.TImage{
+func GetImage(control vcl.IWinControl,width,height int,s string)*vcl.TImage{
 	ret:=vcl.NewImage(control)
-	ret.Picture().LoadFromBytes(iconList[s])
+	ret.SetHeight(15)
+	rdata:=pics.ResizePng(iconList[s],width,height)
+	ret.Picture().LoadFromBytes(rdata)
 	return ret
 }
+
 
 func LoadData(img *vcl.TImage,s string){
 	img.Picture().LoadFromBytes(iconList[s])

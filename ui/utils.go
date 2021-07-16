@@ -88,7 +88,7 @@ func CreateSplitter(parent vcl.IWinControl,align types.TAlign, size types.TConst
 	return splitter
 }
 
-func CreateSeparator(parent vcl.IWinControl,align types.TAlign)*vcl.TBevel{
+func CreateSeparator(align types.TAlign,parent vcl.IWinControl)*vcl.TBevel{
 	splitter:=vcl.NewBevel(parent)
 	splitter.SetParent(parent)
 	splitter.SetAlign(align)
@@ -138,7 +138,7 @@ func CreateSpeedBtn(s string,img *icons.ImageList,parent vcl.IWinControl)*vcl.TS
 }
 
 func CreateImage(s string,parent vcl.IWinControl)*vcl.TImage{
-	ret :=icons.GetImage(parent,s)
+	ret :=icons.GetImage(parent,32,32,s)
 	ret.SetAlign(types.AlLeft)
 	ret.SetParent(parent)
 	ret.SetWidth(32)
