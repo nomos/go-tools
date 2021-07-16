@@ -13,8 +13,8 @@ type Excel2JsonFrame struct {
 	*vcl.TFrame
 	ui.ConfigAble
 
-	ExcelEdit *vcl.TLabeledEdit
-	TsEdit *vcl.TLabeledEdit
+	ExcelEdit *vcl.TEdit
+	TsEdit *vcl.TEdit
 	ExcelButton *vcl.TSpeedButton
 	TsButton *vcl.TSpeedButton
 	HelpButton *vcl.TSpeedButton
