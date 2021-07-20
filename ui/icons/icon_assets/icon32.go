@@ -19,11 +19,27 @@ func Assign(m map[string][]byte){
 	addIcon(m,"cancel",cancel)
 	addIcon(m,"green_circle",green_circle)
 	addIcon(m,"red_circle",red_circle)
+	addIcon(m,"search_client",search_client)
+	addIcon(m,"search",search)
+	addIcon(m,"user",user)
+	addIcon(m,"microsoft_excel",microsoft_excel)
 }
 
 func addIcon(m map[string][]byte,s string,data []byte){
 	m[s] = data
 }
+
+//go:embed icons/icons8-microsoft_excel.png
+var microsoft_excel []byte
+
+//go:embed icons/icons8-user.png
+var user []byte
+
+//go:embed icons/icons8-search.png
+var search []byte
+
+//go:embed icons/icons8-search_client.png
+var search_client []byte
 
 //go:embed icons/icons8-green_circle.png
 var green_circle []byte

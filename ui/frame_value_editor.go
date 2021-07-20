@@ -75,27 +75,51 @@ func (this *ValueEditorFrame) setCallbacks(){
 		}
 	})
 	this.keyEdit.Memo.SetOnKeyDown(func(sender vcl.IObject, key *types.Char, shift types.TShiftState) {
+		if this.OnKeyKeyDown==nil {
+			return
+		}
 		this.OnKeyKeyDown(*key,shift,this.schema)
 	})
 	this.keyEdit.Memo.SetOnKeyDown(func(sender vcl.IObject, key *types.Char, shift types.TShiftState) {
+		if this.OnValueKeyDown==nil {
+			return
+		}
 		this.OnValueKeyDown(*key,shift,this.schema)
 	})
 	this.keyEdit.Memo.SetOnExit(func(sender vcl.IObject) {
+		if this.OnKeyExit==nil {
+			return
+		}
 		this.OnKeyExit(this.schema)
 	})
 	this.keyEdit.Memo.SetOnChange(func(sender vcl.IObject) {
+		if this.OnKeyChange==nil {
+			return
+		}
 		this.OnKeyChange(this.schema)
 	})
 	this.valueEdit.Memo.SetOnKeyDown(func(sender vcl.IObject, key *types.Char, shift types.TShiftState) {
+		if this.OnValueKeyDown==nil {
+			return
+		}
 		this.OnValueKeyDown(*key,shift,this.schema)
 	})
 	this.valueEdit.Memo.SetOnExit(func(sender vcl.IObject) {
+		if this.OnValueExit==nil {
+			return
+		}
 		this.OnValueExit(this.schema)
 	})
 	this.valueEdit.Memo.SetOnChange(func(sender vcl.IObject) {
+		if this.OnValueChange==nil {
+			return
+		}
 		this.OnValueChange(this.schema)
 	})
 	this.dropDown.SetOnSelect(func(sender vcl.IObject) {
+		if this.OnSelect==nil {
+			return
+		}
 		if this.schema == nil {
 			return
 		}

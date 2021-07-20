@@ -117,6 +117,16 @@ func CreateEdit(width types.TConstraintSize,parent vcl.IWinControl)*vcl.TEdit{
 	return ret
 }
 
+func CreateEditNoConstrain(parent vcl.IWinControl)*vcl.TEdit{
+	ret:=vcl.NewEdit(parent)
+	ret.SetParent(parent)
+	ret.BorderSpacing().SetTop(2)
+	ret.BorderSpacing().SetBottom(2)
+	ret.SetAlign(types.AlLeft)
+	ret.SetText("")
+	return ret
+}
+
 func CreateSeg(width int32,parent vcl.IWinControl){
 	frame:=vcl.NewPanel(parent)
 	frame.SetAlign(types.AlLeft)
