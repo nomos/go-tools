@@ -49,6 +49,11 @@ func NewEditor(owner vcl.IComponent, option ...ui.FrameOption) (root *JsonEditor
 	return
 }
 
+func (this *JsonEditor) SetJsonString(s string){
+	this.textEdit.SetText(s)
+	this.parseString()
+}
+
 func (this *JsonEditor) setup() {
 	this.SetAlign(types.AlClient)
 	ui.CreateSplitter(this, types.AlLeft, 6)

@@ -63,6 +63,29 @@ func (this *PageContainer) OnCreate() {
 	})
 }
 
+func (this *PageContainer) SwitchTo(s int32){
+	log.Warnf(this.pageControl)
+	go func() {
+		vcl.ThreadSync(func() {
+			this.pageControl.SetTabIndex(s)
+		})
+	}()
+
+}
+
+func (this *PageContainer) SwitchToName(name string){
+	log.Warnf(this.pageControl)
+	if iframe,ok:=this.iframes[name];ok {
+		log.Infof("Switch Index",iframe.GetIndex())
+		go func() {
+			vcl.ThreadSync(func() {
+				this.pageControl.SetTabIndex(int32(iframe.GetIndex()))
+			})
+		}()
+
+	}
+}
+
 func (this *PageContainer) On(evt events.EventName, listener ...events.Listener) {
 	this.listener.On(evt, listener...)
 }
