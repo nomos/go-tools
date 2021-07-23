@@ -47,6 +47,7 @@ type EditLabel struct {
 	enums []protocol.IEnum
 	enumMap map[string]protocol.IEnum
 	enumIntMap map[protocol.Enum]protocol.IEnum
+	enabled bool
 }
 
 func NewEditLabel(owner vcl.IWinControl,name string,width int32,t EDIT_TYPE,option... FrameOption) (root *EditLabel)  {
@@ -60,6 +61,26 @@ func NewEditLabel(owner vcl.IWinControl,name string,width int32,t EDIT_TYPE,opti
 	root.incr = 1.0
 	root.enums = []protocol.IEnum{}
 	return
+}
+
+func (this *EditLabel) SetEnabled(v bool){
+	this.enabled = v
+	this.updateEnabled()
+}
+
+func (this *EditLabel) updateEnabled(){
+	if this.boolPanel!=nil {
+		this.boolPanel.SetEnabled(this.enabled)
+	}
+	if this.edit!=nil {
+		this.edit.SetEnabled(this.enabled)
+	}
+	if this.mPanel!=nil {
+		this.mPanel.SetEnabled(this.enabled)
+	}
+	if this.enumPanel!=nil {
+		this.enumPanel.SetEnabled(this.enabled)
+	}
 }
 
 func (this *EditLabel) setup(){
@@ -79,6 +100,7 @@ func (this *EditLabel) setup(){
 	this.createBoolPanel()
 	this.SetType(this.editType)
 	this.updateEnumsUI()
+	this.updateEnabled()
 }
 
 func (this *EditLabel) createBoolPanel(){
