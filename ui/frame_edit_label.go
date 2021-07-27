@@ -32,6 +32,9 @@ type EditLabel struct {
 	value string
 	enumValue protocol.IEnum
 	boolValue bool
+
+	dirty bool
+
 	name string
 	width int32
 	incr float64
@@ -49,6 +52,7 @@ type EditLabel struct {
 	enumIntMap map[protocol.Enum]protocol.IEnum
 	enabled bool
 	color types.TColor
+	OnValueChange func(label *EditLabel,editType EDIT_TYPE,value interface{})
 }
 
 func NewEditLabel(owner vcl.IWinControl,name string,width int32,t EDIT_TYPE,option... FrameOption) (root *EditLabel)  {
@@ -63,6 +67,18 @@ func NewEditLabel(owner vcl.IWinControl,name string,width int32,t EDIT_TYPE,opti
 	root.incr = 1.0
 	root.enums = []protocol.IEnum{}
 	return
+}
+
+func (this *EditLabel) MarkDirty(){
+	this.dirty = true
+}
+
+func (this *EditLabel) Dirty()bool{
+	return this.dirty
+}
+
+func (this *EditLabel) Clean(){
+	this.dirty = false
 }
 
 func (this *EditLabel) SetEnabled(v bool){
@@ -115,9 +131,9 @@ func (this *EditLabel) createBoolPanel(){
 	this.boolPanel.SetParent(this.dPanel)
 	this.boolPanel.SetOnClick(func(sender vcl.IObject) {
 		if this.boolPanel.Checked() {
-			this.boolValue = true
+			this.SetBool(true,true)
 		} else {
-			this.boolValue = false
+			this.SetBool(false,true)
 		}
 	})
 }
@@ -150,19 +166,11 @@ func (this *EditLabel) createNumPanel(){
 		}
 		switch this.editType {
 		case EDIT_TYPE_DECIMAL:
-			data,err:=this.Float()
-			if err != nil {
-				log.Error(err.Error())
-				return
-			}
-			this.SetFloat(data-this.incr)
+			data:=this.Float()
+			this.SetFloat(data-this.incr,true,true)
 		case EDIT_TYPE_INTERGER:
-			data,err:=this.Int()
-			if err != nil {
-				log.Error(err.Error())
-				return
-			}
-			this.SetInt(data-int(this.incr))
+			data:=this.Int()
+			this.SetInt(data-int(this.incr),true)
 		}
 	})
 	this.plusBtn.SetOnClick(func(sender vcl.IObject) {
@@ -171,24 +179,39 @@ func (this *EditLabel) createNumPanel(){
 		}
 		switch this.editType {
 		case EDIT_TYPE_DECIMAL:
-			data,err:=this.Float()
-			if err != nil {
-				log.Error(err.Error())
-				return
-			}
-			this.SetFloat(data+this.incr)
+			data:=this.Float()
+			this.SetFloat(data+this.incr,true)
 		case EDIT_TYPE_INTERGER:
-			data,err:=this.Int()
-			if err != nil {
-				log.Error(err.Error())
-				return
+			data:=this.Int()
+			this.SetInt(data+int(this.incr),true)
+		}
+	})
+	this.edit.SetOnExit(func(sender vcl.IObject) {
+		if !this.enabled {
+			if this.edit.Text()!=this.value {
+				this.edit.SetText(this.value)
 			}
-			this.SetInt(data+int(this.incr))
+			return
+		}
+		if this.dirty {
+			switch this.editType {
+			case EDIT_TYPE_INTERGER:
+				this.OnValueChange(this,this.editType,this.Int())
+				this.dirty = false
+			case EDIT_TYPE_STRING:
+				this.OnValueChange(this,this.editType,this.String())
+				this.dirty = false
+			case EDIT_TYPE_DECIMAL:
+				this.OnValueChange(this,this.editType,this.Float())
+				this.dirty = false
+			}
 		}
 	})
 	this.edit.SetOnChange(func(sender vcl.IObject) {
 		if !this.enabled {
-			this.SetString(this.value)
+			if this.edit.Text()!=this.value {
+				this.edit.SetText(this.value)
+			}
 			return
 		}
 		text:=this.edit.Text()
@@ -225,7 +248,7 @@ func (this *EditLabel) createEnumPanel(){
 		}
 		text:=this.enumPanel.Text()
 		if v,ok := this.enumMap[text];ok {
-			this.enumValue = v
+			this.SetEnum(v.Enum(),true)
 		}
 	})
 }
@@ -302,40 +325,81 @@ func isInt(s string) bool {
 	return err == nil
 }
 
-func (this *EditLabel) SetEnum(enum protocol.Enum){
+func (this *EditLabel) SetEnum(enum protocol.Enum,edited...interface{}){
 	if v,ok:=this.enumIntMap[enum];ok {
 		this.enumPanel.SetText(v.ToString())
 	}
+	if this.enumValue.Enum() == enum.Enum() {
+		return
+	}
+	if len(edited)>0&&this.OnValueChange!=nil {
+		this.OnValueChange(this,this.editType,enum)
+	}
 }
 
-func (this *EditLabel) SetString(v string){
+func (this *EditLabel) SetOnValueChange(f func(label *EditLabel,editType EDIT_TYPE,value interface{})){
+	this.OnValueChange = f
+}
+
+func (this *EditLabel) SetString(v string,edited...interface{}){
 	if this.editType==EDIT_TYPE_ENUM {
+		return
+	}
+	if this.value == v {
 		return
 	}
 	this.value = v
 	if this.edit.Text()!=this.value {
 		this.edit.SetText(this.value)
 	}
+	if this.OnValueChange!=nil {
+		this.MarkDirty()
+	}
 }
 
-func (this *EditLabel) SetBool(v bool){
+func (this *EditLabel) SetBool(v bool,edited...interface{}){
+	if this.boolValue == v {
+		return
+	}
+	this.boolValue = v
 	this.boolPanel.SetChecked(v)
+	if len(edited)>0&&this.OnValueChange!=nil {
+		this.OnValueChange(this,this.editType,v)
+	}
 }
 
-func (this *EditLabel) SetInt(v int){
-	this.SetString(strconv.Itoa(v))
+func (this *EditLabel) SetInt(v int,edited...interface{}){
+	this.SetString(strconv.Itoa(v),edited...)
 }
 
-func (this *EditLabel) SetFloat(v float64){
-	this.SetString(strconv.FormatFloat(v,'f',2,64))
+func (this *EditLabel) SetFloat(v float64,edited...interface{}){
+	this.SetString(strconv.FormatFloat(v,'f',2,64),edited...)
 }
 
-func (this *EditLabel) Int()(int,error){
+func (this *EditLabel) Int()int{
 	if this.value == "" {
-		return 0,nil
+		log.Panic("value is not int")
+		return 0
 	}
 	ret, err := strconv.ParseInt(this.value,10,64)
-	return int(ret),err
+	if err != nil {
+		log.Panic(err.Error())
+		return 0
+	}
+	return int(ret)
+}
+
+func (this *EditLabel) Float()float64 {
+	if this.value == "" {
+		log.Panic("value is not float")
+		return 0
+	}
+	ret, err := strconv.ParseFloat(this.value, 64)
+	if err != nil {
+		log.Panic(err.Error())
+		return 0
+	}
+	return ret
 }
 
 func (this *EditLabel) Bool()bool {
@@ -368,14 +432,6 @@ func (this *EditLabel) Set(v interface{}){
 	default:
 		log.Panic("unrecognized type")
 	}
-}
-
-func (this *EditLabel) Float()(float64,error) {
-	if this.value == "" {
-		return 0,nil
-	}
-	ret, err := strconv.ParseFloat(this.value, 64)
-	return ret,err
 }
 
 func (this *EditLabel) OnCreate(){
