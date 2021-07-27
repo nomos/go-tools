@@ -48,6 +48,7 @@ type EditLabel struct {
 	enumMap map[string]protocol.IEnum
 	enumIntMap map[protocol.Enum]protocol.IEnum
 	enabled bool
+	color types.TColor
 }
 
 func NewEditLabel(owner vcl.IWinControl,name string,width int32,t EDIT_TYPE,option... FrameOption) (root *EditLabel)  {
@@ -55,6 +56,7 @@ func NewEditLabel(owner vcl.IWinControl,name string,width int32,t EDIT_TYPE,opti
 	for _,o:=range option {
 		o(root)
 	}
+	root.enabled = true
 	root.editType = t
 	root.name = name
 	root.width = width
@@ -69,18 +71,22 @@ func (this *EditLabel) SetEnabled(v bool){
 }
 
 func (this *EditLabel) updateEnabled(){
-	if this.boolPanel!=nil {
-		this.boolPanel.SetEnabled(this.enabled)
+	this.label.SetEnabled(this.enabled)
+	if !this.enabled {
+		this.label.SetColor(colors.ClGray)
 	}
-	if this.edit!=nil {
-		this.edit.SetEnabled(this.enabled)
-	}
-	if this.mPanel!=nil {
-		this.mPanel.SetEnabled(this.enabled)
-	}
-	if this.enumPanel!=nil {
-		this.enumPanel.SetEnabled(this.enabled)
-	}
+	//if this.boolPanel!=nil {
+	//	this.boolPanel.SetEnabled(this.enabled)
+	//}
+	//if this.edit!=nil {
+	//	this.edit.SetEnabled(this.enabled)
+	//}
+	//if this.mPanel!=nil {
+	//	this.mPanel.SetEnabled(this.enabled)
+	//}
+	//if this.enumPanel!=nil {
+	//	this.enumPanel.SetEnabled(this.enabled)
+	//}
 }
 
 func (this *EditLabel) setup(){
@@ -139,6 +145,9 @@ func (this *EditLabel) createNumPanel(){
 	this.minusBtn.SetHeight(11)
 	this.minusBtn.SetFlat(true)
 	this.minusBtn.SetOnClick(func(sender vcl.IObject) {
+		if !this.enabled {
+			return
+		}
 		switch this.editType {
 		case EDIT_TYPE_DECIMAL:
 			data,err:=this.Float()
@@ -157,6 +166,9 @@ func (this *EditLabel) createNumPanel(){
 		}
 	})
 	this.plusBtn.SetOnClick(func(sender vcl.IObject) {
+		if !this.enabled {
+			return
+		}
 		switch this.editType {
 		case EDIT_TYPE_DECIMAL:
 			data,err:=this.Float()
@@ -175,6 +187,10 @@ func (this *EditLabel) createNumPanel(){
 		}
 	})
 	this.edit.SetOnChange(func(sender vcl.IObject) {
+		if !this.enabled {
+			this.SetString(this.value)
+			return
+		}
 		text:=this.edit.Text()
 		switch this.editType {
 		case EDIT_TYPE_STRING:
@@ -204,6 +220,9 @@ func (this *EditLabel) createEnumPanel(){
 	this.enumPanel.SetAlign(types.AlClient)
 	this.enumPanel.SetParent(this.dPanel)
 	this.enumPanel.SetOnSelect(func(sender vcl.IObject) {
+		if !this.enabled {
+			this.SetEnum(this.enumValue.Enum())
+		}
 		text:=this.enumPanel.Text()
 		if v,ok := this.enumMap[text];ok {
 			this.enumValue = v
@@ -268,8 +287,9 @@ func (this *EditLabel) SetIncrement(incr float64){
 }
 
 func (this *EditLabel) SetColor(c types.TColor){
+	this.color = c
 	this.label.SetColor(c)
-	this.label.Font().SetColor(c.RGB(255-c.B(),255-c.G(),255-c.B()))
+	this.label.Font().SetColor(c.RGB(255-c.R(),255-c.G(),255-c.B()))
 }
 
 func isDouble(s string) bool {
