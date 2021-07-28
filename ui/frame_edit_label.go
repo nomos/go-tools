@@ -3,6 +3,7 @@ package ui
 import (
 	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-lokas/protocol"
+	"github.com/nomos/go-lokas/util"
 	"github.com/nomos/go-tools/ui/icons"
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
@@ -328,8 +329,9 @@ func isInt(s string) bool {
 func (this *EditLabel) SetEnum(enum protocol.Enum,edited...interface{}){
 	if v,ok:=this.enumIntMap[enum];ok {
 		this.enumPanel.SetText(v.ToString())
+		this.enumValue = v
 	}
-	if this.enumValue.Enum() == enum.Enum() {
+	if !util.IsNil(this.enumValue)&&this.enumValue.Enum() == enum.Enum() {
 		return
 	}
 	if len(edited)>0&&this.OnValueChange!=nil {
@@ -413,6 +415,10 @@ func (this *EditLabel) String()string{
 func (this *EditLabel) Set(v interface{}){
 	t:=reflect.TypeOf(v)
 	switch t.Kind() {
+	case reflect.String:
+		if this.editType==EDIT_TYPE_STRING {
+			this.SetString(v.(string))
+		}
 	case reflect.Bool:
 		if this.editType==EDIT_TYPE_BOOL {
 			this.SetBool(v.(bool))
@@ -427,10 +433,10 @@ func (this *EditLabel) Set(v interface{}){
 		}
 	case reflect.Int32:
 		if this.editType==EDIT_TYPE_ENUM {
-			this.SetEnum(protocol.Enum(v.(int32)))
+			this.SetEnum(v.(protocol.Enum))
 		}
 	default:
-		log.Panic("unrecognized type")
+		log.Panic("unrecognized type:"+t.Kind().String())
 	}
 }
 
