@@ -45,3 +45,21 @@ func (this *FrameContainer) OnDestroy(){
 	}
 	log.Warnf("OnDestroy")
 }
+
+func (this *FrameContainer) OnEnter(){
+	for _,f:=range this.frames {
+		f.OnEnter()
+	}
+}
+
+func (this *FrameContainer) OnExit(){
+	for _,f:=range this.frames {
+		f.OnExit()
+	}
+}
+
+func (this *FrameContainer) Clear(){
+	for _,f:=range this.frames {
+		f.Clear()
+	}
+}

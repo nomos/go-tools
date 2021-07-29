@@ -129,7 +129,7 @@ func (this *PageContainer) AddIFrame(name string, frame IFrame, opts ...FrameOpt
 		if r := recover(); r != nil {
 			if err,ok:=r.(error);ok {
 				log.Error(err.Error())
-				buf := make([]byte, 1<<16)
+				buf := make([]byte, 1<<8)
 				runtime.Stack(buf, true)
 				log.Error(string(buf))
 			}
@@ -168,4 +168,22 @@ func (this *PageContainer) AddWebView(name string, url string) {
 	frame.SetParent(sheet)
 	frame.OnCreate()
 	frame.SetUrl(url)
+}
+
+func (this *PageContainer) OnEnter(){
+	for _,v:=range this.iframes {
+		v.OnEnter()
+	}
+}
+
+func (this *PageContainer) OnExit(){
+	for _,v:=range this.iframes {
+		v.OnExit()
+	}
+}
+
+func (this *PageContainer) Clear(){
+	for _,v:=range this.iframes {
+		v.Clear()
+	}
 }

@@ -59,3 +59,16 @@ func (this *WebViewFrame) OnCreate(){
 func (this *WebViewFrame) OnDestroy(){
 
 }
+
+
+func (this *WebViewFrame) OnEnter(){
+
+}
+
+func (this *WebViewFrame) OnExit(){
+
+}
+
+func (this *WebViewFrame) Clear(){
+
+}

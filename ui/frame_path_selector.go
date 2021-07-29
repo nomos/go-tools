@@ -5,8 +5,6 @@ import "github.com/ying32/govcl/vcl"
 type PathSelectFrame struct {
 	*vcl.TFrame
 	ConfigAble
-
-
 }
 
 func NewPathSelectFrame(owner vcl.IComponent,option... FrameOption) (root *PathSelectFrame) {
@@ -27,4 +25,17 @@ func (this *PathSelectFrame) OnCreate(){
 func (this *PathSelectFrame) OnDestroy(){
 
 }
+
+func (this *PathSelectFrame) OnEnter(){
+
+}
+
+func (this *PathSelectFrame) OnExit(){
+
+}
+
+func (this *PathSelectFrame) Clear(){
+
+}
+
 

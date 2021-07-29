@@ -65,6 +65,9 @@ type IFrame interface {
 	Name() string
 	OnCreate()
 	OnDestroy()
+	OnEnter()
+	OnExit()
+	Clear()
 	SetParent(vcl.IWinControl)
 	SetEventEmitter(listener events.EventEmmiter)
 	SetLogger(logger log.ILogger)

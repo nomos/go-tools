@@ -448,5 +448,22 @@ func (this *EditLabel) OnDestroy(){
 
 }
 
+func (this *EditLabel) OnEnter(){
+
+}
+
+func (this *EditLabel) OnExit(){
+
+}
+
+func (this *EditLabel) Clear(){
+	this.dirty = false
+	vcl.ThreadSync(func() {
+		this.edit.Clear()
+		this.enumPanel.Clear()
+		this.boolPanel.SetChecked(false)
+	})
+}
+
 
 

@@ -331,7 +331,7 @@ func (this *JsonEditor) onEditorKeyExit(schema ui.ITreeSchema) {
 		if r := recover(); r != nil {
 			if err, ok := r.(error); ok {
 				log.Error(err.Error())
-				buf := make([]byte, 1<<16)
+				buf := make([]byte, 1<<8)
 				runtime.Stack(buf, true)
 				log.Error(string(buf))
 			}
@@ -345,7 +345,7 @@ func (this *JsonEditor) onEditorValueExit(schema ui.ITreeSchema) {
 		if r := recover(); r != nil {
 			if err, ok := r.(error); ok {
 				log.Error(err.Error())
-				buf := make([]byte, 1<<16)
+				buf := make([]byte, 1<<8)
 				runtime.Stack(buf, true)
 				log.Error(string(buf))
 			}
@@ -379,7 +379,7 @@ func (this *JsonEditor) onEditorSetSchema(s ui.ITreeSchema) {
 		if r := recover(); r != nil {
 			if err, ok := r.(error); ok {
 				log.Error(err.Error())
-				buf := make([]byte, 1<<16)
+				buf := make([]byte, 1<<8)
 				runtime.Stack(buf, true)
 				log.Error(string(buf))
 			}
@@ -501,7 +501,7 @@ func (this *JsonEditor) Clear(){
 		if r := recover(); r != nil {
 			if err,ok:=r.(error);ok {
 				log.Error(err.Error())
-				buf := make([]byte, 1<<16)
+				buf := make([]byte, 1<<8)
 				runtime.Stack(buf, true)
 				log.Error(string(buf))
 			}
@@ -599,7 +599,7 @@ func (this *JsonEditor) parseModelTextOnly() {
 		if r := recover(); r != nil {
 			if err, ok := r.(error); ok {
 				log.Error(err.Error())
-				buf := make([]byte, 1<<16)
+				buf := make([]byte, 1<<8)
 				runtime.Stack(buf, true)
 				log.Error(string(buf))
 			}
@@ -614,7 +614,7 @@ func (this *JsonEditor) parseModelTextOnly() {
 					if r := recover(); r != nil {
 						if err, ok := r.(error); ok {
 							log.Error(err.Error())
-							buf := make([]byte, 1<<16)
+							buf := make([]byte, 1<<8)
 							runtime.Stack(buf, true)
 							log.Error(string(buf))
 						}
@@ -635,7 +635,7 @@ func (this *JsonEditor) parseModel() {
 			if r := recover(); r != nil {
 				if err, ok := r.(error); ok {
 					log.Error(err.Error())
-					buf := make([]byte, 1<<16)
+					buf := make([]byte, 1<<8)
 					runtime.Stack(buf, true)
 					log.Error(string(buf))
 				}
@@ -649,7 +649,7 @@ func (this *JsonEditor) parseModel() {
 					if r := recover(); r != nil {
 						if err, ok := r.(error); ok {
 							log.Error(err.Error())
-							buf := make([]byte, 1<<16)
+							buf := make([]byte, 1<<8)
 							runtime.Stack(buf, true)
 							log.Error(string(buf))
 						}
@@ -738,4 +738,12 @@ func (this *JsonEditor) AddNewSchemaAtSelected(t Type) {
 		this.parseModel()
 		this.tree.SetSelectSchema(s)
 	}
+}
+
+func (this *JsonEditor) OnEnter() {
+	panic("implement me")
+}
+
+func (this *JsonEditor) OnExit() {
+	panic("implement me")
 }

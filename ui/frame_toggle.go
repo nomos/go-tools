@@ -6,6 +6,8 @@ import (
 	"github.com/ying32/govcl/vcl/types"
 )
 
+var _ IFrame = (*ToggleFrame)(nil)
+
 type ToggleFrame struct {
 	*vcl.TFrame
 	ConfigAble
@@ -26,43 +28,46 @@ func NewToggleFrame(owner vcl.IWinControl,checked bool,option... FrameOption) (r
 }
 
 func (this *ToggleFrame) setup(){
-	this.SetAlign(types.AlClient)
+	this.SetAlign(types.AlLeft)
+	this.SetWidth(100)
 	this.image = vcl.NewImage(this)
 	this.image.SetParent(this)
 	this.image.SetAlign(types.AlClient)
 	this.image.SetOnClick(func(sender vcl.IObject) {
+		this.checked = !this.checked
 		if this.checked {
+			this.Check()
 			if this.OnChecked!=nil {
 				this.OnChecked(true)
 			}
-			this.check()
 		} else {
+			this.Uncheck()
 			if this.OnChecked!=nil {
 				this.OnChecked(false)
 			}
-			this.uncheck()
 		}
 	})
+	go this.updateCheck()
 }
 
 func (this *ToggleFrame) updateCheck(){
 	if this.checked {
-		vcl.ThreadSync(func() {
+		go vcl.ThreadSync(func() {
 			icons.LoadData(this.image,"toggle_on")
 		})
 	} else {
-		vcl.ThreadSync(func() {
+		go vcl.ThreadSync(func() {
 			icons.LoadData(this.image,"toggle_off")
 		})
 	}
 }
 
-func (this *ToggleFrame) check(){
+func (this *ToggleFrame) Check(){
 	this.checked = true
 	this.updateCheck()
 }
 
-func (this *ToggleFrame) uncheck(){
+func (this *ToggleFrame) Uncheck(){
 	this.checked = false
 	this.updateCheck()
 }
@@ -75,4 +80,16 @@ func (this *ToggleFrame) OnDestroy(){
 
 }
 
+
+func (this *ToggleFrame) OnEnter() {
+
+}
+
+func (this *ToggleFrame) OnExit() {
+
+}
+
+func (this *ToggleFrame) Clear() {
+	this.Uncheck()
+}
 

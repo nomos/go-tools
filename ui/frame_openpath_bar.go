@@ -23,6 +23,7 @@ type OpenPathBar struct {
 
 	label          *vcl.TLabel
 	btn            *vcl.TSpeedButton
+	width int32
 	edit           *vcl.TEdit
 	path           string
 	openDirDialog  *vcl.TSelectDirectoryDialog
@@ -54,11 +55,13 @@ func WithSaveDialog(name string, ext string) FrameOption {
 	}
 }
 
-func NewOpenPathBar(owner vcl.IWinControl, option ...FrameOption) (root *OpenPathBar) {
+func NewOpenPathBar(owner vcl.IWinControl,width int32, option ...FrameOption) (root *OpenPathBar) {
 	vcl.CreateResFrame(owner, &root)
 	for _, o := range option {
 		o(root)
 	}
+	root.width =width
+
 	return
 }
 
@@ -87,8 +90,9 @@ func (this *OpenPathBar) SetOpenFileDialog(name string, filter string) {
 func (this *OpenPathBar) setup() {
 	this.SetAlign(types.AlLeft)
 	this.SetHeight(32)
-	this.SetWidth(500)
-	this.edit = CreateEdit(200, this)
+	this.SetWidth(this.width)
+	this.edit = CreateEdit(types.TConstraintSize(this.width-36), this)
+	this.edit.SetAlign(types.AlClient)
 	this.edit.SetHeight(32)
 	this.edit.BorderSpacing().SetLeft(0)
 	this.btn = CreateSpeedBtn("folder", icons.GetImageList(32, 32), this)
@@ -154,6 +158,9 @@ func (this *OpenPathBar) SetInitialDir(p string) {
 
 func (this *OpenPathBar) SetPath(p string) {
 	this.path = p
+	if this.edit.Text()!=p {
+		this.edit.SetText(p)
+	}
 }
 
 func (this *OpenPathBar) GetPath() string {
@@ -166,4 +173,16 @@ func (this *OpenPathBar) OnCreate() {
 
 func (this *OpenPathBar) OnDestroy() {
 
+}
+
+func (this *OpenPathBar) OnEnter() {
+
+}
+
+func (this *OpenPathBar) OnExit() {
+
+}
+
+func (this *OpenPathBar) Clear() {
+	this.edit.SetText("")
 }

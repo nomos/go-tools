@@ -73,6 +73,14 @@ func (this *MemoFrame) SetText(s string) {
     this.Memo.Lines().SetText(s)
 }
 
+func (this *MemoFrame) OnEnter() {
+
+}
+
+func (this *MemoFrame) OnExit() {
+
+}
+
 func (this *MemoFrame) Clear() {
     this.Memo.Clear()
 }

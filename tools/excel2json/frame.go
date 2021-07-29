@@ -110,7 +110,7 @@ func (this *Excel2JsonFrame) OnCreate(){
 			if r := recover(); r != nil {
 				if err,ok:=r.(error);ok {
 					log.Error(err.Error())
-					buf := make([]byte, 1<<16)
+					buf := make([]byte, 1<<8)
 					runtime.Stack(buf, true)
 					log.Error(string(buf))
 				}

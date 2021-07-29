@@ -6,7 +6,6 @@ import (
 	"github.com/ying32/govcl/vcl/types"
 )
 
-
 type ValueEditorFrame struct {
 	*vcl.TFrame
 	ConfigAble
@@ -176,4 +175,12 @@ func (this *ValueEditorFrame) Key()string {
 
 func (this *ValueEditorFrame) Pretty()bool{
 	return this.prettyCheck.Checked()
+}
+
+func (this *ValueEditorFrame) OnEnter() {
+
+}
+
+func (this *ValueEditorFrame) OnExit() {
+
 }

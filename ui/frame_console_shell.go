@@ -475,3 +475,11 @@ func (this *ConsoleShell) GetLastOutput(data interface{})string{
 	}
 	return ret[len(ret)-1]
 }
+
+func (this *ConsoleShell) OnEnter(){
+
+}
+
+func (this *ConsoleShell) OnExit(){
+	this.Console.Clear()
+}
