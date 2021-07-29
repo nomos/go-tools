@@ -458,7 +458,7 @@ func (this *EditLabel) OnExit(){
 
 func (this *EditLabel) Clear(){
 	this.dirty = false
-	vcl.ThreadSync(func() {
+	go vcl.ThreadSync(func() {
 		this.edit.Clear()
 		this.enumPanel.Clear()
 		this.boolPanel.SetChecked(false)
