@@ -7,7 +7,6 @@ import (
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
 	"github.com/ying32/govcl/vcl/types/colors"
-	"runtime"
 )
 
 

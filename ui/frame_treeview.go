@@ -6,7 +6,6 @@ import (
 	"github.com/nomos/go-tools/ui/icons"
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
-	"runtime"
 	"sync"
 )
 
