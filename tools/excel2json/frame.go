@@ -9,6 +9,8 @@ import (
 	"runtime"
 )
 
+var _ ui.IFrame = (*Excel2JsonFrame)(nil)
+
 type Excel2JsonFrame struct {
 	*vcl.TFrame
 	ui.ConfigAble
@@ -22,6 +24,18 @@ type Excel2JsonFrame struct {
 	IndieFolderCheck *vcl.TCheckBox
 }
 
+func (this *Excel2JsonFrame) OnEnter() {
+	panic("implement me")
+}
+
+func (this *Excel2JsonFrame) OnExit() {
+	panic("implement me")
+}
+
+func (this *Excel2JsonFrame) Clear() {
+	panic("implement me")
+}
+
 func NewExcel2JsonFrame(owner vcl.IComponent,option... ui.FrameOption) (root *Excel2JsonFrame)  {
 	vcl.CreateResFrame(owner, &root)
 	for _,o:=range option {
@@ -32,13 +46,14 @@ func NewExcel2JsonFrame(owner vcl.IComponent,option... ui.FrameOption) (root *Ex
 
 func (this *Excel2JsonFrame) setup(){
 	imgList:=icons.GetImageList(32,32)
-	line5:=ui.CreateLine(types.AlLeft,6,6,32,this)
-	ui.CreateLine(types.AlLeft,6,6,10,this)
-	line4:=ui.CreateLine(types.AlLeft,6,6,32,this)
-	line3:=ui.CreateLine(types.AlLeft,6,6,24,this)
-	ui.CreateLine(types.AlLeft,6,6,10,this)
-	line2:=ui.CreateLine(types.AlLeft,6,6,32,this)
-	line1:=ui.CreateLine(types.AlLeft,6,6,24,this)
+	line5:=ui.CreateLine(types.AlTop,6,6,32,this)
+	ui.CreateLine(types.AlTop,6,6,10,this)
+	line4:=ui.CreateLine(types.AlTop,6,6,32,this)
+	line3:=ui.CreateLine(types.AlTop,6,6,24,this)
+	ui.CreateLine(types.AlTop,6,6,10,this)
+	line2:=ui.CreateLine(types.AlTop,6,6,32,this)
+	line1:=ui.CreateLine(types.AlTop,6,6,24,this)
+
 	ui.CreateText("Excel路径",line1)
 	ui.CreateText("Ts路径",line3)
 	this.ExcelEdit=ui.CreateEdit(300,line2)
@@ -46,25 +61,29 @@ func (this *Excel2JsonFrame) setup(){
 	this.ExcelButton=ui.CreateSpeedBtn("folder",imgList,line2)
 	this.TsButton=ui.CreateSpeedBtn("folder",imgList,line4)
 	this.HelpButton = ui.CreateSpeedBtn("help",imgList,line5)
+
 	ui.CreateSeg(120,line5)
 	this.GenerateButton = ui.CreateButton("生成",line5)
 	this.IndieFolderCheck = ui.CreateCheckBox("嵌入",line5)
-
 }
 
 func (this *Excel2JsonFrame) OnCreate(){
 	this.setup()
 	openDirDialog := vcl.NewSelectDirectoryDialog(this)
 	openDirDialog.SetTitle("打开文件夹")
+
 	if this.getExcelPath()!="" {
 		this.setExcelPath(this.getExcelPath())
 	}
+
 	if this.getDistPath()!="" {
 		this.setDistPath(this.getDistPath())
 	}
+
 	this.ExcelEdit.SetOnChange(func(sender vcl.IObject) {
 
 	})
+
 	this.TsEdit.SetOnChange(func(sender vcl.IObject) {
 
 	})
@@ -79,6 +98,7 @@ func (this *Excel2JsonFrame) OnCreate(){
 			this.setExcelPath(p)
 		}
 	})
+
 	this.TsButton.SetOnClick(func(sender vcl.IObject) {
 		if this.getDistPath()!="" {
 			openDirDialog.SetInitialDir(this.getDistPath())
@@ -89,9 +109,11 @@ func (this *Excel2JsonFrame) OnCreate(){
 			this.setDistPath(p)
 		}
 	})
+
 	this.IndieFolderCheck.SetOnClick(func(sender vcl.IObject) {
 		this.setEmbed(this.IndieFolderCheck.Checked())
 	})
+
 	this.GenerateButton.SetOnClick(func(sender vcl.IObject) {
 		log.Warn("click")
 		if this.getExcelPath()=="" {
@@ -105,6 +127,7 @@ func (this *Excel2JsonFrame) OnCreate(){
 		this.GetLogger().Info("开始生成Json配置...")
 		Excel2JsonMiniGame(this.getExcelPath(),this.getDistPath(),this.GetLogger(),this.getEmbed())
 	})
+
 	this.HelpButton.SetOnClick(func(sender vcl.IObject) {
 		defer func() {
 			if r := recover(); r != nil {
