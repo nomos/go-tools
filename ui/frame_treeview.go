@@ -208,12 +208,7 @@ func (this *TreeView) ContainSchema(parent ITreeSchema, schema ITreeSchema) bool
 func (this *TreeView) UpdateTree(schema ITreeSchema) {
 	defer func() {
 		if r := recover(); r != nil {
-			if err, ok := r.(error); ok {
-				log.Error(err.Error())
-				buf := make([]byte, 1<<8)
-				runtime.Stack(buf, true)
-				log.Error(string(buf))
-			}
+			util.Recover(r,false)
 		}
 	}()
 	var parent *vcl.TTreeNode

@@ -2,11 +2,11 @@ package excel2json
 
 import (
 	"github.com/nomos/go-lokas/log"
+	"github.com/nomos/go-lokas/util"
 	"github.com/nomos/go-tools/ui"
 	"github.com/nomos/go-tools/ui/icons"
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
-	"runtime"
 )
 
 var _ ui.IFrame = (*Excel2JsonFrame)(nil)
@@ -131,12 +131,7 @@ func (this *Excel2JsonFrame) OnCreate(){
 	this.HelpButton.SetOnClick(func(sender vcl.IObject) {
 		defer func() {
 			if r := recover(); r != nil {
-				if err,ok:=r.(error);ok {
-					log.Error(err.Error())
-					buf := make([]byte, 1<<8)
-					runtime.Stack(buf, true)
-					log.Error(string(buf))
-				}
+				util.Recover(r,false)
 			}
 		}()
 		log.Warnf(this.GetLogger())

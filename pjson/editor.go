@@ -12,7 +12,6 @@ import (
 	"github.com/ying32/govcl/vcl/types/colors"
 	"github.com/ying32/govcl/vcl/types/keys"
 	"io/ioutil"
-	"runtime"
 	"strconv"
 	"sync"
 	"time"
@@ -327,28 +326,14 @@ func (this *JsonEditor) onEditorSelect(schema ui.ITreeSchema, s string) {
 }
 
 func (this *JsonEditor) onEditorKeyExit(schema ui.ITreeSchema) {
-	defer func() {
-		if r := recover(); r != nil {
-			if err, ok := r.(error); ok {
-				log.Error(err.Error())
-				buf := make([]byte, 1<<8)
-				runtime.Stack(buf, true)
-				log.Error(string(buf))
-			}
-		}
-	}()
+
 
 }
 
 func (this *JsonEditor) onEditorValueExit(schema ui.ITreeSchema) {
 	defer func() {
 		if r := recover(); r != nil {
-			if err, ok := r.(error); ok {
-				log.Error(err.Error())
-				buf := make([]byte, 1<<8)
-				runtime.Stack(buf, true)
-				log.Error(string(buf))
-			}
+			util.Recover(r,false)
 		}
 	}()
 	if schema == nil {
@@ -377,12 +362,7 @@ func (this *JsonEditor) onEditorValueExit(schema ui.ITreeSchema) {
 func (this *JsonEditor) onEditorSetSchema(s ui.ITreeSchema) {
 	defer func() {
 		if r := recover(); r != nil {
-			if err, ok := r.(error); ok {
-				log.Error(err.Error())
-				buf := make([]byte, 1<<8)
-				runtime.Stack(buf, true)
-				log.Error(string(buf))
-			}
+			util.Recover(r,false)
 		}
 	}()
 	this.editingSchema = nil
@@ -499,12 +479,7 @@ func (this *JsonEditor) Clear(){
 	this.schema = nil
 	defer func() {
 		if r := recover(); r != nil {
-			if err,ok:=r.(error);ok {
-				log.Error(err.Error())
-				buf := make([]byte, 1<<8)
-				runtime.Stack(buf, true)
-				log.Error(string(buf))
-			}
+			util.Recover(r,false)
 		}
 	}()
 	vcl.ThreadSync(func() {
@@ -597,12 +572,7 @@ func (this *JsonEditor) buildMenu(s ui.ITreeSchema) *vcl.TPopupMenu {
 func (this *JsonEditor) parseModelTextOnly() {
 	defer func() {
 		if r := recover(); r != nil {
-			if err, ok := r.(error); ok {
-				log.Error(err.Error())
-				buf := make([]byte, 1<<8)
-				runtime.Stack(buf, true)
-				log.Error(string(buf))
-			}
+			util.Recover(r,false)
 		}
 	}()
 	if this.tree.Root != nil {
@@ -612,12 +582,7 @@ func (this *JsonEditor) parseModelTextOnly() {
 			vcl.ThreadSync(func() {
 				defer func() {
 					if r := recover(); r != nil {
-						if err, ok := r.(error); ok {
-							log.Error(err.Error())
-							buf := make([]byte, 1<<8)
-							runtime.Stack(buf, true)
-							log.Error(string(buf))
-						}
+						util.Recover(r,false)
 					}
 				}()
 				this.remodeling = true
@@ -633,12 +598,7 @@ func (this *JsonEditor) parseModel() {
 	if this.tree.Root != nil {
 		defer func() {
 			if r := recover(); r != nil {
-				if err, ok := r.(error); ok {
-					log.Error(err.Error())
-					buf := make([]byte, 1<<8)
-					runtime.Stack(buf, true)
-					log.Error(string(buf))
-				}
+				util.Recover(r,false)
 			}
 		}()
 		text := this.schema.ToString(true)
@@ -647,12 +607,7 @@ func (this *JsonEditor) parseModel() {
 			vcl.ThreadSync(func() {
 				defer func() {
 					if r := recover(); r != nil {
-						if err, ok := r.(error); ok {
-							log.Error(err.Error())
-							buf := make([]byte, 1<<8)
-							runtime.Stack(buf, true)
-							log.Error(string(buf))
-						}
+						util.Recover(r,false)
 					}
 				}()
 				this.remodeling = true

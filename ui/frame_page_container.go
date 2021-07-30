@@ -3,6 +3,7 @@ package ui
 import (
 	"github.com/nomos/go-events"
 	"github.com/nomos/go-lokas/log"
+	"github.com/nomos/go-lokas/util"
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
 	"github.com/ying32/govcl/vcl/types/colors"
@@ -127,12 +128,7 @@ func (this *PageContainer) GetIFrame(s string) IFrame {
 func (this *PageContainer) AddIFrame(name string, frame IFrame, opts ...FrameOption) IFrame {
 	defer func() {
 		if r := recover(); r != nil {
-			if err,ok:=r.(error);ok {
-				log.Error(err.Error())
-				buf := make([]byte, 1<<8)
-				runtime.Stack(buf, true)
-				log.Error(string(buf))
-			}
+			util.Recover(r,false)
 		}
 	}()
 	for _, opt := range opts {

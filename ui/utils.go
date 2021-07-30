@@ -23,8 +23,6 @@ func CreatePanel(align types.TAlign,component vcl.IWinControl)*vcl.TPanel{
 	frame.SetBevelOuter(0)
 	frame.SetBevelInner(0)
 	frame.SetAlign(align)
-	frame.SetBevelInner(0)
-	frame.SetBevelOuter(0)
 	frame.SetCaption("")
 	frame.SetParent(component)
 	return frame

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"github.com/iancoleman/orderedmap"
 	"github.com/nomos/go-lokas/log"
+	"github.com/nomos/go-lokas/util"
 	"github.com/nomos/go-lokas/util/slice"
 	"github.com/nomos/go-lokas/util/stringutil"
 	"github.com/nomos/go-tools/ui"
@@ -14,7 +15,6 @@ import (
 	"math"
 	"reflect"
 	"regexp"
-	"runtime"
 	"strconv"
 )
 
@@ -61,12 +61,7 @@ func (this *Schema) UpdateNode()bool{
 			vcl.ThreadSync(func() {
 				defer func() {
 					if r := recover(); r != nil {
-						if err,ok:=r.(error);ok {
-							log.Error(err.Error())
-							buf := make([]byte, 1<<8)
-							runtime.Stack(buf, true)
-							log.Error(string(buf))
-						}
+						util.Recover(r,false)
 					}
 				}()
 				if this.node!=nil {
