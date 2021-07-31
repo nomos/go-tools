@@ -7,7 +7,6 @@ import (
 	"github.com/nomos/go-tools/ui/icons"
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
-	"github.com/ying32/govcl/vcl/types/colors"
 )
 
 var _ ui.IFrame = (*Excel2JsonFrame)(nil)
@@ -44,6 +43,7 @@ func NewExcel2JsonFrame(owner vcl.IComponent,option... ui.FrameOption) (root *Ex
 }
 
 func (this *Excel2JsonFrame) setup(){
+	this.SetAlign(types.AlClient)
 	imgList:=icons.GetImageList(32,32)
 	line5:=ui.CreateLine(types.AlTop,32,this)
 	line5.BorderSpacing().SetLeft(6)
@@ -51,14 +51,12 @@ func (this *Excel2JsonFrame) setup(){
 	line1:=ui.CreateLine(types.AlTop,42,this)
 	line2:=ui.CreateLine(types.AlTop,42,this)
 
-	this.ExcelEdit=ui.NewOpenPathBar(line2,"Excel路径",300,ui.WithOpenDirDialog("Excel路径"))
+	this.ExcelEdit=ui.NewOpenPathBar(line2,"Excel路径",480,ui.WithOpenDirDialog("Excel路径"))
 	this.ExcelEdit.OnCreate()
 	this.ExcelEdit.SetParent(line2)
-	this.ExcelEdit.SetColor(colors.ClWhite)
-	this.TsEdit=ui.NewOpenPathBar(line1,"Ts路径",300,ui.WithOpenDirDialog("Ts路径"))
+	this.TsEdit=ui.NewOpenPathBar(line1,"Ts路径",480,ui.WithOpenDirDialog("Ts路径"))
 	this.TsEdit.OnCreate()
 	this.TsEdit.SetParent(line1)
-	this.TsEdit.SetColor(colors.ClWhite)
 	this.HelpButton = ui.CreateSpeedBtn("help",imgList,line5)
 
 	ui.CreateSeg(120,line5)
@@ -97,7 +95,7 @@ func (this *Excel2JsonFrame) OnCreate(){
 		}
 		if s!="" {
 			this.GetLogger().Warn("选择导出路径"+s)
-			this.setExcelPath(s)
+			this.setDistPath(s)
 		}
 	}
 	this.TsEdit.OnEdit = func(s string) {
@@ -111,10 +109,13 @@ func (this *Excel2JsonFrame) OnCreate(){
 	this.GenerateButton.SetOnClick(func(sender vcl.IObject) {
 		log.Warn("click")
 		if this.getExcelPath()=="" {
+
+			this.GetLogger().Warn("Excel路径为空")
 			this.ExcelEdit.SetFocus()
 			return
 		}
 		if this.getDistPath()=="" {
+			this.GetLogger().Warn("导出路径为空")
 			this.TsEdit.SetFocus()
 			return
 		}

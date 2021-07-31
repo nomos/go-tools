@@ -6,6 +6,7 @@ import (
 	"github.com/nomos/go-lokas/log"
 	"io"
 	"os/exec"
+	"path"
 	"runtime"
 	"strings"
 )
@@ -72,6 +73,7 @@ const (
 )
 
 type CocosBuildOption struct {
+	EnginePath string
 	Path            string
 	BuildPath       string
 	ExcludedModules []CocosModules
@@ -85,17 +87,23 @@ type CocosBuildOption struct {
 	Md5Cache        bool
 }
 
-const COCOS_WIN_BUILDER = "CocosCreator/CocosCreator.exe"
-const COCOS_MAC_BUILDER = "/Applications/CocosCreator.app/Contents/MacOS/CocosCreator"
+const COCOS_WIN_BUILDER = "CocosCreator.exe"
+const COCOS_MAC_BUILDER = "CocosCreator.app/Contents/MacOS/CocosCreator"
 
 func BuildCocos(conf *CocosBuildOption,writer io.Writer) error {
-	var builderStr string
+	var builderStr  = conf.EnginePath
 	if runtime.GOOS == "darwin" {
-		builderStr = COCOS_MAC_BUILDER
+		builderStr = path.Join(builderStr,COCOS_MAC_BUILDER)
 	} else if runtime.GOOS == "windows" {
-		builderStr = COCOS_WIN_BUILDER
+		builderStr = path.Join(builderStr,COCOS_WIN_BUILDER)
 	}
 	params := ""
+	log.Infof("engine path",builderStr)
+	_,err:=writer.Write([]byte("engine path"+builderStr+"\n"))
+	if err != nil {
+		log.Error(err.Error())
+		return err
+	}
 	if len(conf.ExcludedModules) > 0 {
 		excludeString := "["
 		for _, v := range conf.ExcludedModules {
@@ -116,16 +124,26 @@ func BuildCocos(conf *CocosBuildOption,writer io.Writer) error {
 	}
 	cmd := exec.Command(builderStr, "--force", "--path", conf.Path, "--build", params)
 	stdout, _ := cmd.StdoutPipe()
-	cmd.Start()
+	log.Infof(cmd.String())
+	err=cmd.Start()
+	if err != nil {
+		log.Error(err.Error())
+		return err
+	}
 	reader := bufio.NewReader(stdout)
 	for {
 		line, err2 := reader.ReadString('\n')
 		if err2 != nil || io.EOF == err2 {
 			break
 		}
-		log.Warnf(line)
-		writer.Write([]byte(line))
+		if writer!=nil {
+			writer.Write([]byte(line))
+		}
 	}
-	cmd.Wait()
+	err=cmd.Wait()
+	if err != nil {
+		log.Error(err.Error())
+		return err
+	}
 	return nil
 }
