@@ -27,7 +27,7 @@ func CreatePanel(align types.TAlign,component vcl.IWinControl)*vcl.TPanel{
 	frame.SetParent(component)
 	return frame
 }
-func CreateLine(align types.TAlign,offset int32,around int32,size types.TConstraintSize,component vcl.IWinControl)*vcl.TPanel{
+func CreateLine(align types.TAlign,size types.TConstraintSize,component vcl.IWinControl)*vcl.TPanel{
 	frame:=vcl.NewPanel(component)
 	frame.SetBevelOuter(0)
 	frame.SetBevelInner(0)
@@ -35,16 +35,13 @@ func CreateLine(align types.TAlign,offset int32,around int32,size types.TConstra
 	if align==types.AlTop||align==types.AlBottom {
 		frame.Constraints().SetMinHeight(size)
 		frame.Constraints().SetMaxHeight(size)
-		frame.BorderSpacing().SetLeft(offset)
 	} else if align==types.AlLeft||align==types.AlRight {
 		frame.Constraints().SetMinWidth(size)
 		frame.Constraints().SetMaxWidth(size)
-		frame.BorderSpacing().SetTop(offset)
 	} else {
 		frame.SetWidth(int32(size))
 		frame.SetHeight(int32(size))
 	}
-	frame.BorderSpacing().SetAround(around)
 	frame.SetBevelInner(0)
 	frame.SetBevelOuter(0)
 	frame.SetCaption("")

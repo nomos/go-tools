@@ -66,9 +66,10 @@ func (this *JsonEditor) setup() {
 	this.textEdit.BorderSpacing().SetLeft(6)
 	this.textEdit.BorderSpacing().SetRight(6)
 	rightPanel := ui.CreatePanel(types.AlClient, this)
-	line2 := ui.CreateLine(types.AlTop, 0, 0, 32, rightPanel)
+	line2 := ui.CreateLine(types.AlTop, 32, rightPanel)
 	line2.BorderSpacing().SetBottom(3)
-	line3 := ui.CreateLine(types.AlTop, 6, 0, 32, leftPanel)
+	line3 := ui.CreateLine(types.AlTop, 32, leftPanel)
+	line3.BorderSpacing().SetLeft(6)
 	line3.BorderSpacing().SetBottom(3)
 	ui.CreateSeg(3, line2)
 	ui.CreateSpeedBtn("sort_up", icons.GetImageList(32, 32), line2).SetOnClick(func(sender vcl.IObject) {

@@ -7,6 +7,7 @@ import (
 	"github.com/nomos/go-tools/ui/icons"
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
+	"github.com/ying32/govcl/vcl/types/colors"
 )
 
 var _ ui.IFrame = (*Excel2JsonFrame)(nil)
@@ -15,10 +16,8 @@ type Excel2JsonFrame struct {
 	*vcl.TFrame
 	ui.ConfigAble
 
-	ExcelEdit *vcl.TEdit
-	TsEdit *vcl.TEdit
-	ExcelButton *vcl.TSpeedButton
-	TsButton *vcl.TSpeedButton
+	ExcelEdit *ui.OpenPathBar
+	TsEdit *ui.OpenPathBar
 	HelpButton *vcl.TSpeedButton
 	GenerateButton *vcl.TButton
 	IndieFolderCheck *vcl.TCheckBox
@@ -46,20 +45,20 @@ func NewExcel2JsonFrame(owner vcl.IComponent,option... ui.FrameOption) (root *Ex
 
 func (this *Excel2JsonFrame) setup(){
 	imgList:=icons.GetImageList(32,32)
-	line5:=ui.CreateLine(types.AlTop,6,6,32,this)
-	ui.CreateLine(types.AlTop,6,6,10,this)
-	line4:=ui.CreateLine(types.AlTop,6,6,32,this)
-	line3:=ui.CreateLine(types.AlTop,6,6,24,this)
-	ui.CreateLine(types.AlTop,6,6,10,this)
-	line2:=ui.CreateLine(types.AlTop,6,6,32,this)
-	line1:=ui.CreateLine(types.AlTop,6,6,24,this)
+	line5:=ui.CreateLine(types.AlTop,32,this)
+	line5.BorderSpacing().SetLeft(6)
+	line5.BorderSpacing().SetAround(6)
+	line1:=ui.CreateLine(types.AlTop,42,this)
+	line2:=ui.CreateLine(types.AlTop,42,this)
 
-	ui.CreateText("Excel路径",line1)
-	ui.CreateText("Ts路径",line3)
-	this.ExcelEdit=ui.CreateEdit(300,line2)
-	this.TsEdit=ui.CreateEdit(300,line4)
-	this.ExcelButton=ui.CreateSpeedBtn("folder",imgList,line2)
-	this.TsButton=ui.CreateSpeedBtn("folder",imgList,line4)
+	this.ExcelEdit=ui.NewOpenPathBar(line2,"Excel路径",300,ui.WithOpenDirDialog("Excel路径"))
+	this.ExcelEdit.OnCreate()
+	this.ExcelEdit.SetParent(line2)
+	this.ExcelEdit.SetColor(colors.ClWhite)
+	this.TsEdit=ui.NewOpenPathBar(line1,"Ts路径",300,ui.WithOpenDirDialog("Ts路径"))
+	this.TsEdit.OnCreate()
+	this.TsEdit.SetParent(line1)
+	this.TsEdit.SetColor(colors.ClWhite)
 	this.HelpButton = ui.CreateSpeedBtn("help",imgList,line5)
 
 	ui.CreateSeg(120,line5)
@@ -80,35 +79,30 @@ func (this *Excel2JsonFrame) OnCreate(){
 		this.setDistPath(this.getDistPath())
 	}
 
-	this.ExcelEdit.SetOnChange(func(sender vcl.IObject) {
-
-	})
-
-	this.TsEdit.SetOnChange(func(sender vcl.IObject) {
-
-	})
-
-	this.ExcelButton.SetOnClick(func(sender vcl.IObject) {
+	this.ExcelEdit.OnOpen = func(s string) {
 		if this.getExcelPath()!="" {
-			openDirDialog.SetInitialDir(this.getExcelPath())
+			this.ExcelEdit.SetInitialDir(this.getExcelPath())
 		}
-		if openDirDialog.Execute() {
-			p := openDirDialog.FileName()
-			this.GetLogger().Warn("选择Excel路径"+p)
-			this.setExcelPath(p)
+		if s!="" {
+			this.GetLogger().Warn("选择Excel路径"+s)
+			this.setExcelPath(s)
 		}
-	})
+	}
+	this.ExcelEdit.OnEdit = func(s string) {
 
-	this.TsButton.SetOnClick(func(sender vcl.IObject) {
+	}
+	this.TsEdit.OnOpen = func(s string) {
 		if this.getDistPath()!="" {
-			openDirDialog.SetInitialDir(this.getDistPath())
+			this.TsEdit.SetInitialDir(this.getDistPath())
 		}
-		if openDirDialog.Execute() {
-			p := openDirDialog.FileName()
-			this.GetLogger().Warn("选择导出路径"+p)
-			this.setDistPath(p)
+		if s!="" {
+			this.GetLogger().Warn("选择导出路径"+s)
+			this.setExcelPath(s)
 		}
-	})
+	}
+	this.TsEdit.OnEdit = func(s string) {
+
+	}
 
 	this.IndieFolderCheck.SetOnClick(func(sender vcl.IObject) {
 		this.setEmbed(this.IndieFolderCheck.Checked())
@@ -170,12 +164,12 @@ func (this *Excel2JsonFrame) getDistPath()string {
 }
 
 func (this *Excel2JsonFrame) setExcelPath(p string){
-	this.ExcelEdit.SetText(p)
+	this.ExcelEdit.SetPath(p)
 	this.Config().Set("excel_path",p)
 }
 
 func (this *Excel2JsonFrame) setDistPath(p string){
-	this.TsEdit.SetText(p)
+	this.TsEdit.SetPath(p)
 	this.Config().Set("dist_path",p)
 }
 

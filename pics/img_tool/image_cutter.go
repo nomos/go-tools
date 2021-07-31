@@ -32,8 +32,8 @@ func NewImageCutter(owner vcl.IComponent) (root *TImageCutter)  {
 
 func (this *TImageCutter) setup(){
     this.SetAlign(types.AlClient)
-    line2:=ui.CreateLine(types.AlTop,0,0,32,this)
-    line1:=ui.CreateLine(types.AlTop,0,0,32,this)
+    line2:=ui.CreateLine(types.AlTop,32,this)
+    line1:=ui.CreateLine(types.AlTop,32,this)
     this.PngPath = ui.CreateEdit(200,line1)
     this.OpenPngButton = ui.CreateSpeedBtn("folder",icons.GetImageList(32,32),line1)
     this.Label1 = ui.CreateText("图片路径",line1)

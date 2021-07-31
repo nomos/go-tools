@@ -5,6 +5,7 @@ import (
 	"github.com/nomos/go-tools/ui/icons"
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
+	"github.com/ying32/govcl/vcl/types/colors"
 )
 
 var _ IFrame = (*OpenPathBar)(nil)
@@ -23,6 +24,7 @@ type OpenPathBar struct {
 
 	label          *vcl.TLabel
 	btn            *vcl.TSpeedButton
+	name string
 	width int32
 	edit           *vcl.TEdit
 	path           string
@@ -30,6 +32,7 @@ type OpenPathBar struct {
 	openFileDialog *vcl.TOpenDialog
 	saveDialog     *vcl.TSaveDialog
 	openType       OPEN_TYPE
+	color types.TColor
 	OnOpen         func(string)
 	OnEdit         func(string)
 }
@@ -55,11 +58,12 @@ func WithSaveDialog(name string, ext string) FrameOption {
 	}
 }
 
-func NewOpenPathBar(owner vcl.IWinControl,width int32, option ...FrameOption) (root *OpenPathBar) {
+func NewOpenPathBar(owner vcl.IWinControl,name string,width int32, option ...FrameOption) (root *OpenPathBar) {
 	vcl.CreateResFrame(owner, &root)
 	for _, o := range option {
 		o(root)
 	}
+	root.name = name
 	root.width =width
 
 	return
@@ -89,11 +93,18 @@ func (this *OpenPathBar) SetOpenFileDialog(name string, filter string) {
 
 func (this *OpenPathBar) setup() {
 	this.SetAlign(types.AlLeft)
-	this.SetHeight(32)
+	this.SetHeight(42)
 	this.SetWidth(this.width)
+	line1:=CreateLine(types.AlTop,13,this)
+	line1.BorderSpacing().SetBottom(0)
+	this.label = CreateText(this.name,line1)
+	this.label.BorderSpacing().SetLeft(2)
+	this.label.Font().SetSize(9)
+	this.label.Font().SetColor(colors.ClWhite)
+	this.label.SetColor(colors.ClBlack)
 	this.edit = CreateEdit(types.TConstraintSize(this.width-36), this)
 	this.edit.SetAlign(types.AlClient)
-	this.edit.SetHeight(32)
+	this.edit.SetHeight(28)
 	this.edit.BorderSpacing().SetLeft(0)
 	this.btn = CreateSpeedBtn("folder", icons.GetImageList(32, 32), this)
 	this.btn.BorderSpacing().SetTop(1)
@@ -145,6 +156,12 @@ func (this *OpenPathBar) setup() {
 			}
 		}
 	})
+}
+
+func (this *OpenPathBar) SetColor(c types.TColor){
+	this.color = c
+	this.label.SetColor(c)
+	this.label.Font().SetColor(c.RGB(255-c.R(),255-c.G(),255-c.B()))
 }
 
 func (this *OpenPathBar) SetInitialDir(p string) {

@@ -17,6 +17,10 @@ type ConfigAble struct {
 	index     int
 }
 
+func (this *ConfigAble) Options()[]FrameOption {
+	return []FrameOption{WithConfig(this.conf),WithLogger(this.log),WithListener(this.listener)}
+}
+
 func (this *ConfigAble) GetListener()events.EventEmmiter{
 	return this.listener
 }
