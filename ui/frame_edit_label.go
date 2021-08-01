@@ -24,11 +24,38 @@ const (
 	EDIT_TYPE_BOOL
 )
 
+var _ protocol.IEnum = StringEnum{}
+
+type StringEnum struct {
+	Label *EditLabel
+	EnumValue int32
+	StringValue string
+}
+
+func (s StringEnum) ToString() string {
+	return s.StringValue
+}
+
+func (s StringEnum) Enum() protocol.Enum {
+	return protocol.Enum(s.EnumValue)
+}
+
+func NewStringEnum(label *EditLabel,index int,s string)*StringEnum{
+	ret:=&StringEnum{
+		Label: label,
+		EnumValue: int32(index),
+		StringValue: s,
+	}
+	return ret
+}
+
 type EditLabel struct {
 	*vcl.TFrame
 	ConfigAble
 
 	editType EDIT_TYPE
+
+	stringEnums map[StringEnum]string
 
 	value string
 	enumValue protocol.IEnum
@@ -286,12 +313,35 @@ func (this *EditLabel) SetType(t EDIT_TYPE){
 }
 
 
+func (this *EditLabel) AddStringEnum(s string){
+	if this.enums == nil {
+		this.enums = []protocol.IEnum{}
+	}
+	if this.enumMap == nil {
+		this.enumMap = map[string]protocol.IEnum{}
+	}
+	if this.enumIntMap == nil {
+		this.enumIntMap = map[protocol.Enum]protocol.IEnum{}
+	}
+	e:=NewStringEnum(this,len(this.enums),s)
+	this.enums = append(this.enums, e)
+	if util.IsNil(this.enumValue) {
+		this.enumValue = e
+	}
+	this.enumMap[e.ToString()] = e
+	this.enumIntMap[e.Enum()] = e
+	this.updateEnumsUI()
+}
+
 func (this *EditLabel) SetEnums(enums []protocol.IEnum){
 	if enums!= nil {
 		this.enums = enums
 		this.enumMap = map[string]protocol.IEnum{}
 		this.enumIntMap = map[protocol.Enum]protocol.IEnum{}
 		for _,e:=range this.enums {
+			if util.IsNil(this.enumValue) {
+				this.enumValue = e
+			}
 			this.enumMap[e.ToString()] = e
 			this.enumIntMap[e.Enum()] = e
 		}
@@ -335,16 +385,32 @@ func isInt(s string) bool {
 	return err == nil
 }
 
-func (this *EditLabel) SetEnum(enum protocol.Enum,edited...interface{}){
-	if v,ok:=this.enumIntMap[enum];ok {
-		this.enumPanel.SetText(v.ToString())
-		this.enumValue = v
+func (this *EditLabel) SetEnumString(s string){
+	for _,e:=range this.enums {
+		if e.ToString()==s {
+			this.SetEnum(e.Enum())
+		}
 	}
-	if !util.IsNil(this.enumValue)&&this.enumValue.Enum() == enum.Enum() {
+}
+
+func (this *EditLabel) SetEnum(enum protocol.Enum,edited...interface{}){
+	defer func() {
+		if r:=recover();r!=nil {
+			util.Recover(r,false)
+		}
+	}()
+	if !util.IsNil(this.enumValue)&&int32(this.enumValue.Enum()) == int32(enum.Enum()) {
 		return
 	}
+	if v,ok:=this.enumIntMap[enum];ok {
+		go vcl.ThreadSync(func() {
+			this.enumPanel.SetText(v.ToString())
+		})
+		this.enumValue = v
+	}
+
 	if len(edited)>0&&this.OnValueChange!=nil {
-		this.OnValueChange(this,this.editType,enum)
+		this.OnValueChange(this,this.editType,this.enumValue)
 	}
 }
 
@@ -413,11 +479,25 @@ func (this *EditLabel) Float()float64 {
 	return ret
 }
 
+func (this *EditLabel) Enum()protocol.IEnum {
+	return this.enumValue
+}
+
 func (this *EditLabel) Bool()bool {
 	return this.boolValue
 }
 
 func (this *EditLabel) String()string{
+	if this.editType==EDIT_TYPE_ENUM {
+		return this.enumValue.ToString()
+	}
+	if this.editType==EDIT_TYPE_BOOL {
+		if this.boolValue {
+			return "true"
+		} else {
+			return "false"
+		}
+	}
 	return this.value
 }
 
@@ -467,10 +547,15 @@ func (this *EditLabel) OnExit(){
 
 func (this *EditLabel) Clear(){
 	this.dirty = false
+	this.enums = []protocol.IEnum{}
+	this.enumMap = map[string]protocol.IEnum{}
+	this.enumIntMap = map[protocol.Enum]protocol.IEnum{}
+	this.enumValue = nil
 	go vcl.ThreadSync(func() {
 		this.edit.Clear()
 		this.enumPanel.Clear()
 		this.boolPanel.SetChecked(false)
+		this.updateEnumsUI()
 	})
 }
 
