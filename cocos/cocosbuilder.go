@@ -180,6 +180,7 @@ func BuildCocos(conf *CocosBuildOption,writer io.Writer) error {
 	}
 	params += fmt.Sprintf("platform=%s;", conf.Platform.ToString())
 	params += fmt.Sprintf("debug=%v;", conf.Debug)
+	params += fmt.Sprintf("md5Cache=%v;", conf.Md5Cache)
 	params += fmt.Sprintf("sourceMaps=%v;", conf.SourceMaps)
 	params += fmt.Sprintf("startScene=%s;", conf.StartScene)
 	if conf.BuildPath != "" {

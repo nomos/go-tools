@@ -11,7 +11,7 @@ require (
 	github.com/lestrrat-go/strftime v1.0.4 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/nomos/go-events v0.0.3
-	github.com/nomos/go-lokas v0.1.17
+	github.com/nomos/go-lokas v0.1.18
 	github.com/nomos/promise v0.0.1
 	github.com/tyler-smith/go-bip39 v1.1.0
 	github.com/ying32/dylib v0.0.0-20210414124638-bf395b2d391a // indirect
@@ -23,3 +23,4 @@ require (
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 )
 
+replace github.com/nomos/go-lokas => /Users/wqs/go/src/github.com/nomos/go-lokas
