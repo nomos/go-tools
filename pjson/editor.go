@@ -12,6 +12,7 @@ import (
 	"github.com/ying32/govcl/vcl/types/colors"
 	"github.com/ying32/govcl/vcl/types/keys"
 	"io/ioutil"
+	"regexp"
 	"strconv"
 	"sync"
 	"time"
@@ -464,6 +465,29 @@ func (this *JsonEditor) parseString() {
 	if text=="" {
 		return
 	}
+	if regexp.MustCompile(`^\[`).MatchString(text) {
+		log.Warnf("parseArray")
+		this.parseArrayRoot(text)
+	} else {
+		log.Warnf("parseObject")
+		this.parseObjectRoot(text)
+	}
+}
+
+func (this *JsonEditor) parseArrayRoot(text string){
+	i := []interface{}{}
+	err := json.Unmarshal([]byte(text), &i)
+	if err != nil {
+		this.textEdit.Font().SetColor(colors.ClRed)
+		return
+	}
+	this.textEdit.Font().SetColor(colors.ClSysDefault)
+	this.schema = NewSchema()
+	this.schema.Unmarshal("", -1, i)
+	this.tree.UpdateTree(this.schema)
+}
+
+func (this *JsonEditor) parseObjectRoot(text string){
 	i := orderedmap.New()
 	err := json.Unmarshal([]byte(text), i)
 	if err != nil {
@@ -512,6 +536,7 @@ func (this *JsonEditor) newDropMenuItem(img string, caption string, shortcut str
 
 	return ret
 }
+
 func (this *JsonEditor) createNewFunc(t Type) func(schema ui.ITreeSchema) {
 	return func(schema ui.ITreeSchema) {
 		new := schema.Insert(t.CreateDefaultSchema())
@@ -519,6 +544,7 @@ func (this *JsonEditor) createNewFunc(t Type) func(schema ui.ITreeSchema) {
 		this.tree.SetSelectSchema(new)
 	}
 }
+
 func (this *JsonEditor) buildMenu(s ui.ITreeSchema) *vcl.TPopupMenu {
 	iconTypes := []string{"object_box", "array_box", "string_icon", "number_icon", "boolean_icon", "null_icon"}
 	funcTypes := []func(schema ui.ITreeSchema){}

@@ -190,14 +190,21 @@ func (this *Schema) Unmarshal(key string,index int, d interface{}) (*Schema, err
 	this.Type = t
 	switch t {
 	case Object:
-		d1:=d.(orderedmap.OrderedMap)
-		for _,k:=range d1.Keys() {
-			schema:=this.AppendChild()
-			v,ok:=d1.Get(k)
-			if ok {
+		if d1,ok:=d.(orderedmap.OrderedMap);ok {
+			for _,k:=range d1.Keys() {
+				schema:=this.AppendChild()
+				v,ok:=d1.Get(k)
+				if ok {
+					schema.Unmarshal(k,-1,v)
+				}
+			}
+		} else if d1,ok:=d.(map[string]interface{});ok {
+			for k,v:=range d1 {
+				schema:=this.AppendChild()
 				schema.Unmarshal(k,-1,v)
 			}
 		}
+
 		break
 	case Array:
 		d1 := d.([]interface{})
