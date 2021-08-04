@@ -2,7 +2,7 @@ package cmds
 
 import (
 	"github.com/nomos/go-lokas/log"
-	"github.com/nomos/promise"
+	"github.com/nomos/go-lokas/promise"
 )
 
 type IConsole interface {

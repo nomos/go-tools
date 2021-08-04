@@ -1,6 +1,6 @@
 package deploy
 
-import "github.com/nomos/promise"
+import "github.com/nomos/go-lokas/promise"
 
 type IDeployProcedure interface {
 	UnmarshalFrom()

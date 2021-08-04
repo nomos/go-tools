@@ -7,7 +7,7 @@ import (
 	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-lokas/network/sshc"
 	"github.com/nomos/go-tools/cmds"
-	"github.com/nomos/promise"
+	"github.com/nomos/go-lokas/promise"
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
 	"github.com/ying32/govcl/vcl/types/keys"

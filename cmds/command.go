@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/nomos/go-lokas/log"
-	"github.com/nomos/promise"
+	"github.com/nomos/go-lokas/promise"
 	"strconv"
 	"strings"
 )
