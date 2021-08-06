@@ -295,6 +295,9 @@ func (this *ConsoleShell) addCachedText(text string) {
 }
 
 func (this *ConsoleShell) sendCmd(text string){
+	go vcl.ThreadSync(func() {
+		this.Console.Lines().Add(">"+text)
+	})
 	if this.shell {
 		int,err:=this.stdIn.Write([]byte(text+"\n"))
 		if err != nil {
