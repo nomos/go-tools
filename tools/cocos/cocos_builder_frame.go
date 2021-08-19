@@ -2,6 +2,7 @@ package cocos
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-lokas/protocol"
 	"github.com/nomos/go-lokas/util"
@@ -219,6 +220,24 @@ func (this *CocosBuilderFrame) setup(){
 			}
 		}()
 	})
+}
+
+func (this *CocosBuilderFrame) OpenProject()error{
+	enginePath:=this.Config().GetString("engine_path")
+	projectPath:=this.Config().GetString("project_path")
+	if projectPath==""{
+		this.GetLogger().Warnf("路径为空",projectPath)
+		return errors.New("路径为空")
+	}
+	err:=OpenCocosProject(&CocosBuildOption{
+		Path: projectPath,
+		EnginePath: enginePath,
+	},this.GetLogger())
+	if err != nil {
+		log.Error(err.Error())
+		return err
+	}
+	return err
 }
 
 func (this *CocosBuilderFrame) findScenes(){

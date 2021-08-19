@@ -80,6 +80,7 @@ type EditLabel struct {
 	enumIntMap map[protocol.Enum]protocol.IEnum
 	enabled bool
 	color types.TColor
+	changeOnEdit bool
 	OnValueChange func(label *EditLabel,editType EDIT_TYPE,value interface{})
 }
 
@@ -95,6 +96,14 @@ func NewEditLabel(owner vcl.IWinControl,name string,width int32,t EDIT_TYPE,opti
 	root.incr = 1.0
 	root.enums = []protocol.IEnum{}
 	return
+}
+
+func (this *EditLabel) SetChangeOnEdit(v bool){
+	this.changeOnEdit = v
+}
+
+func (this *EditLabel) GetChangeOnEdit()bool{
+	return this.changeOnEdit
 }
 
 func (this *EditLabel) MarkDirty(){
@@ -224,55 +233,68 @@ func (this *EditLabel) createNumPanel(){
 		}
 	})
 	this.edit.SetOnExit(func(sender vcl.IObject) {
-		if !this.enabled {
-			if this.edit.Text()!=this.value {
-				this.edit.SetText(this.value)
-			}
-			return
-		}
-		if this.dirty {
-			switch this.editType {
-			case EDIT_TYPE_INTERGER:
-				this.OnValueChange(this,this.editType,this.Int())
-				this.dirty = false
-			case EDIT_TYPE_STRING:
-				this.OnValueChange(this,this.editType,this.String())
-				this.dirty = false
-			case EDIT_TYPE_DECIMAL:
-				this.OnValueChange(this,this.editType,this.Float())
-				this.dirty = false
-			}
+		if !this.changeOnEdit {
+			this.onEditExit()
 		}
 	})
 	this.edit.SetOnChange(func(sender vcl.IObject) {
-		if !this.enabled {
-			if this.edit.Text()!=this.value {
-				this.edit.SetText(this.value)
-			}
-			return
-		}
-		text:=this.edit.Text()
-		switch this.editType {
-		case EDIT_TYPE_STRING:
-			this.SetString(text)
-		case EDIT_TYPE_DECIMAL:
-			if !isDouble(text) {
-				text = "0.0"
-				this.SetString(text)
-			} else {
-				this.SetString(text)
-			}
-		case EDIT_TYPE_INTERGER:
-			if !isInt(text) {
-				text = "0"
-				this.SetString(text)
-			} else {
-				this.SetString(text)
-			}
-		default:
-			log.Panic("type is not support")
+		this.onEditChange()
+		if this.changeOnEdit {
+			this.onEditExit()
 		}
 	})
+}
+
+func (this *EditLabel) onEditChange(){
+	if !this.enabled {
+		if this.edit.Text()!=this.value {
+			this.edit.SetText(this.value)
+		}
+		return
+	}
+	text:=this.edit.Text()
+	switch this.editType {
+	case EDIT_TYPE_STRING:
+		this.SetString(text)
+	case EDIT_TYPE_DECIMAL:
+		if !isDouble(text) {
+			text = "0.0"
+			this.SetString(text)
+		} else {
+			this.SetString(text)
+		}
+	case EDIT_TYPE_INTERGER:
+		if !isInt(text) {
+			text = "0"
+			this.SetString(text)
+		} else {
+			this.SetString(text)
+		}
+	default:
+		log.Panic("type is not support")
+	}
+}
+
+func (this *EditLabel) onEditExit(){
+	if !this.enabled {
+		if this.edit.Text()!=this.value {
+			this.edit.SetText(this.value)
+		}
+		return
+	}
+	if this.dirty {
+		switch this.editType {
+		case EDIT_TYPE_INTERGER:
+			this.OnValueChange(this,this.editType,this.Int())
+			this.dirty = false
+		case EDIT_TYPE_STRING:
+			this.OnValueChange(this,this.editType,this.String())
+			this.dirty = false
+		case EDIT_TYPE_DECIMAL:
+			this.OnValueChange(this,this.editType,this.Float())
+			this.dirty = false
+		}
+	}
 }
 
 func (this *EditLabel) createEnumPanel(){
@@ -349,6 +371,11 @@ func (this *EditLabel) SetEnums(enums []protocol.IEnum){
 		this.enums = []protocol.IEnum{}
 		this.enumMap = map[string]protocol.IEnum{}
 		this.enumIntMap = map[protocol.Enum]protocol.IEnum{}
+	}
+	if _,ok:=this.enumMap[this.enumValue.ToString()];!ok {
+		if len(this.enums)>0 {
+			this.SetEnum(this.enums[0].Enum())
+		}
 	}
 	this.updateEnumsUI()
 }

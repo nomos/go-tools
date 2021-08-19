@@ -149,6 +149,44 @@ type CocosBuildOption struct {
 const COCOS_WIN_BUILDER = "CocosCreator.exe"
 const COCOS_MAC_BUILDER = "CocosCreator.app/Contents/MacOS/CocosCreator"
 
+func OpenCocosProject(conf *CocosBuildOption,writer io.Writer)error{
+	var builderStr  = conf.EnginePath
+	if runtime.GOOS == "darwin" {
+		builderStr = path.Join(builderStr,COCOS_MAC_BUILDER)
+	} else if runtime.GOOS == "windows" {
+		builderStr = path.Join(builderStr,COCOS_WIN_BUILDER)
+	}
+	_,err:=writer.Write([]byte("engine path"+builderStr+"\n"))
+	if err != nil {
+		log.Error(err.Error())
+		return err
+	}
+	cmd := exec.Command(builderStr, "--force", "--path", conf.Path, "--open")
+	stdout, _ := cmd.StdoutPipe()
+	log.Infof(cmd.String())
+	err=cmd.Start()
+	if err != nil {
+		log.Error(err.Error())
+		return err
+	}
+	reader := bufio.NewReader(stdout)
+	for {
+		line, err2 := reader.ReadString('\n')
+		if err2 != nil || io.EOF == err2 {
+			break
+		}
+		if writer!=nil {
+			writer.Write([]byte(line))
+		}
+	}
+	err=cmd.Wait()
+	if err != nil {
+		log.Error(err.Error())
+		return err
+	}
+	return nil
+}
+
 func BuildCocos(conf *CocosBuildOption,writer io.Writer) error {
 	var builderStr  = conf.EnginePath
 	if runtime.GOOS == "darwin" {
