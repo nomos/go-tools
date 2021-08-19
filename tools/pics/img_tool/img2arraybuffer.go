@@ -2,7 +2,8 @@ package img_tool
 
 import (
     "github.com/atotto/clipboard"
-    "github.com/nomos/go-tools/pics/img_png"
+    "github.com/nomos/go-lokas/log"
+    "github.com/nomos/go-tools/tools/pics/img_png"
     "github.com/nomos/go-tools/ui"
     "github.com/ying32/govcl/vcl"
     "github.com/ying32/govcl/vcl/types"
@@ -14,15 +15,31 @@ type TImage2ArrayBuffer struct {
     *vcl.TFrame
     DropDownPanel     *vcl.TPanel
     Label1            *vcl.TLabel
-
+    entered bool
     ui.ConfigAble
 }
 
+func (this *TImage2ArrayBuffer) OnEnter() {
 
-func NewImage2ArrayBuffer(owner vcl.IComponent) (root *TImage2ArrayBuffer)  {
+}
+
+func (this *TImage2ArrayBuffer) OnExit() {
+
+}
+
+func (this *TImage2ArrayBuffer) Clear() {
+
+}
+
+func NewImage2ArrayBuffer(owner vcl.IComponent,option... ui.FrameOption) (root *TImage2ArrayBuffer)  {
     vcl.CreateResFrame(owner, &root)
+    for _,o:=range option {
+        o(root)
+    }
     return
 }
+
+var _ ui.IFrame = (*TImage2ArrayBuffer)(nil)
 
 func (this *TImage2ArrayBuffer) setup(){
     this.SetAlign(types.AlClient)
@@ -36,8 +53,16 @@ func (this *TImage2ArrayBuffer) setup(){
 
 func (this *TImage2ArrayBuffer) OnCreate(){
     this.setup()
+    this.DropDownPanel.SetOnMouseEnter(func(sender vcl.IObject) {
+        this.entered = true
+    })
+    this.DropDownPanel.SetOnMouseLeave(func(sender vcl.IObject) {
+        this.entered = false
+    })
+
     this.GetListener().On("DropFile", func(i ...interface{}) {
-        if this.Container().IsFrameSelected(this) {
+        log.Warnf("listener")
+        if this.Container().IsFrameSelected(this) && this.entered {
             paths:=i[0].([]string)
             this.GetLogger().Warnf("DropFile",paths)
             filePath:=paths[0]

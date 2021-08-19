@@ -2,7 +2,7 @@ package img_tool
 
 import (
     "github.com/nomos/go-lokas/log"
-    "github.com/nomos/go-tools/pics/img_png"
+    "github.com/nomos/go-tools/tools/pics/img_png"
     "github.com/nomos/go-tools/ui"
     "github.com/nomos/go-tools/ui/icons"
     "github.com/ying32/govcl/vcl"

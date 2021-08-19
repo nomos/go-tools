@@ -1,8 +1,8 @@
 package icons
 
 import (
-	"github.com/nomos/go-tools/pics"
-	"github.com/nomos/go-tools/pics/img_bmp"
+	"github.com/nomos/go-tools/tools/pics"
+	"github.com/nomos/go-tools/tools/pics/img_bmp"
 	"github.com/nomos/go-tools/ui/icons/icon_assets"
 	"github.com/nomos/go-tools/ui/icons/pix_icon_assets"
 	"github.com/ying32/govcl/vcl"

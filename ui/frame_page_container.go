@@ -133,7 +133,6 @@ func (this *PageContainer) AddIFrame(name string, frame IFrame, opts ...FrameOpt
 	for _, opt := range opts {
 		opt(frame)
 	}
-	frame.SetEventEmitter(this.listener)
 	frame.setSheetName(name)
 	frame.setContainer(this)
 	this.iframes[name] = frame
