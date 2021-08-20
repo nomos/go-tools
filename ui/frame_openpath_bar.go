@@ -91,6 +91,16 @@ func (this *OpenPathBar) SetOpenFileDialog(name string, filter string) {
 	this.openFileDialog.SetOptions(this.openFileDialog.Options().Include(types.OfShowHelp, types.OfAllowMultiSelect))
 }
 
+func (this *OpenPathBar) onOpen(s string) {
+	if this.onOpen!=nil {
+		this.OnOpen(s)
+	} else {
+		if this.OnEdit!=nil {
+			this.OnEdit(s)
+		}
+	}
+}
+
 func (this *OpenPathBar) setup() {
 	this.SetAlign(types.AlLeft)
 	this.SetHeight(42)
@@ -126,8 +136,8 @@ func (this *OpenPathBar) setup() {
 				p = this.openFileDialog.FileName()
 				this.path = p
 				this.edit.SetText(p)
-				if this.OnOpen!= nil {
-					this.OnOpen(p)
+				if this.onOpen!= nil {
+					this.onOpen(p)
 				}
 			}
 		case OPEN_DIR:
@@ -138,8 +148,8 @@ func (this *OpenPathBar) setup() {
 				p = this.openDirDialog.FileName()
 				this.path = p
 				this.edit.SetText(p)
-				if this.OnOpen!= nil {
-					this.OnOpen(p)
+				if this.onOpen!= nil {
+					this.onOpen(p)
 				}
 			}
 		case SAVE_FILE:
@@ -150,8 +160,8 @@ func (this *OpenPathBar) setup() {
 				p = this.saveDialog.FileName()
 				this.path = p
 				this.edit.SetText(p)
-				if this.OnOpen!= nil {
-					this.OnOpen(p)
+				if this.onOpen!= nil {
+					this.onOpen(p)
 				}
 			}
 		}

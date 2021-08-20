@@ -459,6 +459,9 @@ func (this *EditLabel) SetString(v string,edited...interface{}){
 	if this.OnValueChange!=nil {
 		this.MarkDirty()
 	}
+	if len(edited)>0&&this.OnValueChange!=nil {
+		this.OnValueChange(this,this.editType,v)
+	}
 }
 
 func (this *EditLabel) SetBool(v bool,edited...interface{}){

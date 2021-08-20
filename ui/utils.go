@@ -64,6 +64,7 @@ func CreateButton(s string,parent vcl.IWinControl)*vcl.TButton{
 	btn.SetCaption(s)
 	btn.SetWidth(80)
 	btn.SetHeight(32)
+	btn.AnchorVerticalCenterTo(parent)
 	return btn
 }
 

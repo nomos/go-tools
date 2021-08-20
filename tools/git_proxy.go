@@ -47,10 +47,16 @@ func (this *GitProxyTool) setup(){
 			this.gitProxyOff()
 		}
 	}
+	this.GitProxyEdit.OnCreate()
+	if this.Config().GetString("git_proxy")!= "" {
+		this.GitProxyEdit.SetString(this.Config().GetString("git_proxy"))
+	}
+	if this.Config().GetBool("git_proxy_on") {
+		toggle.Check()
+	}
 	this.GitProxyEdit.OnValueChange = func(label *ui.EditLabel, editType ui.EDIT_TYPE, value interface{}) {
 		this.Config().Set("git_proxy",this.GitProxyEdit.String())
 	}
-	this.GitProxyEdit.OnCreate()
 	if this.Config().GetBool("git_proxy_on") {
 		toggle.Check()
 	} else {
