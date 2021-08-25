@@ -92,7 +92,7 @@ func (this *OpenPathBar) SetOpenFileDialog(name string, filter string) {
 }
 
 func (this *OpenPathBar) onOpen(s string) {
-	if this.onOpen!=nil {
+	if this.OnOpen!=nil {
 		this.OnOpen(s)
 	} else {
 		if this.OnEdit!=nil {
@@ -136,9 +136,7 @@ func (this *OpenPathBar) setup() {
 				p = this.openFileDialog.FileName()
 				this.path = p
 				this.edit.SetText(p)
-				if this.onOpen!= nil {
-					this.onOpen(p)
-				}
+				this.onOpen(p)
 			}
 		case OPEN_DIR:
 			if this.openDirDialog == nil {
@@ -148,9 +146,7 @@ func (this *OpenPathBar) setup() {
 				p = this.openDirDialog.FileName()
 				this.path = p
 				this.edit.SetText(p)
-				if this.onOpen!= nil {
-					this.onOpen(p)
-				}
+				this.onOpen(p)
 			}
 		case SAVE_FILE:
 			if this.saveDialog == nil {
@@ -160,9 +156,7 @@ func (this *OpenPathBar) setup() {
 				p = this.saveDialog.FileName()
 				this.path = p
 				this.edit.SetText(p)
-				if this.onOpen!= nil {
-					this.onOpen(p)
-				}
+				this.onOpen(p)
 			}
 		}
 	})
