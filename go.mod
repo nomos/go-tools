@@ -10,7 +10,7 @@ require (
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible // indirect
 	github.com/lestrrat-go/strftime v1.0.4 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
-	github.com/nomos/go-lokas v0.1.22
+	github.com/nomos/go-lokas v0.1.25
 	github.com/tyler-smith/go-bip39 v1.1.0
 	github.com/ying32/dylib v0.0.0-20210414124638-bf395b2d391a // indirect
 	github.com/ying32/govcl v2.0.10+incompatible
@@ -20,5 +20,3 @@ require (
 	golang.org/x/image v0.0.0-20210220032944-ac19c3e999fb
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 )
-
-replace github.com/nomos/go-lokas => /Users/wqs/go/src/github.com/nomos/go-lokas
