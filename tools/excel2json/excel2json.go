@@ -677,7 +677,7 @@ func (this *excel2JsonMiniGame)generateEnumGetter(name string,data *gameFileSour
 }
 
 func (this *excel2JsonMiniGame)generateTsSchema(data *gameFileSource,name string,p string)error{
-	lowerName:=stringutil.CamelToUnder(name)
+	lowerName:=stringutil.CamelToSnake(name)
 	lowerName+="_data_source"
 
 	this.logger.Warnf("开始生成Ts文件",name,path.Join(p,lowerName+".ts"))
@@ -723,7 +723,7 @@ func (this *excel2JsonMiniGame)generateJson(data *gameFileSource)(string,error) 
 }
 
 func (this *excel2JsonMiniGame) generateJsonData(data *gameFileSource,name string,p string)error{
-	lowerName:=stringutil.CamelToUnder(name)
+	lowerName:=stringutil.CamelToSnake(name)
 	lowerName+="_data_source"
 	this.logger.Warnf("开始生成Json文件",name,path.Join(p,lowerName+".json"))
 	output,err:=this.generateJson(data)

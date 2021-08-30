@@ -7,8 +7,6 @@ require (
 	github.com/atotto/clipboard v0.1.4
 	github.com/iancoleman/orderedmap v0.2.0
 	github.com/kr/text v0.2.0 // indirect
-	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible // indirect
-	github.com/lestrrat-go/strftime v1.0.4 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/nomos/go-lokas v0.1.25
 	github.com/tyler-smith/go-bip39 v1.1.0
@@ -20,3 +18,5 @@ require (
 	golang.org/x/image v0.0.0-20210220032944-ac19c3e999fb
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 )
+
+replace github.com/nomos/go-lokas => /Users/wqs/go/src/github.com/nomos/go-lokas
