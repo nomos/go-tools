@@ -77,7 +77,7 @@ func (this *Excel2JsonFrame) OnCreate(){
 		this.setDistPath(this.getDistPath())
 	}
 
-	this.ExcelEdit.OnOpen = func(s string) {
+	this.ExcelEdit.OnEdit = func(s string) {
 		if this.getExcelPath()!="" {
 			this.ExcelEdit.SetInitialDir(this.getExcelPath())
 		}
@@ -85,11 +85,9 @@ func (this *Excel2JsonFrame) OnCreate(){
 			this.GetLogger().Warn("选择Excel路径"+s)
 			this.setExcelPath(s)
 		}
-	}
-	this.ExcelEdit.OnEdit = func(s string) {
 
 	}
-	this.TsEdit.OnOpen = func(s string) {
+	this.TsEdit.OnEdit = func(s string) {
 		if this.getDistPath()!="" {
 			this.TsEdit.SetInitialDir(this.getDistPath())
 		}
@@ -97,9 +95,6 @@ func (this *Excel2JsonFrame) OnCreate(){
 			this.GetLogger().Warn("选择导出路径"+s)
 			this.setDistPath(s)
 		}
-	}
-	this.TsEdit.OnEdit = func(s string) {
-
 	}
 
 	this.IndieFolderCheck.SetOnClick(func(sender vcl.IObject) {
