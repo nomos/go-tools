@@ -62,7 +62,7 @@ func (this *TImage2ArrayBuffer) OnCreate(){
 
     this.GetListener().On("DropFile", func(i ...interface{}) {
         log.Warnf("listener")
-        if this.Container().IsFrameSelected(this) && this.entered {
+        if this.entered {
             paths:=i[0].([]string)
             this.GetLogger().Warnf("DropFile",paths)
             filePath:=paths[0]
