@@ -95,28 +95,17 @@ func (this *MemoFrame) WriteString(s string) {
 }
 
 func (this *MemoFrame) write(s string) {
-    this.Memo.Lines().Add(s)
+    go vcl.ThreadSync(func() {
+       this.Memo.Lines().Add(s)
+    })
 }
 
 func (this *MemoFrame) update() {
     go func() {
         for {
             select {
-            case <-this.ticker.C:
-                count := 1
-            loop:
-                for {
-                    count++
-                    select {
-                    case msg := <-this.msgChan:
-                        this.write(msg)
-                    default:
-                        break loop
-                    }
-                    if count > 10 {
-                        break loop
-                    }
-                }
+            case msg := <-this.msgChan:
+                this.write(msg)
             }
         }
     }()

@@ -6,8 +6,9 @@ import (
 	"fmt"
 	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-lokas/network/sshc"
-	"github.com/nomos/go-tools/cmds"
 	"github.com/nomos/go-lokas/promise"
+	"github.com/nomos/go-lokas/util"
+	"github.com/nomos/go-tools/cmds"
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
 	"github.com/ying32/govcl/vcl/types/keys"
@@ -295,19 +296,24 @@ func (this *ConsoleShell) addCachedText(text string) {
 }
 
 func (this *ConsoleShell) sendCmd(text string){
+	defer func() {
+		if r := recover(); r != nil {
+			util.Recover(r,false)
+		}
+	}()
 	go vcl.ThreadSync(func() {
 		this.Console.Lines().Add(">"+text)
 	})
 	if this.shell {
-		int,err:=this.stdIn.Write([]byte(text+"\n"))
+		r,err:=this.stdIn.Write([]byte(text+"\n"))
 		if err != nil {
 			log.Error(err.Error())
 		}
-		log.Warnf(int)
-
+		log.Warnf(r)
 		return
 	}
 	name,params:=cmds.SplitCommandParams(text)
+	log.Infof("send cmd",name)
 	s:=this.ShellSelect.Text()
 	if this.commands[s]!=nil {
 		if cmd,ok:=this.commands[s][name];ok {
