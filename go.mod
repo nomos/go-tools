@@ -18,3 +18,6 @@ require (
 	golang.org/x/image v0.0.0-20210220032944-ac19c3e999fb
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 )
+
+
+replace github.com/nomos/go-lokas => /Users/wqs/go/src/github.com/nomos/go-lokas
