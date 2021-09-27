@@ -7,6 +7,7 @@ import (
 	"github.com/nomos/go-lokas/protocol"
 )
 
+
 //一个和electron typescript通信来实现访问golang原生功能的框架
 func WithPort(port string)Option{
 	return func(app *App) {
@@ -36,11 +37,7 @@ func NewApp(opts ...Option) *App {
 }
 
 func (this *App) SessionCreator(conn lokas.IConn) lokas.ISession {
-	sess := lox.NewPassiveSession(conn, this.GetProcess().GenId(), this)
-	sess.AuthFunc = func(data []byte) error {
-		return nil
-	}
-	sess.Protocol = this.Protocol
+	sess := NewSession(conn, this.GetProcess().GenId(), this)
 	this.ISessionManager.AddSession(sess.GetId(), sess)
 	this.GetProcess().AddActor(sess)
 	this.GetProcess().StartActor(sess)

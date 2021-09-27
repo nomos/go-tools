@@ -2,11 +2,17 @@ package erpc
 
 import (
 	"github.com/nomos/go-lokas"
+	"github.com/nomos/go-lokas/log"
+	"github.com/nomos/go-lokas/lox"
 	"github.com/nomos/go-lokas/lox/flog"
 	"github.com/nomos/go-lokas/protocol"
 	"github.com/nomos/go-lokas/util"
 	"go.uber.org/zap"
 	"time"
+)
+const (
+	TimeOut            = time.Second * 15
+	UpdateTime = time.Second*15
 )
 
 type ErpcSessionOption func(*Session)
@@ -14,9 +20,9 @@ type ErpcSessionOption func(*Session)
 var _ lokas.ISession = &Session{}
 var _ lokas.IActor = &Session{}
 
-func NewErpcSession(conn lokas.IConn, id util.ID, manager lokas.ISessionManager, opts ...ErpcSessionOption) *Session {
+func NewSession(conn lokas.IConn, id util.ID, manager lokas.ISessionManager, opts ...ErpcSessionOption) *Session {
 	s := &Session{
-		Actor:    NewActor(),
+		Actor:    lox.NewActor(),
 		Messages: make(chan []byte, 100),
 		Conn:     conn,
 		manager:  manager,
@@ -32,17 +38,14 @@ func NewErpcSession(conn lokas.IConn, id util.ID, manager lokas.ISessionManager,
 }
 
 type Session struct {
-	*Actor
-	Verified         bool
+	*lox.Actor
 	Messages         chan []byte
 	Conn             lokas.IConn
-	Protocol         protocol.TYPE
 	manager          lokas.ISessionManager
 	done             chan struct{}
 	OnCloseFunc      func(conn lokas.IConn)
 	OnOpenFunc       func(conn lokas.IConn)
 	ClientMsgHandler func(msg *protocol.BinaryMessage)
-	AuthFunc         func(data []byte) error
 	timeout          time.Duration
 	ticker           *time.Ticker
 }
@@ -84,9 +87,7 @@ func (this *Session) GetConn() lokas.IConn {
 }
 
 func (this *Session) StartMessagePump() {
-	log.Info("ErpcSession:StartMessagePump", flog.ActorInfo(this)...)
 
-	this.msgChan = make(chan *protocol.RouteMessage, 100)
 	this.done = make(chan struct{})
 	go func() {
 		defer func() {
@@ -94,7 +95,6 @@ func (this *Session) StartMessagePump() {
 			if r != nil {
 				if e, ok := r.(error); ok {
 					log.Errorf(e.Error())
-					log.Error("客户端协议出错")
 					this.Conn.Close()
 				}
 			}
@@ -104,28 +104,10 @@ func (this *Session) StartMessagePump() {
 		for {
 			select {
 			case <-this.ticker.C:
-				if this.OnUpdateFunc != nil && this.Verified {
-					this.OnUpdateFunc()
-				}
 				//ClientSide MessageLoop
 			case data := <-this.Messages:
 				cmdId := protocol.GetCmdId16(data)
-				if !this.Verified && cmdId != protocol.TAG_HandShake {
-					var msg []byte
-					msg, err := protocol.MarshalMessage(0, protocol.NewError(protocol.ERR_AUTH_FAILED), this.Protocol)
-					if err != nil {
-						log.Error(err.Error())
-						this.Conn.Wait()
-						this.Conn.Close()
-						return
-					}
-					log.Errorf("Auth Failed", cmdId)
-					this.Conn.Write(msg)
-					this.Conn.Wait()
-					this.Conn.Close()
-					return
-				}
-				msg, err := protocol.UnmarshalMessage(data, this.Protocol)
+				msg, err := protocol.UnmarshalMessage(data, protocol.BINARY)
 				if err != nil {
 					log.Error("unmarshal client message error",
 						zap.Any("cmdId", cmdId),
@@ -138,53 +120,6 @@ func (this *Session) StartMessagePump() {
 					this.Conn.Close()
 					break CLIENT_LOOP
 				}
-				if cmdId == protocol.TAG_HandShake {
-					var err error
-					if this.AuthFunc != nil {
-						err = this.AuthFunc(msg.Body.(*protocol.HandShake).Data)
-					}
-					if err != nil {
-						log.Error(err.Error())
-						msg, err := protocol.MarshalMessage(msg.TransId, protocol.NewError(protocol.ERR_AUTH_FAILED), this.Protocol)
-						if err != nil {
-							log.Error(err.Error())
-							this.Conn.Wait()
-							this.Conn.Close()
-							return
-						}
-						log.Errorf("Auth Failed", cmdId)
-						this.Conn.Write(msg)
-						this.Conn.Wait()
-						this.Conn.Close()
-						break CLIENT_LOOP
-					}
-					_, err = this.Conn.Write(data)
-					if err != nil {
-						log.Error(err.Error())
-						this.Conn.Close()
-						break CLIENT_LOOP
-					}
-					this.Verified = true
-					continue
-				}
-				if cmdId == protocol.TAG_Ping {
-					//ping:=msg.Body.(*Protocol.Ping)
-					pong := &protocol.Pong{Time: time.Now()}
-					data, err := protocol.MarshalMessage(msg.TransId, pong, this.Protocol)
-					if err != nil {
-						log.Error(err.Error())
-						this.Conn.Wait()
-						this.Conn.Close()
-						break CLIENT_LOOP
-					}
-					_, err = this.Conn.Write(data)
-					if err != nil {
-						log.Error(err.Error())
-						this.Conn.Close()
-						break CLIENT_LOOP
-					}
-					continue
-				}
 				if this.ClientMsgHandler != nil {
 					this.ClientMsgHandler(msg)
 				} else {
@@ -192,36 +127,11 @@ func (this *Session) StartMessagePump() {
 				}
 			case <-this.done:
 				this.closeSession()
-				//log.Warnf("done")
 				break CLIENT_LOOP
 			}
 		}
-		close(this.msgChan)
 		close(this.done)
 		close(this.Messages)
-	}()
-
-	go func() {
-		defer func() {
-			r := recover()
-			if r != nil {
-				if e, ok := r.(error); ok {
-					log.Errorf(e.Error())
-					log.Error("服务端协议出错")
-					this.Conn.Close()
-				}
-			}
-		}()
-	SERVER_LOOP:
-		for {
-			select {
-			//ServerSideMsgLoop
-			case rMsg := <-this.msgChan:
-				this.OnMessage(rMsg)
-			case <-this.done:
-				break SERVER_LOOP
-			}
-		}
 	}()
 }
 
