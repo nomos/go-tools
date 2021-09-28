@@ -1,8 +1,11 @@
 package erpc
 
-import "github.com/nomos/go-lokas/lox"
+import (
+	"github.com/nomos/go-lokas/cmds"
+	"github.com/nomos/go-lokas/lox"
+)
 
-type rpcFunc func(cmd *lox.AdminCommand)([]byte,error)
+type rpcFunc func(cmd *lox.AdminCommand,params *cmds.ParamsValue)([]byte,error)
 
 var rpcHandlers = map[string]rpcFunc{}
 

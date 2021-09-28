@@ -1,13 +1,17 @@
 package erpc
 
 import (
+	"encoding/json"
+	"errors"
+	"github.com/nomos/go-lokas/cmds"
 	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-lokas/lox"
+	"github.com/nomos/go-lokas/util"
 	"io/ioutil"
 )
 
 func init(){
-	registerFunc(READ_FILE, func(cmd *lox.AdminCommand) ([]byte, error) {
+	registerFunc(READ_FILE, func(cmd *lox.AdminCommand,params *cmds.ParamsValue) ([]byte, error) {
 		path:=cmd.ParamsValue().String()
 		data,err:=ioutil.ReadFile(path)
 		log.Warnf("path",path,string(data))
@@ -17,8 +21,39 @@ func init(){
 		}
 		return data,nil
 	})
-	registerFunc("test", func(cmd *lox.AdminCommand) ([]byte, error) {
-		log.Warn("test")
+	registerFunc(PATH_EXIST, func(cmd *lox.AdminCommand,params *cmds.ParamsValue) ([]byte, error) {
+		path:=cmd.ParamsValue().String()
+		exist,_:=util.PathExists(path)
+		if exist {
+			return nil,nil
+		} else {
+			return nil,errors.New("not exist")
+		}
+	})
+	registerFunc(CREATE_FILE, func(cmd *lox.AdminCommand,params *cmds.ParamsValue) ([]byte, error) {
+		path:=params.String()
+		log.Warnf("path",path)
+		perm:=params.Int()
+		log.Warnf("perm",perm)
+		err:=util.CreateFile(path,perm)
+		if err != nil {
+			log.Error(err.Error())
+			return nil,errors.New("create file failed")
+		}
 		return nil,nil
 	})
+	registerFunc(WALK_DIR, func(cmd *lox.AdminCommand,params *cmds.ParamsValue) ([]byte, error) {
+		path:=params.String()
+		log.Warnf("path",path)
+		recursive:=params.Bool()
+		log.Warnf("recursive",recursive)
+		arr,err:=util.WalkDir(path,recursive)
+		if err != nil {
+			log.Error(err.Error())
+			return nil,errors.New("walk dir failed")
+		}
+		data,_:=json.Marshal(arr)
+		return data,nil
+	})
+
 }
