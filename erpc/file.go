@@ -53,7 +53,12 @@ func init(){
 			return nil,errors.New("walk dir failed")
 		}
 		data,_:=json.Marshal(arr)
+		log.Warnf("data",string(data))
 		return data,nil
+	})
+	registerFunc(EXEC_PATH, func(cmd *lox.AdminCommand, params *cmds.ParamsValue) ([]byte, error) {
+		p,_:=util.ExecPath()
+		return []byte(p),nil
 	})
 
 }
