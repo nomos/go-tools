@@ -1,6 +1,7 @@
 package erpc
 
 import (
+	"errors"
 	"github.com/nomos/go-lokas"
 	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-lokas/lox"
@@ -10,17 +11,18 @@ import (
 	"go.uber.org/zap"
 	"time"
 )
+
 const (
 	TimeOut            = time.Second * 15
 	UpdateTime = time.Second*15
 )
 
-type ErpcSessionOption func(*Session)
+type SessionOption func(*Session)
 
 var _ lokas.ISession = &Session{}
 var _ lokas.IActor = &Session{}
 
-func NewSession(conn lokas.IConn, id util.ID, manager lokas.ISessionManager, opts ...ErpcSessionOption) *Session {
+func NewSession(conn lokas.IConn, id util.ID, manager lokas.ISessionManager, opts ...SessionOption) *Session {
 	s := &Session{
 		Actor:    lox.NewActor(),
 		Messages: make(chan []byte, 100),
@@ -45,7 +47,7 @@ type Session struct {
 	done             chan struct{}
 	OnCloseFunc      func(conn lokas.IConn)
 	OnOpenFunc       func(conn lokas.IConn)
-	ClientMsgHandler func(msg *protocol.BinaryMessage)
+	ClientMsgHandler func(msg *protocol.BinaryMessage,session *Session)
 	timeout          time.Duration
 	ticker           *time.Ticker
 }
@@ -78,6 +80,34 @@ func (this *Session) Stop() error {
 	return nil
 }
 
+func (this *Session) CallAdminCommand(command *lox.AdminCommand)([]byte,error){
+	res,err:=this.Call(0,command)
+	if err != nil {
+		log.Error(err.Error())
+		return nil,err
+	}
+	cmd:=res.(*lox.AdminCommandResult)
+	if !cmd.Success {
+		return nil,errors.New(string(cmd.Data))
+	}
+	return cmd.Data,nil
+}
+
+func (this *Session) SendMessage(actorId util.ID, transId uint32, msg protocol.ISerializable) error {
+	_,err:=msg.GetId()
+	if err != nil {
+		log.Error(err.Error())
+		return err
+	}
+	data,err:=protocol.MarshalMessage(transId,msg,protocol.BINARY)
+	if err != nil {
+		log.Error(err.Error())
+		return err
+	}
+	this.Conn.Write(data)
+	return nil
+}
+
 func (this *Session) OnDestroy() error {
 	return nil
 }
@@ -99,12 +129,10 @@ func (this *Session) StartMessagePump() {
 				}
 			}
 		}()
-		//ClientSideLoop
-	CLIENT_LOOP:
+	Loop:
 		for {
 			select {
 			case <-this.ticker.C:
-				//ClientSide MessageLoop
 			case data := <-this.Messages:
 				cmdId := protocol.GetCmdId16(data)
 				msg, err := protocol.UnmarshalMessage(data, protocol.BINARY)
@@ -118,21 +146,45 @@ func (this *Session) StartMessagePump() {
 						log.Error(err.Error())
 					}
 					this.Conn.Close()
-					break CLIENT_LOOP
+					break Loop
 				}
-				if this.ClientMsgHandler != nil {
-					this.ClientMsgHandler(msg)
+				if msg.CmdId == lox.TAG_AdminCmd {
+					this.handAdminCommand(msg)
+				} else if this.ClientMsgHandler != nil {
+					this.ClientMsgHandler(msg,this)
 				} else {
-					log.Error("no msg handler found")
+					log.Errorf("no msg handler found",msg.CmdId)
 				}
 			case <-this.done:
 				this.closeSession()
-				break CLIENT_LOOP
+				break Loop
 			}
 		}
 		close(this.done)
 		close(this.Messages)
 	}()
+}
+
+func (this *Session) handAdminCommand(msg *protocol.BinaryMessage){
+	cmd:=msg.Body.(*lox.AdminCommand)
+	if handler, ok := rpcHandlers[cmd.Command]; ok {
+		res,err:=handler(cmd)
+		if err!=nil {
+			log.Error(err.Error())
+			ret:=lox.NewAdminCommandResult(cmd,false,[]byte(err.Error()))
+			data, _ := protocol.MarshalMessage(msg.TransId, ret, protocol.BINARY)
+			this.Conn.Write(data)
+			return
+		}
+		ret:=lox.NewAdminCommandResult(cmd,true,res)
+		data, _ := protocol.MarshalMessage(msg.TransId, ret, protocol.BINARY)
+		this.Conn.Write(data)
+	} else {
+		log.Errorf("Admin Command not found",cmd.Command)
+		ret:=lox.NewAdminCommandResult(cmd,false,[]byte("admin cmd not found"))
+		data, _ := protocol.MarshalMessage(msg.TransId, ret, protocol.BINARY)
+		this.Conn.Write(data)
+	}
 }
 
 func (this *Session) closeSession() {
@@ -164,7 +216,6 @@ func (this *Session) OnClose(conn lokas.IConn) {
 	if this.OnCloseFunc != nil {
 		this.OnCloseFunc(conn)
 	}
-	this.GetProcess().RemoveActor(this)
 	this.stop()
 }
 

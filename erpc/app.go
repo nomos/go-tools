@@ -5,6 +5,8 @@ import (
 	"github.com/nomos/go-lokas/lox"
 	"github.com/nomos/go-lokas/network"
 	"github.com/nomos/go-lokas/protocol"
+	"github.com/nomos/go-lokas/util"
+	"sync"
 )
 
 
@@ -17,9 +19,35 @@ func WithPort(port string)Option{
 
 type Option func(app *App)
 
+var instance *App
+var once sync.Once
+
+func Start()*App{
+	once.Do(func() {
+		if instance ==nil {
+			instance = NewApp(WithPort("13333"))
+			instance.Start()
+		}
+	})
+	return instance
+}
+
+func Close(){
+	if instance!=nil {
+		instance.Stop()
+	}
+}
+
+func Call(command *lox.AdminCommand)([]byte,error){
+	return Start().CallAdminCommand(command)
+}
+
 type App struct {
 	*lox.Gate
 	Port string
+	*Session
+	sid util.ID
+	mutex sync.Mutex
 }
 
 func NewApp(opts ...Option) *App {
@@ -32,16 +60,26 @@ func NewApp(opts ...Option) *App {
 	for _, o := range opts {
 		o(ret)
 	}
+	ret.SessionCreatorFunc = ret.SessionCreator
 	ret.Gate.LoadCustom("0.0.0.0",ret.Port,protocol.BINARY,lox.Websocket)
 	return ret
 }
 
+func (this *App) genId()util.ID{
+	this.mutex.Lock()
+	defer this.mutex.Unlock()
+	this.sid++
+	return this.sid
+}
+
 func (this *App) SessionCreator(conn lokas.IConn) lokas.ISession {
-	sess := NewSession(conn, this.GetProcess().GenId(), this)
-	this.ISessionManager.AddSession(sess.GetId(), sess)
-	this.GetProcess().AddActor(sess)
-	this.GetProcess().StartActor(sess)
-	return sess
+	if this.Session!=nil {
+		this.Session.Conn.Close()
+		this.Session = nil
+	}
+	this.Session = NewSession(conn, this.genId(), this)
+	go this.Session.Start()
+	return this.Session
 }
 
 func (this *App) Start() error{
