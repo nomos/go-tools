@@ -3,7 +3,6 @@ package img_tool
 import (
     "github.com/atotto/clipboard"
     "github.com/nomos/go-lokas/log"
-    "github.com/nomos/go-lokas/promise"
     "github.com/nomos/go-tools/tools/pics/img_png"
     "github.com/nomos/go-tools/ui"
     "github.com/ying32/govcl/vcl"
@@ -56,9 +55,18 @@ func (this *TImage2ArrayBuffer) setup(){
 
 func (this *TImage2ArrayBuffer) OnCreate(){
     this.setup()
-    this.DropDownPanel.SetOnMouseEnter(func(sender vcl.IObject) {
-        log.Info("enter drop down")
-        this.entered = true
+    this.DropDownPanel.SetOnMouseLeave(func(sender vcl.IObject) {
+        this.entered = false
+    })
+
+    this.GetListener().On("DropFile", func(i ...interface{}) {
+        log.Warnf("listener")
+        time.Sleep(1000)
+        mouse:=this.MouseInClient()
+        log.Warnf("mouse",mouse)
+        paths:=i[0].([]string)
+        this.GetLogger().Warnf("DropFile",paths)
+        this.dropFile = paths[0]
         filePath:=this.dropFile
         if filePath=="" {
             return
@@ -72,30 +80,12 @@ func (this *TImage2ArrayBuffer) OnCreate(){
         this.GetLogger().Infof("width:",w)
         this.GetLogger().Infof("height:",h)
         this.GetLogger().Infof("data:",data)
+        filePath = path.Base(filePath)
+        filePathArr := strings.Split(filePath,`\`)
+        filePath = filePathArr[len(filePathArr)-1]
         fileName:=strings.Replace(path.Base(filePath),".png","",-1)
         clipboard.WriteAll(fileName+" : `"+data+"`,")
         this.GetLogger().Info("已拷贝到剪切板")
-        //if path.Ext(filePath) == ".png" {
-        //    outPath:= strings.Replace(filePath,".png",".txt",1)
-        //    err:=ioutil.WriteFile(outPath,[]byte(strconv.Itoa(w)+" "+strconv.Itoa(h)+"\n"+data),0666)
-        //    if err != nil {
-        //        this.GetLogger().Error(err.Error())
-        //    }
-        //}
-    })
-    this.DropDownPanel.SetOnMouseLeave(func(sender vcl.IObject) {
-        this.entered = false
-    })
-
-    this.GetListener().On("DropFile", func(i ...interface{}) {
-        log.Warnf("listener")
-        time.Sleep(1000)
-        paths:=i[0].([]string)
-        this.GetLogger().Warnf("DropFile",paths)
-        this.dropFile = paths[0]
-        promise.SetTimeout(time.Second*1, func(timeout *promise.Timeout) {
-            this.dropFile = ""
-        })
     })
 }
 
