@@ -1,9 +1,9 @@
 package ui
 
 import (
-	"github.com/nomos/go-lokas/events"
 	"github.com/nomos/go-lokas"
 	"github.com/nomos/go-lokas/log"
+	"github.com/nomos/go-lokas/util/events"
 	"github.com/ying32/govcl/vcl"
 )
 
