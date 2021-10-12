@@ -7,8 +7,8 @@ import (
 	"github.com/nomos/go-lokas/cmds"
 	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-lokas/network/sshc"
-	"github.com/nomos/go-lokas/util/promise"
 	"github.com/nomos/go-lokas/util"
+	"github.com/nomos/go-lokas/util/promise"
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
 	"github.com/ying32/govcl/vcl/types/keys"
@@ -313,17 +313,21 @@ func (this *ConsoleShell) sendCmd(text string){
 		return
 	}
 	name,params:=cmds.SplitCommandParams(text)
+	iParams:=[]interface{}{}
+	for _,v:=range params {
+		iParams = append(iParams, v)
+	}
 	log.Infof("send cmd",name)
 	s:=this.ShellSelect.Text()
 	if this.commands[s]!=nil {
 		if cmd,ok:=this.commands[s][name];ok {
-			para:=cmds.NewParamsValue(name,params...)
+			para:=cmds.NewParamsValue(name,iParams...)
 			go cmd.ConsoleExec(para,this).Await()
 			return
 		}
 	}
 	if cmd,ok:=this.commonCommands[name];ok {
-		para:=cmds.NewParamsValue(name,params...)
+		para:=cmds.NewParamsValue(name,iParams...)
 		go cmd.ConsoleExec(para,this).Await()
 		return
 	}
