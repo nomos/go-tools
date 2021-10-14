@@ -546,6 +546,9 @@ func (this *EditLabel) Set(v interface{}){
 		if this.editType==EDIT_TYPE_INTERGER {
 			this.SetInt(v.(int))
 		}
+		if this.editType==EDIT_TYPE_STRING {
+			this.SetString(strconv.Itoa(v.(int)))
+		}
 	case reflect.Float64:
 		if this.editType==EDIT_TYPE_DECIMAL {
 			this.SetFloat(v.(float64))
@@ -553,6 +556,19 @@ func (this *EditLabel) Set(v interface{}){
 	case reflect.Int32:
 		if this.editType==EDIT_TYPE_ENUM {
 			this.SetEnum(v.(protocol.Enum))
+		}
+		if this.editType==EDIT_TYPE_INTERGER {
+			this.SetInt(int(v.(int32)))
+		}
+		if this.editType==EDIT_TYPE_STRING {
+			this.SetString(strconv.Itoa(int(v.(int32))))
+		}
+	case reflect.Int64:
+		if this.editType==EDIT_TYPE_INTERGER {
+			this.SetInt(int(v.(int64)))
+		}
+		if this.editType==EDIT_TYPE_STRING {
+			this.SetString(strconv.Itoa(int(v.(int64))))
 		}
 	default:
 		log.Panic("unrecognized type:"+t.Kind().String())
