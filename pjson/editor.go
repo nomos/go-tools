@@ -402,6 +402,9 @@ func (this *JsonEditor) onEditing(schema ui.ITreeSchema) {
 		return
 	}
 	node := schema.Node()
+	if node == nil {
+		return
+	}
 	if this.keyEditTag || schema.(*Schema).Type == Array || schema.(*Schema).Type == Object {
 		if schema.Parent() != nil {
 			node.SetText(schema.Key())
