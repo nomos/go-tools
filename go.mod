@@ -84,10 +84,6 @@ require (
 	gopkg.in/ini.v1 v1.51.0 // indirect
 	gopkg.in/webnice/b64.v1 v1.0.0 // indirect
 	gopkg.in/yaml.v2 v2.2.8 // indirect
-)
-
-require (
-	golang.design/x/clipboard v0.5.3 // indirect
 	golang.org/x/exp v0.0.0-20191030013958-a1ab85dbe136 // indirect
 	golang.org/x/mobile v0.0.0-20210716004757-34ab1303b554 // indirect
 )
