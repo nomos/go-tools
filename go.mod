@@ -4,6 +4,7 @@ go 1.17
 
 require (
 	github.com/360EntSecGroup-Skylar/excelize/v2 v2.4.0
+	github.com/asticode/go-astilectron v0.25.0
 	github.com/atotto/clipboard v0.1.4
 	github.com/iancoleman/orderedmap v0.2.0
 	github.com/kr/text v0.2.0 // indirect
@@ -20,6 +21,8 @@ require (
 )
 
 require (
+	github.com/TheTitanrain/w32 v0.0.0-20180517000239-4f5cfb03fabf // indirect
+	github.com/asticode/go-astikit v0.15.0 // indirect
 	github.com/aws/aws-sdk-go v1.34.28 // indirect
 	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/coreos/go-systemd/v22 v22.3.1 // indirect
@@ -61,6 +64,7 @@ require (
 	github.com/spf13/jwalterweatherman v1.0.0 // indirect
 	github.com/spf13/pflag v1.0.3 // indirect
 	github.com/spf13/viper v1.7.1 // indirect
+	github.com/sqweek/dialog v0.0.0-20211002065838-9a201b55ab91 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.0.2 // indirect
