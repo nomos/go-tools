@@ -1,8 +1,10 @@
 package erpc
 
 import (
+	"context"
 	"github.com/asticode/go-astikit"
 	"github.com/asticode/go-astilectron"
+	"github.com/nomos/clipboard"
 	"github.com/nomos/go-lokas"
 	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-lokas/lox"
@@ -14,6 +16,23 @@ import (
 
 
 //一个和electron typescript通信来实现访问golang原生功能的框架
+
+func (this *App) watchClipBoard(){
+	ch := clipboard.Watch(context.TODO(), clipboard.FmtImage)
+	ch1 := clipboard.Watch(context.TODO(), clipboard.FmtBMP)
+	go func() {
+		for {
+			select {
+			case data:=<-ch:
+				log.Infof("recv",data)
+				println(`"text data" is no longer available from clipboard.`)
+			case data:=<-ch1:
+				log.Infof("recv",data)
+				println(`"text data" is no longer available from clipboard.`)
+			}
+		}
+	}()
+}
 
 var defaultWinOpt = &astilectron.WindowOptions{
 	Center: astikit.BoolPtr(true),

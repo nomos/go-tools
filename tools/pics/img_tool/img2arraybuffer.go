@@ -1,7 +1,7 @@
 package img_tool
 
 import (
-    "github.com/atotto/clipboard"
+    "github.com/nomos/clipboard"
     "github.com/nomos/go-lokas/log"
     "github.com/nomos/go-tools/tools/pics/img_png"
     "github.com/nomos/go-tools/ui"
@@ -84,7 +84,7 @@ func (this *TImage2ArrayBuffer) OnCreate(){
         filePathArr := strings.Split(filePath,`\`)
         filePath = filePathArr[len(filePathArr)-1]
         fileName:=strings.Replace(path.Base(filePath),".png","",-1)
-        clipboard.WriteAll(fileName+" : `"+data+"`,")
+        clipboard.Write(clipboard.FmtText,[]byte(fileName+" : `"+data+"`,"))
         this.GetLogger().Info("已拷贝到剪切板")
     })
 }
