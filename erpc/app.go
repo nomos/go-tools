@@ -36,8 +36,8 @@ func (this *App) watchClipBoard(){
 
 var defaultWinOpt = &astilectron.WindowOptions{
 	Center: astikit.BoolPtr(true),
-	Height: astikit.IntPtr(1580),
-	Width:  astikit.IntPtr(800),
+	Height: astikit.IntPtr(800),
+	Width:  astikit.IntPtr(1580),
 	Title: astikit.StrPtr(""),
 	WebPreferences: &astilectron.WebPreferences{
 		WebSecurity: astikit.BoolPtr(false),
@@ -78,11 +78,11 @@ type Option func(app *App)
 var instance *App
 var once sync.Once
 
-func Instance()*App{
+func Instance(opts ...Option)*App{
 	var err error
 	once.Do(func() {
 		if instance ==nil {
-			instance = NewApp(WithPort("13333"))
+			instance = NewApp(opts...)
 			err=instance.Start()
 
 		}
@@ -227,6 +227,10 @@ func (this *App) SessionCreator(conn lokas.IConn) lokas.ISession {
 
 func (this *App) Start() error{
 	return this.Gate.Start()
+}
+
+func (this *App) Wait() {
+	util.WaitForTerminate()
 }
 
 func (this *App) Stop() error{
