@@ -78,24 +78,27 @@ type Option func(app *App)
 var instance *App
 var once sync.Once
 
-func Start()*App{
+func Instance()*App{
+	var err error
 	once.Do(func() {
 		if instance ==nil {
 			instance = NewApp(WithPort("13333"))
-			instance.Start()
+			err=instance.Start()
+
 		}
 	})
+	if err != nil {
+		log.Error(err.Error())
+		return nil
+	}
 	return instance
 }
 
-func Close(){
+func Close()error{
 	if instance!=nil {
-		instance.Stop()
+		return instance.Stop()
 	}
-}
-
-func Call(command *lox.AdminCommand)([]byte,error){
-	return Start().CallAdminCommand(command)
+	return nil
 }
 
 type App struct {
@@ -123,9 +126,6 @@ func NewApp(opts ...Option) *App {
 	}
 	for _, o := range opts {
 		o(ret)
-	}
-	if ret.config==nil {
-		ret.config = lox.NewAppConfig("config")
 	}
 	ret.SessionCreatorFunc = ret.SessionCreator
 	ret.Gate.LoadCustom("0.0.0.0",ret.Port,protocol.BINARY,lox.Websocket)

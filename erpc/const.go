@@ -6,6 +6,9 @@ const (
 	CREATE_FILE = "create_file"
 	WALK_DIR = "walk_dir"
 	EXEC_PATH = "exec_path"
+	LOAD_CONF = "load_conf"
+	GET_CONF = "get_conf"
+	SET_CONF = "set_conf"
 
 	OPEN_DIALOG_FILE = "open_dialog_file"
 	OPEN_DIALOG_DIR = "open_dialog_dir"
