@@ -55,6 +55,12 @@ func WithElectron(name string,defaultUrl string)Option{
 	}
 }
 
+func WithConfig(name string)Option{
+	return func(app *App) {
+		app.config = lox.NewAppConfig(name)
+	}
+}
+
 func WithElectronOption(opt *astilectron.WindowOptions)Option{
 	return func(a *App) {
 		a.gameWindowOpt = opt
@@ -100,6 +106,7 @@ type App struct {
 	electronApp *astilectron.Astilectron
 	gameWindow *astilectron.Window
 	gameWindowOpt *astilectron.WindowOptions
+	config *lox.AppConfig
 
 	devTool bool
 	url string
@@ -116,6 +123,9 @@ func NewApp(opts ...Option) *App {
 	}
 	for _, o := range opts {
 		o(ret)
+	}
+	if ret.config==nil {
+		ret.config = lox.NewAppConfig("config")
 	}
 	ret.SessionCreatorFunc = ret.SessionCreator
 	ret.Gate.LoadCustom("0.0.0.0",ret.Port,protocol.BINARY,lox.Websocket)
