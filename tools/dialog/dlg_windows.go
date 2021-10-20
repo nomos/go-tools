@@ -10,6 +10,15 @@ import (
 	"github.com/TheTitanrain/w32"
 )
 
+func firstOf(args ...string) string {
+	for _, arg := range args {
+		if arg != "" {
+			return arg
+		}
+	}
+	return ""
+}
+
 type WinDlgError int
 
 func (e WinDlgError) Error() string {
