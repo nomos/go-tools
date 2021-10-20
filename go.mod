@@ -11,6 +11,7 @@ require (
 	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/coreos/go-systemd/v22 v22.3.1 // indirect
 	github.com/fsnotify/fsnotify v1.4.7 // indirect
+	github.com/gen2brain/dlgs v0.0.0-20210911090025-cbd38e821b98
 	github.com/go-playground/locales v0.13.0 // indirect
 	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/go-playground/validator/v10 v10.4.1 // indirect
@@ -88,3 +89,5 @@ require (
 	gopkg.in/webnice/b64.v1 v1.0.0 // indirect
 	gopkg.in/yaml.v2 v2.2.8 // indirect
 )
+
+require github.com/gopherjs/gopherjs v0.0.0-20181017120253-0766667cb4d1 // indirect

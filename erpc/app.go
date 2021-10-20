@@ -245,8 +245,8 @@ func (this *App) SessionCreator(conn lokas.IConn) lokas.ISession {
 func (this *App) Start() {
 	this.Gate.LoadCustom("0.0.0.0", this.Port, protocol.BINARY, lox.Websocket)
 	this.Gate.Start()
-	go this.start()
-	this.mainLoop()
+	this.start()
+	util.WaitForTerminate()
 }
 
 func (this *App) mainLoop() {
