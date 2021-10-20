@@ -6,7 +6,7 @@ require (
 	github.com/360EntSecGroup-Skylar/excelize/v2 v2.4.0
 	github.com/TheTitanrain/w32 v0.0.0-20180517000239-4f5cfb03fabf // indirect
 	github.com/asticode/go-astikit v0.21.1
-	github.com/asticode/go-astilectron v0.24.0
+	github.com/asticode/go-astilectron v0.25.0
 	github.com/aws/aws-sdk-go v1.34.28 // indirect
 	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/coreos/go-systemd/v22 v22.3.1 // indirect
@@ -71,6 +71,7 @@ require (
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.17.0
+	golang.design/x/clipboard v0.5.3 // indirect
 	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a
 	golang.org/x/exp v0.0.0-20191030013958-a1ab85dbe136 // indirect
 	golang.org/x/image v0.0.0-20210628002857-a66eb6448b8d
@@ -86,5 +87,4 @@ require (
 	gopkg.in/ini.v1 v1.51.0 // indirect
 	gopkg.in/webnice/b64.v1 v1.0.0 // indirect
 	gopkg.in/yaml.v2 v2.2.8 // indirect
-	golang.design/x/clipboard v0.5.3 // indirect
 )
