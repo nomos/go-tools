@@ -6,6 +6,7 @@ import (
 	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-lokas/lox"
 	"github.com/nomos/go-tools/tools/dialog"
+	"strings"
 )
 
 func init(){
@@ -25,7 +26,13 @@ func init(){
 		opStr:=params.String()
 		var file string
 		var err error
-		builder:= dialog.File().SetStartDir(params.String()).Filter(params.String(), params.String()).Title(params.String())
+		startDir:=params.String()
+		desc:=params.String()
+		filterExtensionStr:=params.String()
+		extensions:=strings.Split(filterExtensionStr,",")
+		title:=params.String()
+
+		builder:= dialog.File().SetStartDir(startDir).Filter(desc, extensions...).Title(title)
 		if opStr == FILE_SAVE {
 			file,err = builder.Save()
 		} else if opStr == FILE_LOAD {

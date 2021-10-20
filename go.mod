@@ -11,7 +11,6 @@ require (
 	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/coreos/go-systemd/v22 v22.3.1 // indirect
 	github.com/fsnotify/fsnotify v1.4.7 // indirect
-	github.com/gen2brain/dlgs v0.0.0-20210911090025-cbd38e821b98
 	github.com/go-playground/locales v0.13.0 // indirect
 	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/go-playground/validator/v10 v10.4.1 // indirect
@@ -54,7 +53,6 @@ require (
 	github.com/spf13/jwalterweatherman v1.0.0 // indirect
 	github.com/spf13/pflag v1.0.3 // indirect
 	github.com/spf13/viper v1.7.1 // indirect
-	github.com/sqweek/dialog v0.0.0-20211002065838-9a201b55ab91
 	github.com/subosito/gotenv v1.2.0 // indirect
 	github.com/tyler-smith/go-bip39 v1.1.0
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
