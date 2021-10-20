@@ -129,6 +129,7 @@ func NewApp(opts ...Option) *App {
 	}
 	ret.SessionCreatorFunc = ret.SessionCreator
 	ret.Gate.LoadCustom("0.0.0.0",ret.Port,protocol.BINARY,lox.Websocket)
+	ret.Gate.Start()
 	ret.start()
 	return ret
 }
@@ -226,7 +227,7 @@ func (this *App) SessionCreator(conn lokas.IConn) lokas.ISession {
 }
 
 func (this *App) Start() error{
-	return this.Gate.Start()
+	return nil
 }
 
 func (this *App) Wait() {

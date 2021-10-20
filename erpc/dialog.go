@@ -5,12 +5,23 @@ import (
 	"github.com/nomos/go-lokas/cmds"
 	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-lokas/lox"
+	"github.com/nomos/go-lokas/util"
 	"github.com/sqweek/dialog"
 )
 
 func init(){
 	registerFunc(OPEN_DIALOG_DIR, func(cmd *lox.AdminCommand, params *cmds.ParamsValue) ([]byte, error) {
-		dir,err:=dialog.Directory().SetStartDir(params.String()).Title(params.String()).Browse()
+		defer func() {
+			if r := recover(); r != nil {
+				util.Recover(r,false)
+			}
+		}()
+		log.Warnf("OPEN_DIALOG_DIR")
+
+		pwd,_:=util.ExecPath()
+		dir,err:=dialog.Directory().SetStartDir(pwd).Title("").Browse()
+		log.Infof(dir,err)
+		//dir,err:=dialog.Directory().SetStartDir(params.String()).Title(params.String()).Browse()
 		if err != nil {
 			log.Error(err.Error())
 			return nil,errors.New("cancelled")
@@ -20,6 +31,12 @@ func init(){
 	})
 	
 	registerFunc(OPEN_DIALOG_FILE, func(cmd *lox.AdminCommand, params *cmds.ParamsValue) ([]byte, error) {
+		defer func() {
+			if r := recover(); r != nil {
+				util.Recover(r,false)
+			}
+		}()
+		log.Warnf("OPEN_DIALOG_FILE")
 		opStr:=params.String()
 		var file string
 		var err error
@@ -39,6 +56,12 @@ func init(){
 	})
 
 	registerFunc(OPEN_DIALOG_MSG, func(cmd *lox.AdminCommand, params *cmds.ParamsValue) ([]byte, error) {
+		defer func() {
+			if r := recover(); r != nil {
+				util.Recover(r,false)
+			}
+		}()
+		log.Warnf("OPEN_DIALOG_MSG")
 		opstr:=params.String()
 		builder:= dialog.Message("%s",params.String()).Title(params.String())
 		var ok bool = true

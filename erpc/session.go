@@ -167,6 +167,7 @@ func (this *Session) StartMessagePump() {
 
 func (this *Session) handAdminCommand(msg *protocol.BinaryMessage){
 	cmd:=msg.Body.(*lox.AdminCommand)
+	log.Info("adminCmd",zap.String("cmd",cmd.Command),zap.Any("values",cmd.Params))
 	if handler, ok := rpcHandlers[cmd.Command]; ok {
 		res,err:=handler(cmd,cmd.ParamsValue())
 		if err!=nil {
