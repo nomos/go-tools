@@ -11,7 +11,7 @@ import (
 )
 
 func init(){
-	registerFunc(READ_FILE, func(cmd *lox.AdminCommand,params *cmds.ParamsValue) ([]byte, error) {
+	RegisterAdminFunc(READ_FILE, func(cmd *lox.AdminCommand,params *cmds.ParamsValue) ([]byte, error) {
 		path:=cmd.ParamsValue().String()
 		data,err:=ioutil.ReadFile(path)
 		log.Warnf("path",path,string(data))
@@ -21,7 +21,7 @@ func init(){
 		}
 		return data,nil
 	})
-	registerFunc(PATH_EXIST, func(cmd *lox.AdminCommand,params *cmds.ParamsValue) ([]byte, error) {
+	RegisterAdminFunc(PATH_EXIST, func(cmd *lox.AdminCommand,params *cmds.ParamsValue) ([]byte, error) {
 		path:=cmd.ParamsValue().String()
 		exist,_:=util.PathExists(path)
 		if exist {
@@ -30,7 +30,7 @@ func init(){
 			return nil,errors.New("not exist")
 		}
 	})
-	registerFunc(CREATE_FILE, func(cmd *lox.AdminCommand,params *cmds.ParamsValue) ([]byte, error) {
+	RegisterAdminFunc(CREATE_FILE, func(cmd *lox.AdminCommand,params *cmds.ParamsValue) ([]byte, error) {
 		path:=params.String()
 		log.Warnf("path",path)
 		perm:=params.Int()
@@ -42,7 +42,7 @@ func init(){
 		}
 		return nil,nil
 	})
-	registerFunc(WALK_DIR, func(cmd *lox.AdminCommand,params *cmds.ParamsValue) ([]byte, error) {
+	RegisterAdminFunc(WALK_DIR, func(cmd *lox.AdminCommand,params *cmds.ParamsValue) ([]byte, error) {
 		path:=params.String()
 		log.Warnf("path",path)
 		recursive:=params.Bool()
@@ -56,7 +56,7 @@ func init(){
 		log.Warnf("data",string(data))
 		return data,nil
 	})
-	registerFunc(EXEC_PATH, func(cmd *lox.AdminCommand, params *cmds.ParamsValue) ([]byte, error) {
+	RegisterAdminFunc(EXEC_PATH, func(cmd *lox.AdminCommand, params *cmds.ParamsValue) ([]byte, error) {
 		p,_:=util.ExecPath()
 		return []byte(p),nil
 	})

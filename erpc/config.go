@@ -7,12 +7,12 @@ import (
 )
 
 func init(){
-	registerFunc(LOAD_CONF, func(cmd *lox.AdminCommand, params *cmds.ParamsValue) ([]byte, error) {
+	RegisterAdminFunc(LOAD_CONF, func(cmd *lox.AdminCommand, params *cmds.ParamsValue) ([]byte, error) {
 		path:=cmd.ParamsValue().String()
 		Instance().LoadConfig(path)
 		return nil,nil
 	})
-	registerFunc(GET_CONF, func(cmd *lox.AdminCommand, params *cmds.ParamsValue) ([]byte, error) {
+	RegisterAdminFunc(GET_CONF, func(cmd *lox.AdminCommand, params *cmds.ParamsValue) ([]byte, error) {
 		key:=cmd.ParamsValue().String()
 		subs:=[]string{}
 		for {
@@ -25,7 +25,7 @@ func init(){
 		v:=Instance().GetConfig(key,subs...)
 		return []byte(v),nil
 	})
-	registerFunc(SET_CONF, func(cmd *lox.AdminCommand, params *cmds.ParamsValue) ([]byte, error) {
+	RegisterAdminFunc(SET_CONF, func(cmd *lox.AdminCommand, params *cmds.ParamsValue) ([]byte, error) {
 		key:=cmd.ParamsValue().String()
 		value:=cmd.ParamsValue().String()
 		subs:=[]string{}
