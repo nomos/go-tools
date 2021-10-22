@@ -3,20 +3,28 @@ package erpc
 import (
 	"github.com/nomos/go-lokas"
 	"github.com/nomos/go-lokas/cmds"
+	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-lokas/lox"
+	"github.com/nomos/go-lokas/util"
 )
 
 func init(){
 	RegisterAdminFunc(LOAD_CONF, func(cmd *lox.AdminCommand, params *cmds.ParamsValue) ([]byte, error) {
-		path:=cmd.ParamsValue().String()
+		path:=params.String()
 		Instance().LoadConfig(path)
 		return nil,nil
 	})
 	RegisterAdminFunc(GET_CONF, func(cmd *lox.AdminCommand, params *cmds.ParamsValue) ([]byte, error) {
-		key:=cmd.ParamsValue().String()
+		defer func() {
+			if r := recover(); r != nil {
+				util.Recover(r,false)
+			}
+		}()
+		key:=params.String()
 		subs:=[]string{}
 		for {
-			if sub:=cmd.ParamsValue().StringOpt();sub!="" {
+			if sub:=params.StringOpt();sub!="" {
+				log.Infof("subs",sub)
 				subs = append(subs, sub)
 			} else {
 				break
@@ -26,11 +34,11 @@ func init(){
 		return []byte(v),nil
 	})
 	RegisterAdminFunc(SET_CONF, func(cmd *lox.AdminCommand, params *cmds.ParamsValue) ([]byte, error) {
-		key:=cmd.ParamsValue().String()
-		value:=cmd.ParamsValue().String()
+		key:=params.String()
+		value:=params.String()
 		subs:=[]string{}
 		for {
-			if sub:=cmd.ParamsValue().StringOpt();sub!="" {
+			if sub:=params.StringOpt();sub!="" {
 				subs = append(subs, sub)
 			} else {
 				break
@@ -47,6 +55,13 @@ func (this *App) LoadConfig(name string)error{
 }
 
 func (this *App) SubConfig(subNames ... string)lokas.IConfig{
+	if util.IsNil(this.config) {
+		err:=this.LoadConfig("config")
+		if err != nil {
+			log.Error(err.Error())
+			return nil
+		}
+	}
 	var conf lokas.IConfig=this.config
 	for _,v:=range subNames {
 		conf=conf.Sub(v)
