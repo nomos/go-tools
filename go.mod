@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/360EntSecGroup-Skylar/excelize/v2 v2.4.0
-	github.com/TheTitanrain/w32 v0.0.0-20180517000239-4f5cfb03fabf // indirect
+	github.com/TheTitanrain/w32 v0.0.0-20180517000239-4f5cfb03fabf
 	github.com/asticode/go-astikit v0.21.1
 	github.com/asticode/go-astilectron v0.25.0
 	github.com/aws/aws-sdk-go v1.34.28 // indirect
@@ -37,7 +37,7 @@ require (
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/noaway/dateparse v0.0.0-20171117034806-ad2b19d7b298 // indirect
-	github.com/nomos/clipboard v0.5.6
+	github.com/nomos/clipboard v0.5.7
 	github.com/nomos/go-lokas v0.1.29
 	github.com/nomos/jwt-go v3.2.0+incompatible // indirect
 	github.com/nomos/qmgo v1.9.6 // indirect
@@ -87,5 +87,3 @@ require (
 	gopkg.in/webnice/b64.v1 v1.0.0 // indirect
 	gopkg.in/yaml.v2 v2.2.8 // indirect
 )
-
-require github.com/gopherjs/gopherjs v0.0.0-20181017120253-0766667cb4d1 // indirect
