@@ -449,7 +449,7 @@ func (this *excel2JsonMiniGame)generateData(source *gameDataSource,p string)erro
 	return nil
 }
 
-func Excel2JsonMiniGame(excelPath,distPath string,logger log.ILogger,embed bool) {
+func Excel2JsonMiniGame(excelPath,distPath string,logger log.ILogger,embed bool)(err error){
 	ret := &excel2JsonMiniGame{}
 	ret.embedJson = embed
 	if logger!=nil {
@@ -459,13 +459,14 @@ func Excel2JsonMiniGame(excelPath,distPath string,logger log.ILogger,embed bool)
 	}
 	defer func() {
 		if r := recover(); r != nil {
-			log.Error(r.(error).Error())
+			err = log.Error(r.(error).Error())
 		}
 	}()
-	err:=ret.generate(excelPath,distPath)
+	err=ret.generate(excelPath,distPath)
 	if err != nil {
-		log.Error(err.Error())
+		return log.Error(err.Error())
 	}
+	return
 }
 
 func  (this *excel2JsonMiniGame)generate(excelPath,distPath string)error{

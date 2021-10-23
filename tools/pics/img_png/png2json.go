@@ -74,7 +74,6 @@ func Png2CompressedBase64(path string) (int,int,string,error) {
 	arr2[1] = uint8(height)
 	arr3:=arr2[2:]
 	copy(arr3,arr)
-	log.Warnf(arr)
 	ret,_:=gzip.CompressBytes2Base64(arr2)
 	return width,height,ret,nil
 }
