@@ -9,12 +9,12 @@ import (
 )
 
 func init(){
-	RegisterAdminFunc(LOAD_CONF, func(cmd *lox.AdminCommand, params *cmds.ParamsValue) ([]byte, error) {
+	RegisterAdminFunc(LOAD_CONF, func(cmd *lox.AdminCommand, params *cmds.ParamsValue,logger log.ILogger) ([]byte, error) {
 		path:=params.String()
 		Instance().LoadConfig(path)
 		return nil,nil
 	})
-	RegisterAdminFunc(GET_CONF, func(cmd *lox.AdminCommand, params *cmds.ParamsValue) ([]byte, error) {
+	RegisterAdminFunc(GET_CONF, func(cmd *lox.AdminCommand, params *cmds.ParamsValue,logger log.ILogger) ([]byte, error) {
 		defer func() {
 			if r := recover(); r != nil {
 				util.Recover(r,false)
@@ -33,7 +33,7 @@ func init(){
 		v:=Instance().GetConfig(key,subs...)
 		return []byte(v),nil
 	})
-	RegisterAdminFunc(SET_CONF, func(cmd *lox.AdminCommand, params *cmds.ParamsValue) ([]byte, error) {
+	RegisterAdminFunc(SET_CONF, func(cmd *lox.AdminCommand, params *cmds.ParamsValue,logger log.ILogger) ([]byte, error) {
 		key:=params.String()
 		value:=params.String()
 		subs:=[]string{}

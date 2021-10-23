@@ -267,6 +267,11 @@ LOOP:
 	log.Warnf("stop")
 }
 
+
+func (this *App) Clear() {
+
+}
+
 func (this *App) Stop() error {
 	if this.done!=nil {
 		this.done <- struct{}{}

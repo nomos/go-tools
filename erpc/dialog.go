@@ -10,7 +10,7 @@ import (
 )
 
 func init(){
-	RegisterAdminFunc(OPEN_DIALOG_DIR, func(cmd *lox.AdminCommand, params *cmds.ParamsValue) ([]byte, error) {
+	RegisterAdminFunc(OPEN_DIALOG_DIR, func(cmd *lox.AdminCommand, params *cmds.ParamsValue,logger log.ILogger) ([]byte, error) {
 		log.Info("OPEN_DIALOG_DIR")
 		dir,err:=dialog.Directory().SetStartDir(params.String()).Title(params.String()).Browse()
 		if err != nil {
@@ -21,7 +21,7 @@ func init(){
 
 	})
 	
-	RegisterAdminFunc(OPEN_DIALOG_FILE, func(cmd *lox.AdminCommand, params *cmds.ParamsValue) ([]byte, error) {
+	RegisterAdminFunc(OPEN_DIALOG_FILE, func(cmd *lox.AdminCommand, params *cmds.ParamsValue,logger log.ILogger) ([]byte, error) {
 		log.Info("OPEN_DIALOG_FILE")
 		opStr:=params.String()
 		var file string
@@ -47,7 +47,7 @@ func init(){
 		return []byte(file),nil
 	})
 
-	RegisterAdminFunc(OPEN_DIALOG_MSG, func(cmd *lox.AdminCommand, params *cmds.ParamsValue) ([]byte, error) {
+	RegisterAdminFunc(OPEN_DIALOG_MSG, func(cmd *lox.AdminCommand, params *cmds.ParamsValue,logger log.ILogger) ([]byte, error) {
 		opstr:=params.String()
 		builder:= dialog.Message("%s",params.String()).Title(params.String())
 		var ok bool = true

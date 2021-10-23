@@ -1,6 +1,7 @@
 package erpc
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/nomos/go-lokas"
 	"github.com/nomos/go-lokas/log"
@@ -9,6 +10,8 @@ import (
 	"github.com/nomos/go-lokas/protocol"
 	"github.com/nomos/go-lokas/util"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+	"regexp"
 	"time"
 )
 
@@ -34,6 +37,8 @@ func NewSession(conn lokas.IConn, id util.ID, manager lokas.ISessionManager, opt
 	for _, o := range opts {
 		o(s)
 	}
+	s.ComposeLogger = log.NewComposeLogger(true,log.ConsoleConfig(""),1)
+	s.ComposeLogger.SetConsoleWriter(s)
 	s.SetType("ErpcSession")
 	s.SetId(id)
 	return s
@@ -41,6 +46,7 @@ func NewSession(conn lokas.IConn, id util.ID, manager lokas.ISessionManager, opt
 
 type Session struct {
 	*lox.Actor
+	*log.ComposeLogger
 	Messages         chan []byte
 	Conn             lokas.IConn
 	manager          lokas.ISessionManager
@@ -52,20 +58,55 @@ type Session struct {
 	ticker           *time.Ticker
 }
 
+func (this *Session) WriteString(s string) {
+	this.Write([]byte(s))
+}
+
+func (this *Session) Write(p []byte) (int, error) {
+	err:=this.SendMessage(0,0,newConsoleEvent(string(p)))
+	return 0,err
+}
+
+func (this *Session)WriteConsole(e zapcore.Entry, p []byte) error {
+	return nil
+}
+func (this *Session)WriteJson(e zapcore.Entry, p []byte) error {
+	var j map[string]interface{}
+	json.Unmarshal(p,&j)
+	level:=j["level"].(string)
+	time:=j["time"].(string)
+	caller:=j["caller"].(string)
+	msg:=j["msg"].(string)
+	o:=make(map[string]interface{})
+	for k,v:=range j {
+		if k!="level"&&k!="time"&&k!="caller"&&k!="msg" {
+			o[k] = v
+		}
+	}
+	level = regexp.MustCompile(`[[][A-Z]+[]][A-z]*`).FindString(level)
+	jstr,_:=json.Marshal(o)
+	str := time+" "+level+"   "+caller+" "+msg+" "+string(jstr)
+	this.Write([]byte(str))
+	return nil
+}
+func (this *Session)WriteObject(e zapcore.Entry, o map[string]interface{}) error {
+	return nil
+}
+
 func (this *Session) Load(conf lokas.IConfig) error {
-	panic("implement me")
+	return nil
 }
 
 func (this *Session) Unload() error {
-	panic("implement me")
+	return nil
 }
 
 func (this *Session) OnStart() error {
-	panic("implement me")
+	return nil
 }
 
 func (this *Session) OnStop() error {
-	panic("implement me")
+	return nil
 }
 
 func (this *Session) OnCreate() error {
@@ -169,7 +210,7 @@ func (this *Session) handAdminCommand(msg *protocol.BinaryMessage){
 	cmd:=msg.Body.(*lox.AdminCommand)
 	log.Info("adminCmd",zap.String("cmd",cmd.Command),zap.Any("values",cmd.Params))
 	if handler, ok := rpcHandlers[cmd.Command]; ok {
-		res,err:=handler(cmd,cmd.ParamsValue())
+		res,err:=handler(cmd,cmd.ParamsValue(),this)
 		if err!=nil {
 			log.Error(err.Error())
 			ret:=lox.NewAdminCommandResult(cmd,false,[]byte(err.Error()))
