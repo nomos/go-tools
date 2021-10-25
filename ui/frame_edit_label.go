@@ -597,12 +597,10 @@ func (this *EditLabel) Clear(){
 	this.enumMap = map[string]protocol.IEnum{}
 	this.enumIntMap = map[protocol.Enum]protocol.IEnum{}
 	this.enumValue = nil
-	go vcl.ThreadSync(func() {
-		this.edit.Clear()
-		this.enumPanel.Clear()
-		this.boolPanel.SetChecked(false)
-		this.updateEnumsUI()
-	})
+	this.edit.Clear()
+	this.enumPanel.Clear()
+	this.boolPanel.SetChecked(false)
+	this.updateEnumsUI()
 }
 
 
