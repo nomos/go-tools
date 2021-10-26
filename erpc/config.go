@@ -65,7 +65,6 @@ func (this *App) SubConfig(subNames ... string)lokas.IConfig{
 	var conf lokas.IConfig=this.config
 	for _,v:=range subNames {
 		conf=conf.Sub(v)
-		log.Infof(conf,v,conf.(*lox.AppConfig).Viper)
 	}
 	return conf
 }
