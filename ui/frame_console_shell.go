@@ -296,6 +296,7 @@ func (this *ConsoleShell) addCachedText(text string) {
 }
 
 func (this *ConsoleShell) sendCmd(text string){
+	text = strings.ReplaceAll(text,"\r","")
 	defer func() {
 		if r := recover(); r != nil {
 			util.Recover(r,false)
