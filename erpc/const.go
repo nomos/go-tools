@@ -16,6 +16,9 @@ const (
 	OPEN_DEV_TOOL = "open_dev_tool"
 	CLOSE_DEV_TOOL = "close_dev_tool"
 
+	LOAD_COCOS_PROJECT = "load_cocos_project"
+	BUILD_COCOS_PROJECT = "build_cocos_project"
+
 	FILE_SAVE = "file_save"
 	FILE_LOAD = "file_load"
 	MSG_INFO = "msg_info"
