@@ -8,17 +8,17 @@ import (
 	"reflect"
 )
 
-var _ lokas.IComponent = (*ConsoleEvent)(nil)
+var _ lokas.IComponent = (*PngFolderData)(nil)
 
-type ConsoleEvent struct {
+type PngFolderData struct {
 	ecs.Component `json:"-" bson:"-"`
-	Text string 
+	Files []*PngFile 
 }
 
-func (this *ConsoleEvent) GetId()(protocol.BINARY_TAG,error){
+func (this *PngFolderData) GetId()(protocol.BINARY_TAG,error){
 	return protocol.GetTypeRegistry().GetTagByType(reflect.TypeOf(this).Elem())
 }
 
-func (this *ConsoleEvent) Serializable()protocol.ISerializable {
+func (this *PngFolderData) Serializable()protocol.ISerializable {
 	return this
 }
