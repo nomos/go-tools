@@ -63,7 +63,7 @@ func (this *Session) WriteString(s string) {
 }
 
 func (this *Session) Write(p []byte) (int, error) {
-	err:=this.SendMessage(0,0,newConsoleEvent(string(p)))
+	err:=this.SendMessage(0,0,NewConsoleEvent(string(p)))
 	return 0,err
 }
 

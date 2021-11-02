@@ -1,3 +1,4 @@
+//this is a generated file,do not modify it!!!
 package erpc
 
 import (
@@ -6,9 +7,11 @@ import (
 )
 
 const (
-	TAG_ConsoleEvent = 221
+	TAG_CONSOLE_EVENT  protocol.BINARY_TAG = 221
 )
 
-func init(){
-	protocol.GetTypeRegistry().RegistryType(TAG_ConsoleEvent,reflect.TypeOf((*ConsoleEvent)(nil)).Elem())
+func init() {
+	protocol.GetTypeRegistry().RegistryType(TAG_CONSOLE_EVENT,reflect.TypeOf((*ConsoleEvent)(nil)).Elem())
 }
+
+
