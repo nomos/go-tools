@@ -162,12 +162,8 @@ func (this *Session) StartMessagePump() {
 	this.done = make(chan struct{})
 	go func() {
 		defer func() {
-			r := recover()
-			if r != nil {
-				if e, ok := r.(error); ok {
-					log.Errorf(e.Error())
-					this.Conn.Close()
-				}
+			if r := recover(); r != nil {
+				util.Recover(r,false)
 			}
 		}()
 	Loop:
