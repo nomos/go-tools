@@ -58,10 +58,13 @@ func subImage(img image.Image,width,height int) []image.Image {
 	return ret
 }
 
-func SubImage(imgPath string,width,height int)error{
+func SubImage(imgPath string,width,height int,logger log.ILogger)error{
+	if logger==nil {
+		logger = log.DefaultLogger()
+	}
 	img,err:=readImageFile(imgPath)
 	if err != nil {
-		log.Error(err.Error())
+		logger.Error(err.Error())
 		return err
 	}
 	imgs:=subImage(img,width,height)
@@ -71,7 +74,7 @@ func SubImage(imgPath string,width,height int)error{
 	if digital<2 {
 		digital = 2
 	}
-	log.Warnf("digital",digital)
+	logger.Warnf("digital",digital)
 	exist,err:=util.PathExists(path1)
 	if err != nil {
 		return err
@@ -79,7 +82,7 @@ func SubImage(imgPath string,width,height int)error{
 	if !exist {
 		err=os.Mkdir(path1,0777)
 		if err != nil {
-			log.Error(err.Error())
+			logger.Error(err.Error())
 			return err
 		}
 	}
@@ -95,20 +98,20 @@ func SubImage(imgPath string,width,height int)error{
 		}
 		f,err:=os.OpenFile(path2,os.O_RDWR, 0666)
 		if err != nil {
-			log.Error(err.Error())
+			logger.Error(err.Error())
 			return err
 		}
 		err=png.Encode(f,imga)
 		if err != nil {
-			log.Error(err.Error())
+			logger.Error(err.Error())
 			return err
 		}
 		err=f.Close()
 		if err != nil {
-			log.Error(err.Error())
+			logger.Error(err.Error())
 			return err
 		}
-		log.Warnf("输出图片",path2)
+		logger.Warnf("输出图片",path2)
 	}
 	return nil
 }

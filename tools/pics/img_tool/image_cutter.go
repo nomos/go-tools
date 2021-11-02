@@ -118,7 +118,7 @@ func (this *TImageCutter) OnCreate(){
         if err != nil {
             return
         }
-        err=img_png.SubImage(p,width,height)
+        err=img_png.SubImage(p,width,height,nil)
         if err != nil {
             log.Error(err.Error())
         }

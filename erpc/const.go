@@ -18,6 +18,7 @@ const (
 
 	LOAD_COCOS_PROJECT = "load_cocos_project"
 	BUILD_COCOS_PROJECT = "build_cocos_project"
+	CUT_PNG = "cut_png"
 
 	FILE_SAVE = "file_save"
 	FILE_LOAD = "file_load"
