@@ -3,10 +3,17 @@ package erpc
 
 import (
 	"github.com/nomos/go-lokas"
+	"time"
 )
 
-func NewPngFile()*PngFile{
+func NewPngFile(path string,modTime time.Time,width,height int32,data []byte)*PngFile{
 	ret:=&PngFile{
+		Path: path,
+		ModTime: modTime,
+		Data: data,
+	}
+	if data==nil {
+		ret.Data = []byte{}
 	}
 	return ret
 }

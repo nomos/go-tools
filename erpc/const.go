@@ -25,4 +25,8 @@ const (
 	MSG_INFO = "msg_info"
 	MSG_ERROR = "msg_error"
 	MSG_YESNO = "msg_yesno"
+
+	LOAD_PNG_FOLDER = "load_png_folder"
+	LOAD_PNG_DATA = "load_png_data"
+	LOAD_PNG_FOLDER_DATA = "load_png_folder_data"
 )

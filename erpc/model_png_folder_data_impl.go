@@ -7,8 +7,14 @@ import (
 
 func NewPngFolderData()*PngFolderData{
 	ret:=&PngFolderData{
+		Files: []*PngFile{},
 	}
 	return ret
+}
+
+func (this *PngFolderData) AddFile(file *PngFile)*PngFile{
+	this.Files = append(this.Files, file)
+	return file
 }
 
 func (this *PngFolderData) OnAdd(e lokas.IEntity, r lokas.IRuntime) {
