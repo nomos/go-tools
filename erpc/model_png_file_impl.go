@@ -11,6 +11,8 @@ func NewPngFile(path string,modTime time.Time,width,height int32,data []byte)*Pn
 		Path: path,
 		ModTime: modTime,
 		Data: data,
+		Width: width,
+		Height: height,
 	}
 	if data==nil {
 		ret.Data = []byte{}

@@ -87,3 +87,6 @@ require (
 	gopkg.in/webnice/b64.v1 v1.0.0 // indirect
 	gopkg.in/yaml.v2 v2.2.8 // indirect
 )
+
+
+replace github.com/nomos/go-lokas => /Users/wqs/go/src/github.com/nomos/go-lokas
