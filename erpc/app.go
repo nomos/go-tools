@@ -12,6 +12,7 @@ import (
 	"github.com/nomos/go-lokas/protocol"
 	"github.com/nomos/go-lokas/util"
 	"os"
+	"path/filepath"
 	"sync"
 )
 
@@ -46,7 +47,7 @@ var defaultWinOpt = &astilectron.WindowOptions{
 
 func WithElectron(name string, defaultUrl string) Option {
 	return func(a *App) {
-		pwd, _ := util.ExecPath()
+		pwd:=filepath.Dir(os.Args[0])
 		a.electronApp, _ = astilectron.New(log.NewAstilecTronLogger(false), astilectron.Options{
 			AppName:           name,
 			BaseDirectoryPath: pwd + "/astiletron/",
