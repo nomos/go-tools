@@ -11,7 +11,10 @@ import (
 func init(){
 	RegisterAdminFunc(LOAD_CONF, func(cmd *lox.AdminCommand, params *cmds.ParamsValue,logger log.ILogger) ([]byte, error) {
 		path:=params.String()
-		Instance().LoadConfig(path)
+		err:=Instance().LoadConfig(path)
+		if err != nil {
+			logger.Error(err.Error())
+		}
 		return nil,nil
 	})
 	RegisterAdminFunc(GET_CONF, func(cmd *lox.AdminCommand, params *cmds.ParamsValue,logger log.ILogger) ([]byte, error) {
