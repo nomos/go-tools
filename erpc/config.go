@@ -5,11 +5,12 @@ import (
 	"github.com/nomos/go-lokas/cmds"
 	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-lokas/lox"
+	"github.com/nomos/go-lokas/rpc"
 	"github.com/nomos/go-lokas/util"
 )
 
 func init(){
-	RegisterAdminFunc(LOAD_CONF, func(cmd *lox.AdminCommand, params *cmds.ParamsValue,logger log.ILogger) ([]byte, error) {
+	rpc.RegisterAdminFunc(LOAD_CONF, func(cmd *lox.AdminCommand, params *cmds.ParamsValue,logger log.ILogger) ([]byte, error) {
 		path:=params.String()
 		err:=Instance().LoadConfig(path)
 		if err != nil {
@@ -17,7 +18,7 @@ func init(){
 		}
 		return nil,nil
 	})
-	RegisterAdminFunc(GET_CONF, func(cmd *lox.AdminCommand, params *cmds.ParamsValue,logger log.ILogger) ([]byte, error) {
+	rpc.RegisterAdminFunc(GET_CONF, func(cmd *lox.AdminCommand, params *cmds.ParamsValue,logger log.ILogger) ([]byte, error) {
 		defer func() {
 			if r := recover(); r != nil {
 				util.Recover(r,false)
@@ -36,7 +37,7 @@ func init(){
 		v:=Instance().GetConfig(key,subs...)
 		return []byte(v),nil
 	})
-	RegisterAdminFunc(SET_CONF, func(cmd *lox.AdminCommand, params *cmds.ParamsValue,logger log.ILogger) ([]byte, error) {
+	rpc.RegisterAdminFunc(SET_CONF, func(cmd *lox.AdminCommand, params *cmds.ParamsValue,logger log.ILogger) ([]byte, error) {
 		key:=params.String()
 		value:=params.String()
 		subs:=[]string{}

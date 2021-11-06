@@ -6,12 +6,13 @@ import (
 	"github.com/nomos/go-lokas/cmds"
 	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-lokas/lox"
+	"github.com/nomos/go-lokas/rpc"
 	"github.com/nomos/go-lokas/util"
 	"io/ioutil"
 )
 
 func init(){
-	RegisterAdminFunc(READ_FILE, func(cmd *lox.AdminCommand,params *cmds.ParamsValue,logger log.ILogger) ([]byte, error) {
+	rpc.RegisterAdminFunc(READ_FILE, func(cmd *lox.AdminCommand,params *cmds.ParamsValue,logger log.ILogger) ([]byte, error) {
 		path:=cmd.ParamsValue().String()
 		data,err:=ioutil.ReadFile(path)
 		log.Warnf("path",path,string(data))
@@ -21,7 +22,7 @@ func init(){
 		}
 		return data,nil
 	})
-	RegisterAdminFunc(PATH_EXIST, func(cmd *lox.AdminCommand,params *cmds.ParamsValue,logger log.ILogger) ([]byte, error) {
+	rpc.RegisterAdminFunc(PATH_EXIST, func(cmd *lox.AdminCommand,params *cmds.ParamsValue,logger log.ILogger) ([]byte, error) {
 		path:=cmd.ParamsValue().String()
 		exist,_:=util.PathExists(path)
 		if exist {
@@ -30,7 +31,7 @@ func init(){
 			return nil,errors.New("not exist")
 		}
 	})
-	RegisterAdminFunc(CREATE_FILE, func(cmd *lox.AdminCommand,params *cmds.ParamsValue,logger log.ILogger) ([]byte, error) {
+	rpc.RegisterAdminFunc(CREATE_FILE, func(cmd *lox.AdminCommand,params *cmds.ParamsValue,logger log.ILogger) ([]byte, error) {
 		path:=params.String()
 		log.Warnf("path",path)
 		perm:=params.Int()
@@ -42,7 +43,7 @@ func init(){
 		}
 		return nil,nil
 	})
-	RegisterAdminFunc(WALK_DIR, func(cmd *lox.AdminCommand,params *cmds.ParamsValue,logger log.ILogger) ([]byte, error) {
+	rpc.RegisterAdminFunc(WALK_DIR, func(cmd *lox.AdminCommand,params *cmds.ParamsValue,logger log.ILogger) ([]byte, error) {
 		path:=params.String()
 		log.Warnf("path",path)
 		recursive:=params.Bool()
@@ -56,7 +57,7 @@ func init(){
 		log.Warnf("data",string(data))
 		return data,nil
 	})
-	RegisterAdminFunc(EXEC_PATH, func(cmd *lox.AdminCommand, params *cmds.ParamsValue,logger log.ILogger) ([]byte, error) {
+	rpc.RegisterAdminFunc(EXEC_PATH, func(cmd *lox.AdminCommand, params *cmds.ParamsValue,logger log.ILogger) ([]byte, error) {
 		p,_:=util.ExecPath()
 		return []byte(p),nil
 	})

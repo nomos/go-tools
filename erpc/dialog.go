@@ -5,12 +5,13 @@ import (
 	"github.com/nomos/go-lokas/cmds"
 	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-lokas/lox"
+	"github.com/nomos/go-lokas/rpc"
 	"github.com/nomos/go-tools/tools/dialog"
 	"strings"
 )
 
 func init(){
-	RegisterAdminFunc(OPEN_DIALOG_DIR, func(cmd *lox.AdminCommand, params *cmds.ParamsValue,logger log.ILogger) ([]byte, error) {
+	rpc.RegisterAdminFunc(OPEN_DIALOG_DIR, func(cmd *lox.AdminCommand, params *cmds.ParamsValue,logger log.ILogger) ([]byte, error) {
 		log.Info("OPEN_DIALOG_DIR")
 		dir,err:=dialog.Directory().SetStartDir(params.String()).Title(params.String()).Browse()
 		if err != nil {
@@ -20,8 +21,8 @@ func init(){
 		return []byte(dir),nil
 
 	})
-	
-	RegisterAdminFunc(OPEN_DIALOG_FILE, func(cmd *lox.AdminCommand, params *cmds.ParamsValue,logger log.ILogger) ([]byte, error) {
+
+	rpc.RegisterAdminFunc(OPEN_DIALOG_FILE, func(cmd *lox.AdminCommand, params *cmds.ParamsValue,logger log.ILogger) ([]byte, error) {
 		log.Info("OPEN_DIALOG_FILE")
 		opStr:=params.String()
 		var file string
@@ -47,7 +48,7 @@ func init(){
 		return []byte(file),nil
 	})
 
-	RegisterAdminFunc(OPEN_DIALOG_MSG, func(cmd *lox.AdminCommand, params *cmds.ParamsValue,logger log.ILogger) ([]byte, error) {
+	rpc.RegisterAdminFunc(OPEN_DIALOG_MSG, func(cmd *lox.AdminCommand, params *cmds.ParamsValue,logger log.ILogger) ([]byte, error) {
 		opstr:=params.String()
 		builder:= dialog.Message("%s",params.String()).Title(params.String())
 		var ok bool = true

@@ -5,6 +5,7 @@ import (
 	"github.com/nomos/go-lokas/cmds"
 	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-lokas/lox"
+	"github.com/nomos/go-lokas/rpc"
 	"github.com/nomos/go-lokas/util"
 	"github.com/nomos/go-tools/tools/cocos"
 	"io/ioutil"
@@ -30,7 +31,7 @@ func loadSceneId(p string)string{
 }
 
 func init(){
-	RegisterAdminFunc(LOAD_COCOS_PROJECT, func(cmd *lox.AdminCommand, params *cmds.ParamsValue, logger log.ILogger) ([]byte, error) {
+	rpc.RegisterAdminFunc(LOAD_COCOS_PROJECT, func(cmd *lox.AdminCommand, params *cmds.ParamsValue, logger log.ILogger) ([]byte, error) {
 
 		projectPath:=params.String()
 		scenes:=[]string{}
@@ -43,8 +44,8 @@ func init(){
 		retStr:=strings.Join(scenes,"|")
 		return []byte(retStr),nil
 	})
-	
-	RegisterAdminFunc(BUILD_COCOS_PROJECT, func(cmd *lox.AdminCommand, params *cmds.ParamsValue, logger log.ILogger) ([]byte, error) {
+
+	rpc.RegisterAdminFunc(BUILD_COCOS_PROJECT, func(cmd *lox.AdminCommand, params *cmds.ParamsValue, logger log.ILogger) ([]byte, error) {
 
 		enginePath:=params.String()
 		projectPath:=params.String()

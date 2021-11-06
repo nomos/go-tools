@@ -19,14 +19,11 @@ const (
 	LOAD_COCOS_PROJECT = "load_cocos_project"
 	BUILD_COCOS_PROJECT = "build_cocos_project"
 	CUT_PNG = "cut_png"
+	CONVERT_DDS = "convert_dds"
 
 	FILE_SAVE = "file_save"
 	FILE_LOAD = "file_load"
 	MSG_INFO = "msg_info"
 	MSG_ERROR = "msg_error"
 	MSG_YESNO = "msg_yesno"
-
-	LOAD_PNG_FOLDER = "load_png_folder"
-	LOAD_PNG_DATA = "load_png_data"
-	LOAD_PNG_FOLDER_DATA = "load_png_folder_data"
 )

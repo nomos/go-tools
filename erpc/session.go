@@ -8,6 +8,7 @@ import (
 	"github.com/nomos/go-lokas/lox"
 	"github.com/nomos/go-lokas/lox/flog"
 	"github.com/nomos/go-lokas/protocol"
+	"github.com/nomos/go-lokas/rpc"
 	"github.com/nomos/go-lokas/util"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -63,7 +64,7 @@ func (this *Session) WriteString(s string) {
 }
 
 func (this *Session) Write(p []byte) (int, error) {
-	err:=this.SendMessage(0,0,NewConsoleEvent(string(p)))
+	err:=this.SendMessage(0,0,lox.NewConsoleEvent(string(p)))
 	return 0,err
 }
 
@@ -205,7 +206,7 @@ func (this *Session) StartMessagePump() {
 func (this *Session) handAdminCommand(msg *protocol.BinaryMessage){
 	cmd:=msg.Body.(*lox.AdminCommand)
 	log.Info("adminCmd",zap.String("cmd",cmd.Command),zap.Any("values",cmd.Params))
-	if handler, ok := rpcHandlers[cmd.Command]; ok {
+	if handler, ok := rpc.GetRpcHandlers()[cmd.Command]; ok {
 		res,err:=handler(cmd,cmd.ParamsValue(),this)
 		if err!=nil {
 			log.Error(err.Error())
