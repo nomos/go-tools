@@ -38,7 +38,7 @@ require (
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/noaway/dateparse v0.0.0-20171117034806-ad2b19d7b298 // indirect
 	github.com/nomos/clipboard v0.5.7
-	github.com/nomos/go-lokas v0.1.29
+	github.com/nomos/go-lokas v0.1.31
 	github.com/nomos/jwt-go v3.2.0+incompatible // indirect
 	github.com/nomos/qmgo v1.9.6 // indirect
 	github.com/pelletier/go-toml v1.7.0 // indirect
@@ -87,6 +87,3 @@ require (
 	gopkg.in/webnice/b64.v1 v1.0.0 // indirect
 	gopkg.in/yaml.v2 v2.2.8 // indirect
 )
-
-
-replace github.com/nomos/go-lokas => /Users/wqs/go/src/github.com/nomos/go-lokas
