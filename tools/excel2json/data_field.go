@@ -72,14 +72,6 @@ func (this *DataField) readIn(row int, cell *CellSource) (*Data, error) {
 }
 
 func (this *DataField) Load() error {
-	exportCell ,err:= this.sheet.GetCell(EXCEL_EXPORT_LINE, this.ColIndex)
-	if err != nil {
-		return err
-	}
-	this.ExportType, err = GetExportType(exportCell.String())
-	if err != nil {
-		return NewExcellError(EXCEL_EXPORT_LINE, this.ColIndex, err.Error())
-	}
 	typeCell,err := this.sheet.GetCell(EXCEL_TYPE_LINE, this.ColIndex)
 	if err != nil {
 		return err

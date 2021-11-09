@@ -14,11 +14,9 @@ const (
 )
 
 const (
-	EXCEL_INDEX_LINE = 0
-	EXCEL_EXPORT_LINE = 1
+	EXCEL_TYPE_LINE  = 0
+	EXCEL_DESC_LINE  = 1
 	EXCEL_NAME_LINE  = 2
-	EXCEL_TYPE_LINE  = 3
-	EXCEL_DESC_LINE  = 4
 )
 
 const (
