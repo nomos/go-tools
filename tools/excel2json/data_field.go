@@ -8,9 +8,8 @@ import (
 
 type DataField struct {
 	ColIndex   int
-	ExportType ExportType
 	Id         int
-	Typ        FieldType
+	Typ        fieldType
 	Name       string
 	Desc       string
 	IsPercent bool
@@ -20,7 +19,6 @@ type DataField struct {
 func NewDataField(sheet *SheetSource, colIndex int, index int) *DataField {
 	ret := &DataField{
 		ColIndex:   colIndex,
-		ExportType: "",
 		Id:         index,
 		Typ:        0,
 		Name:       "",
@@ -48,27 +46,11 @@ func (this *DataField) ReadIn(row *RowSource) (*Data, error) {
 }
 
 func (this *DataField) readIn(row int, cell *CellSource) (*Data, error) {
-	switch this.Typ {
-	case TypeString:
-		return NewData(this, cell, cell.String()), nil
-	case TypeFloat:
-		s, err := cell.Float()
-		if err != nil {
-			return nil, err
-		}
-		//if this.IsPercent {
-		//	s = s/100
-		//}
-		return NewData(this, cell, s), nil
-	case TypeInt:
-		s, err := cell.Int()
-		if err != nil {
-			return nil, err
-		}
-		return NewData(this, cell, s), nil
-	default:
-		return nil, NewExcellError(row, this.ColIndex, "type is not "+this.Typ.String())
+	v,err:=this.Typ.decode(cell.String())
+	if err != nil {
+		return nil, NewExcellError(row, this.ColIndex, "decode error "+this.Typ.GoString())
 	}
+	return NewData(this,cell,v),nil
 }
 
 func (this *DataField) Load() error {
@@ -76,7 +58,7 @@ func (this *DataField) Load() error {
 	if err != nil {
 		return err
 	}
-	this.Typ, err = GetFieldType(typeCell.String())
+	this.Typ, err = getFieldType(typeCell.String())
 	if err != nil {
 		return NewExcellError(EXCEL_TYPE_LINE, this.ColIndex, err.Error())
 	}
@@ -92,8 +74,10 @@ func (this *DataField) Load() error {
 	}
 	descCell,err := this.sheet.GetCell(EXCEL_DESC_LINE, this.ColIndex)
 	if err != nil {
-		return err
+		this.Desc = ""
+		return nil
+	} else {
+		this.Desc = descCell.String()
 	}
-	this.Desc = descCell.String()
 	return nil
 }

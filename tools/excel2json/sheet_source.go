@@ -15,6 +15,8 @@ import (
 type SheetSource struct {
 	Name       string
 	DescName   string
+	enumField  *DataField
+	enums map[string]int32
 	DataFields []*DataField
 	rows       []*RowSource
 	Data       []*DataLine
@@ -26,6 +28,7 @@ func NewSheetSource(file *excelize.File,name string,descName string)*SheetSource
 		Name:       strings.Join(stringutil.SplitCamelCaseCapitalize(name),""),
 		DescName:   descName,
 		DataFields: []*DataField{},
+		enums: map[string]int32{},
 		rows:       make([]*RowSource, 0),
 		Data:[]*DataLine{},
 		file:       file,
@@ -81,7 +84,7 @@ func (this *SheetSource) Load()error {
 		this.rows = append(this.rows, row)
 		r++
 	}
-	if len(this.rows)<6 {
+	if len(this.rows)<3 {
 		return errors.New("wrong excel format")
 	}
 	err=this.LoadDataFields()
@@ -96,24 +99,23 @@ func (this *SheetSource) Load()error {
 }
 
 func (this *SheetSource) LoadDataFields()error{
+	startIndex:=0
 	for _,cell:=range this.rows[0].Cells {
 		if cell.String()=="" {
 			continue
 		}
-		index,err:=cell.Int()
-		if err != nil {
-			log.Error(err.Error())
-			return err
-		}
-		field:=NewDataField(this,cell.Col,index)
-		this.DataFields = append(this.DataFields, field)
-	}
-	for _,field:=range this.DataFields {
+		field:=NewDataField(this,cell.Col,startIndex)
 		err:=field.Load()
 		if err != nil {
 			log.Error(err.Error())
 			return err
 		}
+		startIndex++
+		if field.Typ==type_tag {
+			this.enumField = field
+			continue
+		}
+		this.DataFields = append(this.DataFields, field)
 	}
 	cols,desc,typ,len:=this.fieldString()
 	lenOffset = len
@@ -158,7 +160,7 @@ func (this *SheetSource) fieldString()(string,string,string,[]int) {
 		ret+="["
 		ret+=field.Name
 		ret+="]"
-		ret+=field.Typ.String()
+		ret+=field.Typ.GoString()
 		ret+=" "
 	}
 	desc = strings.TrimRight(desc," ")
@@ -171,7 +173,7 @@ var lenOffset []int
 
 func (this *SheetSource) LoadData()error{
 	lineIgnores = []string{}
-	for i:=5;i<len(this.rows);i++ {
+	for i:=3;i<len(this.rows);i++ {
 		err:=this.readLine(this.rows[i])
 		if err != nil {
 			return err
@@ -189,6 +191,7 @@ func (this *SheetSource) LoadData()error{
 
 func (this *SheetSource) readLine(row *RowSource)error{
 	line:=NewDataLine(this,row)
+	var idx int32
 	for i,field:=range this.DataFields {
 		if i==0 {
 			cell,err:=row.GetCell(field.ColIndex)
@@ -200,6 +203,14 @@ func (this *SheetSource) readLine(row *RowSource)error{
 				lineIgnores = append(lineIgnores, row.RowName())
 				return nil
 			}
+			var id int
+			id,err = strconv.Atoi(cell.String())
+			if err != nil {
+				log.Error(err.Error())
+				return err
+			}
+			idx = int32(id)
+
 		}
 		data,err:=field.ReadIn(row)
 		if err != nil {
@@ -207,6 +218,15 @@ func (this *SheetSource) readLine(row *RowSource)error{
 		}
 		line.Append(data)
 	}
+	cell,err:=row.GetCell(this.enumField.ColIndex)
+	if err != nil {
+		log.Error(err.Error())
+		return err
+	}
+	if cell.String()!="" {
+		this.enums[cell.String()] = idx
+	}
+
 	this.Data = append(this.Data, line)
 	return nil
 }
@@ -243,9 +263,6 @@ func (this *SheetSource) generateGoFields()string{
 	ret:=""
 	for _,f:=range this.DataFields {
 		ret+="\t"
-		if f.ExportType == TypeIgnore||f.ExportType == TypeClient {
-			ret+="//"
-		}
 		ret+=f.Name
 		ret+=" "
 		ret+=f.Typ.GoString()

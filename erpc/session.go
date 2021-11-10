@@ -186,7 +186,7 @@ func (this *Session) StartMessagePump() {
 					this.Conn.Close()
 					break Loop
 				}
-				if msg.CmdId == lox.TAG_AdminCmd {
+				if msg.CmdId == lox.TAG_ADMIN_CMD {
 					this.handAdminCommand(msg)
 				} else if this.ClientMsgHandler != nil {
 					this.ClientMsgHandler(msg,this)

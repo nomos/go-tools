@@ -81,6 +81,10 @@ func (this *Generator) Generate(gopath string,jsonPath string)error{
 	return nil
 }
 
+func (this *Generator) GenerateTs(tsPath string) error{
+	return nil
+}
+
 func (this *Generator) GenerateGo(gopath string)error{
 	this.dirSource = newDirSource(this.dirSource.dir)
 	err:=this.dirSource.Load()

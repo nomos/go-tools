@@ -1,6 +1,8 @@
 package excel2json
 
-import "strconv"
+import (
+	"strconv"
+)
 
 type RowSource struct {
 	Row int

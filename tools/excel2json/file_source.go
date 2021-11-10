@@ -3,6 +3,7 @@ package excel2json
 import (
 	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	"github.com/nomos/go-lokas/log"
+	"regexp"
 )
 
 func newFileSource(p string)*fileSource{
@@ -34,9 +35,18 @@ func (this *fileSource) Load()error {
 	return nil
 }
 
+func (this *fileSource)checkClassName(s string)bool{
+	if regexp.MustCompile(`Sheet[0-9]*`).FindString(s) == s {
+		return false
+	}
+	return IsCapitalWord(s)
+}
+
 func (this *fileSource) readSheetSource()error {
 	for _,v:=range this.file.GetSheetList() {
-		this.sheets[v] = NewSheetSource(this.file,v,v)
+		if this.checkClassName(v) {
+			this.sheets[v] = NewSheetSource(this.file,v,v)
+		}
 	}
 
 	for _,s:=range this.sheets {
