@@ -7,7 +7,6 @@ import (
 	"github.com/nomos/go-lokas/util/stringutil"
 	"io/ioutil"
 	"path"
-	"regexp"
 	"runtime/debug"
 	"sort"
 	"strconv"
@@ -40,12 +39,12 @@ func (this *Generator) Load()error {
 	return nil
 }
 
-func (this *Generator) GenerateJson(jsonPath string)error{
+func (this *Generator) GenerateJsonString()(string,error){
 	this.dirSource = newDirSource(this.dirSource.dir)
 	err:=this.dirSource.Load()
 	if err != nil {
 		log.Error(err.Error())
-		return err
+		return "",err
 	}
 	jsonMap:=map[string]map[string]*orderedmap.OrderedMap{}
 	for _,f:=range this.dirSource.files {
@@ -56,11 +55,20 @@ func (this *Generator) GenerateJson(jsonPath string)error{
 	jsonStr,err:=json.Marshal(jsonMap)
 	if err != nil {
 		log.Error(err.Error())
+		return "",err
+	}
+	return string(jsonStr),nil
+}
+
+func (this *Generator) GenerateJson(jsonPath string)error{
+	jsonStr,err:=this.GenerateJsonString()
+	if err != nil {
+		log.Error(err.Error())
 		return err
 	}
 	jsonPath=path.Join(jsonPath,"data.json")
 	log.Warnf(jsonPath)
-	err = ioutil.WriteFile(jsonPath, jsonStr, 0644)
+	err = ioutil.WriteFile(jsonPath, []byte(jsonStr), 0644)
 	if err != nil {
 		log.Errorf(err.Error())
 	}
@@ -81,7 +89,82 @@ func (this *Generator) Generate(gopath string,jsonPath string)error{
 	return nil
 }
 
-func (this *Generator) GenerateTs(tsPath string) error{
+func (this *Generator) GenerateTs(tsPath string,embed bool) error{
+	this.dirSource = newDirSource(this.dirSource.dir)
+	err:=this.dirSource.Load()
+	if err != nil {
+		log.Error(err.Error())
+		return err
+	}
+	sheetArr:=[]*SheetSource{}
+	importFieldStr :=""
+	sourceFieldStr :=""
+	loadFieldStr :=""
+	for _,f:=range this.dirSource.files {
+		for _,s:=range f.sheets {
+			sheetArr = append(sheetArr, s)
+			tsFilePath :=path.Join(tsPath,stringutil.SplitCamelCaseLowerSnake(s.Name))+"_source.ts"
+			log.Warnf(tsFilePath)
+			err := ioutil.WriteFile(tsFilePath, []byte(s.GenerateTsString()), 0644)
+			if err != nil {
+				log.Errorf(err.Error())
+			}
+		}
+	}
+	sort.Slice(sheetArr, func(i, j int) bool {
+		return sheetArr[i].Name<sheetArr[j].Name
+	})
+	for _,s:=range sheetArr {
+		sourceFieldStr +=s.GetTsSourceFieldString()
+		sourceFieldStr +="\n"
+		importFieldStr +=s.GetTsImportFieldString()
+		importFieldStr +="\n"
+		loadFieldStr +=s.GetTsLoadFieldString()
+		loadFieldStr +="\n"
+	}
+	importFieldStr = strings.TrimRight(importFieldStr,"\n")
+	sourceFieldStr = strings.TrimRight(sourceFieldStr,"\n")
+	loadFieldStr = strings.TrimRight(loadFieldStr,"\n")
+	dataStr := `{ImportFields}
+{DataFields}
+
+class _DataSource {
+{SourceFields}
+    constructor(objs:Dict<NumericDict<any>>|string) {
+		this.load(objs)
+    }
+    load(objs:Dict<NumericDict<any>>|string){
+		if (typeof objs=="string") {
+			objs = JSON.parse(objs)
+		}
+		if (!objs) {
+			return;
+		}
+{LoadFields}
+    }
+}
+
+export const DataSource = new _DataSource(json)`
+
+	dataStr = strings.Replace(dataStr,"{ImportFields}", importFieldStr,-1)
+	dataStr = strings.Replace(dataStr,"{SourceFields}", sourceFieldStr,-1)
+	dataStr = strings.Replace(dataStr,"{LoadFields}", loadFieldStr,-1)
+	if embed {
+		var jsonStr string
+		jsonStr,err=this.GenerateJsonString()
+		if err != nil {
+			log.Error(err.Error())
+			return err
+		}
+		dataStr = strings.Replace(dataStr,"{DataFields}", "\nconst json = "+jsonStr,-1)
+	} else {
+		dataStr = strings.Replace(dataStr,"{DataFields}", `const json = null`,-1)
+	}
+	dataPath:=path.Join(tsPath,"data_source.ts")
+	err = ioutil.WriteFile(dataPath, []byte(dataStr), 0644)
+	if err != nil {
+		log.Errorf(err.Error())
+	}
 	return nil
 }
 
@@ -113,9 +196,9 @@ func (this *Generator) GenerateGo(gopath string)error{
 		return sheetArr[i].Name<sheetArr[j].Name
 	})
 	for _,s:=range sheetArr {
-		dataFieldStr+=s.GetDataFieldString()
+		dataFieldStr+=s.GetGoDataFieldString()
 		dataFieldStr+="\n"
-		initFieldStr+=s.GetInitFieldString()
+		initFieldStr+=s.GetGoInitFieldString()
 		initFieldStr+="\n"
 	}
 	initFieldStr = strings.TrimRight(initFieldStr,"\n")
@@ -132,7 +215,6 @@ func (this *DataMap) Clear() {
 
 	dataStr = strings.Replace(dataStr,"{InitFields}",initFieldStr,-1)
 	dataStr = strings.Replace(dataStr,"{DataFields}",dataFieldStr,-1)
-	dataStr = regexp.MustCompile(`[*]Chap.+Normal`).ReplaceAllString(dataStr,"*ChapterNormal")
 	dataPath:=path.Join(gopath,"data.go")
 	err = ioutil.WriteFile(dataPath, []byte(dataStr), 0644)
 	if err != nil {

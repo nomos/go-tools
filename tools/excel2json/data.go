@@ -3,6 +3,7 @@ package excel2json
 import (
 	"encoding/json"
 	"github.com/iancoleman/orderedmap"
+	"github.com/nomos/go-lokas/util/stringutil"
 	"strconv"
 	"strings"
 )
@@ -108,7 +109,7 @@ func NewDataLine(sheet *SheetSource, row *RowSource) *DataLine {
 
 func (this *DataLine) Append(d *Data) {
 	this.line = append(this.line, d)
-	this.Map.Set(d.Field.Name, d.Value)
+	this.Map.Set(stringutil.FirstToLower(d.Field.Name), d.Value)
 }
 
 func (this *DataLine) LogString(lenOffset []int) string {

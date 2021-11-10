@@ -6,8 +6,10 @@ import (
 	"github.com/360EntSecGroup-Skylar/excelize/v2"
 	"github.com/iancoleman/orderedmap"
 	"github.com/nomos/go-lokas/log"
+	"github.com/nomos/go-lokas/util/slice"
 	"github.com/nomos/go-lokas/util/stringutil"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -246,17 +248,143 @@ func (this *SheetSource) GenerateGoString()string{
 	return ret
 }
 
+
+const __tsstr = `
+export interface I${class}Data {
+${fields}
+}
+
+${enums}
+
+export class ${class}DataSource {
+    protected data:Map<number, I${class}Data> = new Map<number, I${class}Data>()
+    protected strMap:Map<string, I${class}Data> = new Map<string, I${class}Data>()
+	constructor() {
+    }
+    getById(id:number):I${class}Data {
+        return this.data.get(id)
+    }
+    getByName(name:string):I${class}Data {
+        return this.strMap.get(name)
+    }
+    all():I${class}Data[]{
+        let ret:I${class}Data[] = []
+        this.data.forEach((iter)=>{
+            ret.push(iter)
+        })
+        ret.sort((a,b)=>{
+            return a.id-b.id
+        })
+        return ret
+    }
+    load(objs:NumericDict<any>) {
+        for (let id in objs) {
+            let obj = objs[id]
+            this.data.set(obj.id,obj)
+			if (obj["name"]) {
+				this.strMap.set(obj["name"],obj)
+			}
+        }
+    }
+${enumsGetter}
+}
+`
+
+func (this *SheetSource)generateTsEnums()string {
+	out:="export enum "+this.Name+"Enum {\n"
+	enumsArr:=make([]slice.KVIntString,0)
+
+	for k,v:=range this.enums {
+		descStr:=""
+		value:="\t"+k+" = "+strconv.Itoa(int(v))+","
+		if descStr!="" {
+			value+=" //"+descStr
+		}
+		value+="\n"
+		enumsArr = append(enumsArr, slice.KVIntString{
+			K: int(v),
+			V: value,
+		})
+	}
+	sort.Slice(enumsArr, func(i, j int) bool {
+		return enumsArr[i].K<enumsArr[j].K
+	})
+	for _,v:=range enumsArr {
+		out+=v.V
+	}
+	out+="}\n"
+	return out
+}
+
+func (this *SheetSource) generateTsEnumGetter()string {
+	out:=""
+	enumsArr:=make([]slice.KVIntString,0)
+	for k,v:=range this.enums {
+		enumsArr = append(enumsArr, slice.KVIntString{
+			K: int(v),
+			V: "\t"+`get `+k+`():I`+this.Name+`Data{
+		return this.getById(`+strconv.Itoa(int(v))+`)
+	}
+`,
+		})
+	}
+	sort.Slice(enumsArr, func(i, j int) bool {
+		return enumsArr[i].K<enumsArr[j].K
+	})
+	for _,v:=range enumsArr {
+		out+=v.V
+	}
+	return out
+}
+
+func (this *SheetSource) GenerateTsString()string{
+	ret:=__tsstr
+	ret=strings.Replace(ret,`${class}`,this.Name,-1)
+	ret=strings.Replace(ret,`${fields}`,this.generateTsFields(),-1)
+	ret=strings.Replace(ret,`${enums}`,this.generateTsEnums(),-1)
+	ret=strings.Replace(ret,`${enumsGetter}`,this.generateTsEnumGetter(),-1)
+	return ret
+}
+
+
 func (this *SheetSource) GetMainFieldType()string{
 	f:=this.DataFields[0]
 	return f.Typ.GoString()
 }
 
-func (this *SheetSource) GetDataFieldString()string{
+
+func (this *SheetSource) GetTsImportFieldString()string {
+	importName:=this.Name+"DataSource"
+	pathName:=stringutil.CamelToSnake(this.Name)+"_source"
+	return `import {`+importName+`} from "./`+pathName+`";`
+}
+
+func (this *SheetSource) GetTsLoadFieldString()string{
+	return "\t\t"+`this.`+this.Name+`.load(objs["`+this.Name+`"])`
+}
+
+func (this *SheetSource) GetTsSourceFieldString()string {
+	return "\t"+this.Name+`:`+this.Name+"DataSource = new "+this.Name+"DataSource()"
+}
+
+func (this *SheetSource) GetGoDataFieldString()string{
 	return "\t"+this.Name+" map["+this.GetMainFieldType()+"]*"+this.Name
 }
 
-func (this *SheetSource) GetInitFieldString()string{
+func (this *SheetSource) GetGoInitFieldString()string{
 	return "\tthis."+this.Name+"=make(map["+this.GetMainFieldType()+"]*"+this.Name+")"
+}
+
+func (this *SheetSource) generateTsFields()string{
+	ret:=""
+	for _,f:=range this.DataFields {
+		if f.Name == "#" {
+			continue
+		}
+		ret+="\t"+stringutil.FirstToLower(f.Name)+":"+f.Typ.TsString()+"\n"
+	}
+	ret = strings.TrimRight(ret,"\n")
+	return ret
 }
 
 func (this *SheetSource) generateGoFields()string{
