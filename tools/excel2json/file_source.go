@@ -45,6 +45,18 @@ func (this *fileSource)checkClassName(s string)bool{
 func (this *fileSource) readSheetSource()error {
 	for _,v:=range this.file.GetSheetList() {
 		if this.checkClassName(v) {
+			rows,err:=this.file.Rows(v)
+			if err != nil {
+				log.Error(err.Error())
+				return err
+			}
+			r:=0
+			for rows.Next() {
+				r++
+			}
+			if r<3 {
+				continue
+			}
 			this.sheets[v] = NewSheetSource(this.file,v,v)
 		}
 	}
