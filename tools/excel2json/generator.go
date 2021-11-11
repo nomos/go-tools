@@ -160,7 +160,8 @@ export const DataSource = new _DataSource(json)`
 	} else {
 		dataStr = strings.Replace(dataStr,"{DataFields}", `const json = null`,-1)
 	}
-	dataPath:=path.Join(tsPath,"data_source.ts")
+	baseName:=path.Base(tsPath)
+	dataPath:=path.Join(tsPath,baseName+"_data_source.ts")
 	err = ioutil.WriteFile(dataPath, []byte(dataStr), 0644)
 	if err != nil {
 		log.Errorf(err.Error())

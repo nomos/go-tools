@@ -6,6 +6,7 @@ import (
 	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-lokas/lox"
 	"github.com/nomos/go-lokas/rpc"
+	"github.com/nomos/go-lokas/util"
 	"github.com/nomos/go-tools/tools/dialog"
 	"strings"
 )
@@ -13,13 +14,17 @@ import (
 func init(){
 	rpc.RegisterAdminFunc(OPEN_DIALOG_DIR, func(cmd *lox.AdminCommand, params *cmds.ParamsValue,logger log.ILogger) ([]byte, error) {
 		log.Info("OPEN_DIALOG_DIR")
-		dir,err:=dialog.Directory().SetStartDir(params.String()).Title(params.String()).Browse()
+		startDir:=params.String()
+		title:=params.String()
+		if exist,err:=util.PathExists(startDir);!exist||err!=nil {
+			startDir = "/"
+		}
+		dir,err:=dialog.Directory().SetStartDir(startDir).Title(title).Browse()
 		if err != nil {
 			log.Error(err.Error())
 			return nil,errors.New("cancelled")
 		}
 		return []byte(dir),nil
-
 	})
 
 	rpc.RegisterAdminFunc(OPEN_DIALOG_FILE, func(cmd *lox.AdminCommand, params *cmds.ParamsValue,logger log.ILogger) ([]byte, error) {
@@ -28,6 +33,9 @@ func init(){
 		var file string
 		var err error
 		startDir:=params.String()
+		if exist,err:=util.PathExists(startDir);!exist||err!=nil {
+			startDir = "/"
+		}
 		desc:=params.String()
 		filterExtensionStr:=params.String()
 		extensions:=strings.Split(filterExtensionStr,",")
