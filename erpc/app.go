@@ -12,9 +12,11 @@ import (
 	"github.com/nomos/go-lokas/network"
 	"github.com/nomos/go-lokas/protocol"
 	"github.com/nomos/go-lokas/util"
+	"golang.org/x/image/tiff"
 	"image"
 	"os"
 	"path/filepath"
+	"runtime"
 	"sync"
 )
 
@@ -38,7 +40,17 @@ func (this *App) watchImgClipBoard() {
 }
 
 func (this *App) GetClipBoardImg()(image.Image,error){
-	img, _, err := image.Decode(bytes.NewBuffer(this.clipImgData))
+	var img image.Image
+	var err error
+	if runtime.GOOS=="darwin" {
+		img,err=tiff.Decode(bytes.NewBuffer(this.clipImgData))
+		if err != nil {
+			log.Error(err.Error())
+			return nil,err
+		}
+		return img,nil
+	}
+	img, _, err = image.Decode(bytes.NewBuffer(this.clipImgData))
 	if err != nil {
 		log.Error(err.Error())
 		return nil,err

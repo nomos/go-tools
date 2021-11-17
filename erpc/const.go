@@ -1,6 +1,7 @@
 package erpc
 
 const (
+	PLATFORM = "platform"
 	READ_FILE = "read_file"
 	PATH_EXIST = "path_exist"
 	CREATE_FILE = "create_file"
