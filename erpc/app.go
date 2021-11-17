@@ -1,6 +1,7 @@
 package erpc
 
 import (
+	"bytes"
 	"context"
 	"github.com/asticode/go-astikit"
 	"github.com/asticode/go-astilectron"
@@ -11,6 +12,7 @@ import (
 	"github.com/nomos/go-lokas/network"
 	"github.com/nomos/go-lokas/protocol"
 	"github.com/nomos/go-lokas/util"
+	"image"
 	"os"
 	"path/filepath"
 	"sync"
@@ -18,21 +20,30 @@ import (
 
 //一个和electron typescript通信来实现访问golang原生功能的框架
 
-func (this *App) watchClipBoard() {
+func (this *App) watchImgClipBoard() {
 	ch := clipboard.Watch(context.TODO(), clipboard.FmtImage)
 	ch1 := clipboard.Watch(context.TODO(), clipboard.FmtBMP)
 	go func() {
 		for {
 			select {
-			case data := <-ch:
-				log.Infof("recv", data)
-				println(`"text data" is no longer available from clipboard.`)
 			case data := <-ch1:
-				log.Infof("recv", data)
-				println(`"text data" is no longer available from clipboard.`)
+				log.Infof("clip bmp data")
+				this.clipImgData = data
+			case data := <-ch:
+				log.Infof("clip png data")
+				this.clipImgData = data
 			}
 		}
 	}()
+}
+
+func (this *App) GetClipBoardImg()(image.Image,error){
+	img, _, err := image.Decode(bytes.NewBuffer(this.clipImgData))
+	if err != nil {
+		log.Error(err.Error())
+		return nil,err
+	}
+	return img,nil
 }
 
 var defaultWinOpt = &astilectron.WindowOptions{
@@ -121,6 +132,7 @@ type App struct {
 	sid     util.ID
 	mutex   sync.Mutex
 	done    chan struct{}
+	clipImgData []byte
 }
 
 func NewApp(opts ...Option) *App {
@@ -138,6 +150,7 @@ func NewApp(opts ...Option) *App {
 }
 
 func (this *App) start() error {
+	this.watchImgClipBoard()
 	if this.electronApp != nil {
 		this.electronApp.HandleSignals()
 		this.electronApp.Start()
