@@ -1,10 +1,9 @@
-package img_tool
+package tools
 
 import (
     "github.com/nomos/clipboard"
     "github.com/nomos/go-lokas/log"
     "github.com/nomos/go-tools/tools/pics/img_png"
-    "github.com/nomos/go-tools/ui"
     "github.com/ying32/govcl/vcl"
     "github.com/ying32/govcl/vcl/types"
     "path"
@@ -18,7 +17,7 @@ type TImage2ArrayBuffer struct {
     Label1            *vcl.TLabel
     dropFile string
     entered bool
-    ui.ConfigAble
+    ConfigAble
 }
 
 func (this *TImage2ArrayBuffer) OnEnter() {
@@ -33,7 +32,7 @@ func (this *TImage2ArrayBuffer) Clear() {
 
 }
 
-func NewImage2ArrayBuffer(owner vcl.IComponent,option... ui.FrameOption) (root *TImage2ArrayBuffer)  {
+func NewImage2ArrayBuffer(owner vcl.IComponent,option...FrameOption) (root *TImage2ArrayBuffer)  {
     vcl.CreateResFrame(owner, &root)
     for _,o:=range option {
         o(root)
@@ -41,13 +40,13 @@ func NewImage2ArrayBuffer(owner vcl.IComponent,option... ui.FrameOption) (root *
     return
 }
 
-var _ ui.IFrame = (*TImage2ArrayBuffer)(nil)
+var _ IFrame = (*TImage2ArrayBuffer)(nil)
 
 func (this *TImage2ArrayBuffer) setup(){
     this.SetAlign(types.AlClient)
-    this.DropDownPanel = ui.CreatePanel(types.AlClient,this)
+    this.DropDownPanel = CreatePanel(types.AlClient,this)
     this.DropDownPanel.BorderSpacing().SetAround(24)
-    this.Label1 = ui.CreateText("拖动图片到此处",this.DropDownPanel)
+    this.Label1 = CreateText("拖动图片到此处",this.DropDownPanel)
     this.Label1.SetAlign(types.AlNone)
     this.Label1.AnchorHorizontalCenterTo(this.DropDownPanel)
     this.Label1.AnchorVerticalCenterTo(this.DropDownPanel)

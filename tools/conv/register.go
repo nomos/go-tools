@@ -10,19 +10,19 @@ type convertFunc func(string) (string,error)
 
 var convertFuncs = map[string]convertFunc{}
 
-func getConvertTypePairString(t1,t2 convert.TYPE) string{
+func GetConvertTypePairString(t1,t2 convert.TYPE) string{
 	return t1.ToString()+":"+t2.ToString()
 }
 
-func registerConvertFunc(t1,t2 convert.TYPE,f convertFunc){
-	convertFuncs[getConvertTypePairString(t1,t2)] = f
+func RegisterConvertFunc(t1,t2 convert.TYPE,f convertFunc){
+	convertFuncs[GetConvertTypePairString(t1,t2)] = f
 }
 
-func getConvertFunc(t1,t2 convert.TYPE)convertFunc{
-	return convertFuncs[getConvertTypePairString(t1,t2)]
+func GetConvertFunc(t1,t2 convert.TYPE)convertFunc{
+	return convertFuncs[GetConvertTypePairString(t1,t2)]
 }
 
-func getConvertAble(t convert.TYPE)protocol.IEnumCollection{
+func GetConvertAble(t convert.TYPE)protocol.IEnumCollection{
 	var ret protocol.IEnumCollection = []protocol.IEnum{}
 	for k,_:=range convertFuncs {
 		split:=strings.Split(k,":")

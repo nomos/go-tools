@@ -1,4 +1,4 @@
-package img_tool
+package tools
 
 import (
     "github.com/nomos/go-lokas/log"
@@ -22,7 +22,7 @@ type TImageCutter struct {
 
 var _ ui.IFrame = (*TImageCutter)(nil)
 
-func NewImageCutter(owner vcl.IComponent,option... ui.FrameOption) (root *TImageCutter)  {
+func NewImageCutter(owner vcl.IComponent,option...ui.FrameOption) (root *TImageCutter)  {
     vcl.CreateResFrame(owner, &root)
     for _,o:=range option {
         o(root)
@@ -41,20 +41,20 @@ func (this *TImageCutter) Clear() {
 
 func (this *TImageCutter) setup(){
     this.SetAlign(types.AlClient)
-    line2:=ui.CreateLine(types.AlTop,44,this)
+    line2:= ui.CreateLine(types.AlTop,44,this)
     this.GenerateButton = ui.CreateButton("生成图片",line2)
     this.GenerateButton.BorderSpacing().SetTop(12)
-    line22:=ui.CreateLine(types.AlLeft,100,line2)
-    line21:=ui.CreateLine(types.AlLeft,100,line2)
-    line1:=ui.CreateLine(types.AlTop,44,this)
+    line22:= ui.CreateLine(types.AlLeft,100,line2)
+    line21:= ui.CreateLine(types.AlLeft,100,line2)
+    line1:= ui.CreateLine(types.AlTop,44,this)
     this.OpenPngButton = ui.NewOpenPathBar(line1,"图片路径",280)
     this.OpenPngButton.SetParent(line1)
     this.OpenPngButton.OnCreate()
-    this.ImageHeight = ui.NewEditLabel(line21,"高度",100,ui.EDIT_TYPE_INTERGER)
+    this.ImageHeight = ui.NewEditLabel(line21,"高度",100, ui.EDIT_TYPE_INTERGER)
     this.ImageHeight.SetAlign(types.AlLeft)
     this.ImageHeight.SetParent(line21)
     this.ImageHeight.OnCreate()
-    this.ImageWidth = ui.NewEditLabel(line22,"宽度",100,ui.EDIT_TYPE_INTERGER)
+    this.ImageWidth = ui.NewEditLabel(line22,"宽度",100, ui.EDIT_TYPE_INTERGER)
     this.ImageWidth.SetAlign(types.AlLeft)
     this.ImageWidth.SetParent(line22)
     this.ImageWidth.OnCreate()

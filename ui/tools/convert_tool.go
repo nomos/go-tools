@@ -1,8 +1,9 @@
-package conv
+package tools
 
 import (
 	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-lokas/util/convert"
+	"github.com/nomos/go-tools/tools/conv"
 	"github.com/nomos/go-tools/ui"
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
@@ -21,7 +22,7 @@ type ConvertTool struct {
 	ValueB *ui.EditLabel
 }
 
-func NewConvertTool(owner vcl.IWinControl,option... ui.FrameOption) (root *ConvertTool)  {
+func NewConvertTool(owner vcl.IWinControl,option...ui.FrameOption) (root *ConvertTool)  {
 	vcl.CreateResFrame(owner, &root)
 	for _,o:=range option {
 		o(root)
@@ -32,30 +33,30 @@ func NewConvertTool(owner vcl.IWinControl,option... ui.FrameOption) (root *Conve
 func (this *ConvertTool) setup(){
 	this.SetAlign(types.AlClient)
 	this.SetConfig(this.Config().Sub("convert"))
-	line2:=ui.CreateLine(types.AlTop,44,this)
-	line22:=ui.CreateLine(types.AlLeft,130,line2)
+	line2:= ui.CreateLine(types.AlTop,44,this)
+	line22:= ui.CreateLine(types.AlLeft,130,line2)
 	ui.CreateSeg(20,line2)
-	line21:=ui.CreateLine(types.AlLeft,130,line2)
-	line1:=ui.CreateLine(types.AlTop,44,this)
-	line12:=ui.CreateLine(types.AlLeft,130,line1)
+	line21:= ui.CreateLine(types.AlLeft,130,line2)
+	line1:= ui.CreateLine(types.AlTop,44,this)
+	line12:= ui.CreateLine(types.AlLeft,130,line1)
 	ui.CreateSeg(20,line1)
-	line11:=ui.CreateLine(types.AlLeft,130,line1)
-	this.typeSelectA = ui.NewEditLabel(line11,"类型",130,ui.EDIT_TYPE_ENUM)
+	line11:= ui.CreateLine(types.AlLeft,130,line1)
+	this.typeSelectA = ui.NewEditLabel(line11,"类型",130, ui.EDIT_TYPE_ENUM)
 	this.typeSelectA.OnCreate()
 	this.typeSelectA.SetEnums(convert.ALL_ENC_TYPES)
 	this.typeSelectA.SetAlign(types.AlLeft)
 	this.typeSelectA.SetParent(line11)
-	this.typeSelectB = ui.NewEditLabel(line12,"类型",130,ui.EDIT_TYPE_ENUM)
+	this.typeSelectB = ui.NewEditLabel(line12,"类型",130, ui.EDIT_TYPE_ENUM)
 	this.typeSelectB.OnCreate()
 	this.typeSelectB.SetEnums(convert.ALL_ENC_TYPES)
 	this.typeSelectB.SetAlign(types.AlLeft)
 	this.typeSelectB.SetParent(line12)
 
-	this.ValueA = ui.NewEditLabel(line21,"输入",130,ui.EDIT_TYPE_STRING)
+	this.ValueA = ui.NewEditLabel(line21,"输入",130, ui.EDIT_TYPE_STRING)
 	this.ValueA.OnCreate()
 	this.ValueA.SetAlign(types.AlLeft)
 	this.ValueA.SetParent(line21)
-	this.ValueB = ui.NewEditLabel(line22,"输出",130,ui.EDIT_TYPE_STRING)
+	this.ValueB = ui.NewEditLabel(line22,"输出",130, ui.EDIT_TYPE_STRING)
 	this.ValueB.OnCreate()
 	this.ValueB.SetAlign(types.AlLeft)
 	this.ValueB.SetParent(line22)
@@ -70,10 +71,10 @@ func (this *ConvertTool) setup(){
 		this.convert()
 	}
 	this.ValueA.SetChangeOnEdit(true)
-	this.typeSelectB.SetEnums(getConvertAble(this.typeSelectA.Enum().(convert.TYPE)))
+	this.typeSelectB.SetEnums(conv.GetConvertAble(this.typeSelectA.Enum().(convert.TYPE)))
 	this.typeSelectA.OnValueChange = func(label *ui.EditLabel, editType ui.EDIT_TYPE, value interface{}) {
 		this.Config().Set("input_type",this.typeSelectA.Enum().ToString())
-		this.typeSelectB.SetEnums(getConvertAble(this.typeSelectA.Enum().(convert.TYPE)))
+		this.typeSelectB.SetEnums(conv.GetConvertAble(this.typeSelectA.Enum().(convert.TYPE)))
 		this.convert()
 	}
 	this.typeSelectB.OnValueChange = func(label *ui.EditLabel, editType ui.EDIT_TYPE, value interface{}) {
@@ -83,7 +84,7 @@ func (this *ConvertTool) setup(){
 }
 
 func (this *ConvertTool) convert(){
-	f:=getConvertFunc(this.typeSelectA.Enum().(convert.TYPE),this.typeSelectB.Enum().(convert.TYPE))
+	f:=conv.GetConvertFunc(this.typeSelectA.Enum().(convert.TYPE),this.typeSelectB.Enum().(convert.TYPE))
 	src:=this.ValueA.String()
 	if src == "" {
 		this.ValueB.SetString("")

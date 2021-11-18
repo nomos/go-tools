@@ -1,4 +1,4 @@
-package cocos
+package ui
 
 import (
 	"encoding/json"
@@ -6,7 +6,7 @@ import (
 	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-lokas/protocol"
 	"github.com/nomos/go-lokas/util"
-	"github.com/nomos/go-tools/ui"
+	"github.com/nomos/go-tools/tools/cocos"
 	"github.com/ying32/govcl/vcl"
 	"github.com/ying32/govcl/vcl/types"
 	"io/ioutil"
@@ -15,28 +15,28 @@ import (
 	"strings"
 )
 
-var _ ui.IFrame = (*CocosBuilderFrame)(nil)
+var _ IFrame = (*CocosBuilderFrame)(nil)
 
 
 
 
 type CocosBuilderFrame struct {
 	*vcl.TFrame
-	ui.ConfigAble
+	ConfigAble
 
 	scenes map[string]string
-	enginePathEdit     *ui.OpenPathBar
-	projectPathEdit    *ui.OpenPathBar
-	outputPathEdit     *ui.OpenPathBar
-	startSceneEdit     *ui.EditLabel
-	webOrientationEdit *ui.EditLabel
-	platformEdit       *ui.EditLabel
-	md5Check           *ui.EditLabel
-	debugCheck         *ui.EditLabel
+	enginePathEdit     *OpenPathBar
+	projectPathEdit    *OpenPathBar
+	outputPathEdit     *OpenPathBar
+	startSceneEdit     *EditLabel
+	webOrientationEdit *EditLabel
+	platformEdit       *EditLabel
+	md5Check           *EditLabel
+	debugCheck         *EditLabel
 	generateBtn        *vcl.TButton
 }
 
-func NewCocosBuilderFrame(owner vcl.IWinControl,option... ui.FrameOption) (root *CocosBuilderFrame)  {
+func NewCocosBuilderFrame(owner vcl.IWinControl,option...FrameOption) (root *CocosBuilderFrame)  {
 	vcl.CreateResFrame(owner, &root)
 	for _,o:=range option {
 		o(root)
@@ -46,44 +46,44 @@ func NewCocosBuilderFrame(owner vcl.IWinControl,option... ui.FrameOption) (root 
 
 func (this *CocosBuilderFrame) setup(){
 	this.SetAlign(types.AlClient)
-	panel1:=ui.CreatePanel(types.AlClient,this)
-	line8:=ui.CreateLine(types.AlTop,32,panel1)
-	line4:=ui.CreateLine(types.AlTop,42,panel1)
-	line7:=ui.CreateLine(types.AlTop,42,panel1)
-	line6:=ui.CreateLine(types.AlTop,42,panel1)
-	line5:=ui.CreateLine(types.AlTop,42,panel1)
-	line3:=ui.CreateLine(types.AlTop,42,panel1)
-	line2:=ui.CreateLine(types.AlTop,42,panel1)
-	line1:=ui.CreateLine(types.AlTop,42,panel1)
-	this.generateBtn = ui.CreateButton("打包",line8)
-	line41:=ui.CreateLine(types.AlLeft,80,line4)
-	line42:=ui.CreateLine(types.AlLeft,80,line4)
-	this.startSceneEdit = ui.NewEditLabel(line7,"开始场景",280,ui.EDIT_TYPE_ENUM)
+	panel1:= CreatePanel(types.AlClient,this)
+	line8:= CreateLine(types.AlTop,32,panel1)
+	line4:= CreateLine(types.AlTop,42,panel1)
+	line7:= CreateLine(types.AlTop,42,panel1)
+	line6:= CreateLine(types.AlTop,42,panel1)
+	line5:= CreateLine(types.AlTop,42,panel1)
+	line3:= CreateLine(types.AlTop,42,panel1)
+	line2:= CreateLine(types.AlTop,42,panel1)
+	line1:= CreateLine(types.AlTop,42,panel1)
+	this.generateBtn = CreateButton("打包",line8)
+	line41:= CreateLine(types.AlLeft,80,line4)
+	line42:= CreateLine(types.AlLeft,80,line4)
+	this.startSceneEdit = NewEditLabel(line7,"开始场景",280, EDIT_TYPE_ENUM)
 	this.startSceneEdit.SetParent(line7)
 	this.startSceneEdit.OnCreate()
-	this.webOrientationEdit = ui.NewEditLabel(line5,"Web旋转方向",120,ui.EDIT_TYPE_ENUM)
-	this.webOrientationEdit.SetEnums(ALL_CC_WEB_ORIENTATION)
+	this.webOrientationEdit = NewEditLabel(line5,"Web旋转方向",120, EDIT_TYPE_ENUM)
+	this.webOrientationEdit.SetEnums(cocos.ALL_CC_WEB_ORIENTATION)
 	this.webOrientationEdit.SetParent(line5)
 	this.webOrientationEdit.OnCreate()
-	this.platformEdit = ui.NewEditLabel(line6,"平台",120,ui.EDIT_TYPE_ENUM)
-	this.platformEdit.SetEnums(ALL_CC_PLATFORM)
+	this.platformEdit = NewEditLabel(line6,"平台",120, EDIT_TYPE_ENUM)
+	this.platformEdit.SetEnums(cocos.ALL_CC_PLATFORM)
 	this.platformEdit.SetParent(line6)
 	this.platformEdit.OnCreate()
-	this.md5Check = ui.NewEditLabel(line41,"md5",120,ui.EDIT_TYPE_BOOL)
+	this.md5Check = NewEditLabel(line41,"md5",120, EDIT_TYPE_BOOL)
 	this.md5Check.SetParent(line41)
 	this.md5Check.OnCreate()
 	this.md5Check.SetAlign(types.AlLeft)
-	this.debugCheck = ui.NewEditLabel(line42,"debug",120,ui.EDIT_TYPE_BOOL)
+	this.debugCheck = NewEditLabel(line42,"debug",120, EDIT_TYPE_BOOL)
 	this.debugCheck.SetParent(line42)
 	this.debugCheck.OnCreate()
 	this.debugCheck.SetAlign(types.AlLeft)
-	this.enginePathEdit = ui.NewOpenPathBar(line1,"引擎路径",480,ui.WithOpenDirDialog("引擎路径"))
+	this.enginePathEdit = NewOpenPathBar(line1,"引擎路径",480, WithOpenDirDialog("引擎路径"))
 	this.enginePathEdit.OnCreate()
 	this.enginePathEdit.SetParent(line1)
-	this.outputPathEdit = ui.NewOpenPathBar(line3,"导出路径",480,ui.WithOpenDirDialog("导出路径"))
+	this.outputPathEdit = NewOpenPathBar(line3,"导出路径",480, WithOpenDirDialog("导出路径"))
 	this.outputPathEdit.OnCreate()
 	this.outputPathEdit.SetParent(line3)
-	this.projectPathEdit = ui.NewOpenPathBar(line2,"项目路径",480,ui.WithOpenDirDialog("项目路径"))
+	this.projectPathEdit = NewOpenPathBar(line2,"项目路径",480, WithOpenDirDialog("项目路径"))
 	this.projectPathEdit.OnCreate()
 	this.projectPathEdit.SetParent(line2)
 	if s:=this.Config().GetString("engine_path");s!=""{
@@ -100,10 +100,10 @@ func (this *CocosBuilderFrame) setup(){
 	}
 	this.md5Check.SetBool(this.Config().GetBool("md5"))
 	this.debugCheck.SetBool(this.Config().GetBool("debug"))
-	this.md5Check.OnValueChange = func(label *ui.EditLabel, editType ui.EDIT_TYPE, value interface{}) {
+	this.md5Check.OnValueChange = func(label *EditLabel, editType EDIT_TYPE, value interface{}) {
 		this.Config().Set("md5",this.md5Check.Bool())
 	}
-	this.debugCheck.OnValueChange = func(label *ui.EditLabel, editType ui.EDIT_TYPE, value interface{}) {
+	this.debugCheck.OnValueChange = func(label *EditLabel, editType EDIT_TYPE, value interface{}) {
 		this.Config().Set("debug",this.debugCheck.Bool())
 	}
 	this.enginePathEdit.OnOpen = func(s string) {
@@ -150,25 +150,25 @@ func (this *CocosBuilderFrame) setup(){
 		}
 	}
 	if this.Config().GetString("platform")!="" {
-		e:=ALL_CC_PLATFORM.GetEnumByString(this.Config().GetString("platform"))
+		e:=cocos.ALL_CC_PLATFORM.GetEnumByString(this.Config().GetString("platform"))
 		if !util.IsNil(e) {
 			this.platformEdit.SetEnum(e.Enum())
 		}
 	}
 	if this.Config().GetString("web_orientation")!="" {
-		e:=ALL_CC_WEB_ORIENTATION.GetEnumByString(this.Config().GetString("web_orientation"))
+		e:=cocos.ALL_CC_WEB_ORIENTATION.GetEnumByString(this.Config().GetString("web_orientation"))
 		if !util.IsNil(e) {
 			this.webOrientationEdit.SetEnum(e.Enum())
 		}
 	}
-	this.startSceneEdit.OnValueChange = func(label *ui.EditLabel, editType ui.EDIT_TYPE, value interface{}) {
+	this.startSceneEdit.OnValueChange = func(label *EditLabel, editType EDIT_TYPE, value interface{}) {
 		log.Warnf("OnValueChange",value.(protocol.IEnum).ToString())
 		this.Config().Set("start_scene",value.(protocol.IEnum).ToString())
 	}
-	this.platformEdit.OnValueChange = func(label *ui.EditLabel, editType ui.EDIT_TYPE, value interface{}) {
+	this.platformEdit.OnValueChange = func(label *EditLabel, editType EDIT_TYPE, value interface{}) {
 		this.Config().Set("platform",value.(protocol.IEnum).ToString())
 	}
-	this.webOrientationEdit.OnValueChange = func(label *ui.EditLabel, editType ui.EDIT_TYPE, value interface{}) {
+	this.webOrientationEdit.OnValueChange = func(label *EditLabel, editType EDIT_TYPE, value interface{}) {
 		this.Config().Set("web_orientation",value.(protocol.IEnum).ToString())
 	}
 	this.generateBtn.SetOnClick(func(sender vcl.IObject) {
@@ -189,11 +189,11 @@ func (this *CocosBuilderFrame) setup(){
 			vcl.ThreadSync(func() {
 				this.generateBtn.SetEnabled(false)
 			})
-			err:=BuildCocos(&CocosBuildOption{
+			err:=cocos.BuildCocos(&cocos.CocosBuildOption{
 				Path: projectPath,
 				EnginePath: enginePath,
 				BuildPath:      exportPath,
-				ExcludedModules: []CocosModules{
+				ExcludedModules: []cocos.CocosModules{
 					//tools.CCMO_COLLIDER,
 					//tools.CCMO_DRANGONBONES,
 					//tools.CCMO_GEOMUTILS,
@@ -208,11 +208,11 @@ func (this *CocosBuilderFrame) setup(){
 					//tools.CCMO_VIDEOPLAYER,
 				},
 				StartScene:    this.getSceneUUID(),
-				Platform:      this.platformEdit.Enum().(CocosPlatform),
+				Platform:      this.platformEdit.Enum().(cocos.CocosPlatform),
 				Debug:         this.Config().GetBool("debug"),
 				PreviewWidth:  960,
 				PreviewHeight: 640,
-				WebOrientation:   this.webOrientationEdit.Enum().(CocosWebOrientation),
+				WebOrientation:   this.webOrientationEdit.Enum().(cocos.CocosWebOrientation),
 				Md5Cache:      this.Config().GetBool("md5"),
 			},this.GetLogger())
 			if err != nil {
@@ -229,7 +229,7 @@ func (this *CocosBuilderFrame) OpenProject()error{
 		this.GetLogger().Warnf("路径为空",projectPath)
 		return errors.New("路径为空")
 	}
-	err:=OpenCocosProject(&CocosBuildOption{
+	err:=cocos.OpenCocosProject(&cocos.CocosBuildOption{
 		Path: projectPath,
 		EnginePath: enginePath,
 	},this.GetLogger())
