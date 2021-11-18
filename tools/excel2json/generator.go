@@ -104,7 +104,7 @@ func (this *Generator) GenerateTs(tsPath string,embed bool) error{
 		for _,s:=range f.sheets {
 			sheetArr = append(sheetArr, s)
 			tsFilePath :=path.Join(tsPath,stringutil.SplitCamelCaseLowerSnake(s.Name))+"_source.ts"
-			log.Warnf(tsFilePath)
+			log.Info(tsFilePath)
 			err := ioutil.WriteFile(tsFilePath, []byte(s.GenerateTsString()), 0644)
 			if err != nil {
 				log.Errorf(err.Error())
