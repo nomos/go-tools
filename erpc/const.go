@@ -22,6 +22,9 @@ const (
 	CUT_PNG = "cut_png"
 	CONVERT_DDS = "convert_dds"
 
+	EXEC_CMD = "exec_cmd"
+	SCP = "scp"
+
 	FILE_SAVE = "file_save"
 	FILE_LOAD = "file_load"
 	MSG_INFO = "msg_info"
