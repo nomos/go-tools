@@ -9,9 +9,21 @@ import (
 	"github.com/nomos/go-lokas/rpc"
 	"github.com/nomos/go-lokas/util"
 	"io/ioutil"
+	"os"
 )
 
 func init(){
+	rpc.RegisterAdminFunc(IS_DIR, func(cmd *lox.AdminCommand,params *cmds.ParamsValue,logger log.ILogger) ([]byte, error) {
+		path:=cmd.ParamsValue().String()
+		s, err := os.Stat(path)
+		if err != nil {
+			return nil,errors.New("not exist")
+		}
+		if s.IsDir() {
+			return nil,nil
+		}
+		return nil,errors.New("not dir")
+	})
 	rpc.RegisterAdminFunc(READ_FILE, func(cmd *lox.AdminCommand,params *cmds.ParamsValue,logger log.ILogger) ([]byte, error) {
 		path:=cmd.ParamsValue().String()
 		data,err:=ioutil.ReadFile(path)

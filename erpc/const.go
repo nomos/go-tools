@@ -3,6 +3,7 @@ package erpc
 const (
 	PLATFORM = "platform"
 	READ_FILE = "read_file"
+	IS_DIR = "is_dir"
 	PATH_EXIST = "path_exist"
 	CREATE_FILE = "create_file"
 	WALK_DIR = "walk_dir"
