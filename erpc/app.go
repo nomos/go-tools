@@ -62,6 +62,8 @@ var defaultWinOpt = &astilectron.WindowOptions{
 	Center: astikit.BoolPtr(true),
 	Height: astikit.IntPtr(800),
 	Width:  astikit.IntPtr(1580),
+	MinWidth: astikit.IntPtr(960),
+	MinHeight: astikit.IntPtr(480),
 	Title:  astikit.StrPtr(""),
 	WebPreferences: &astilectron.WebPreferences{
 		WebSecurity: astikit.BoolPtr(false),
@@ -82,6 +84,12 @@ func WithElectron(name string, defaultUrl string) Option {
 func WithConfig(name string) Option {
 	return func(app *App) {
 		app.config = lox.NewAppConfig(name)
+	}
+}
+
+func WithAppConfig(conf lokas.IConfig) Option {
+	return func(app *App) {
+		app.config = conf
 	}
 }
 
@@ -137,7 +145,7 @@ type App struct {
 	electronApp   *astilectron.Astilectron
 	gameWindow    *astilectron.Window
 	gameWindowOpt *astilectron.WindowOptions
-	config        *lox.AppConfig
+	config        lokas.IConfig
 
 	devTool bool
 	url     string
@@ -193,12 +201,30 @@ func (this *App) stop() error {
 	return nil
 }
 
+func reformWidth(s int)int{
+	return (s+1)/2*2-1
+}
+
+func reformHeight(s int)int{
+	return (s)/2*2
+}
+
 func (this *App) createGameWindow(url string) error {
 	var err error
 	winOpt := defaultWinOpt
 	if this.gameWindowOpt != nil {
 		winOpt = this.gameWindowOpt
 	}
+	width:=1280
+	height:=720
+	if this.config.GetInt("width")!=0 {
+		width=this.config.GetInt("width")
+	}
+	if this.config.GetInt("height")!=0 {
+		height=this.config.GetInt("height")
+	}
+	*(winOpt.Width) = reformWidth(width)
+	*(winOpt.Height) = reformHeight(height)
 	this.gameWindow, err = this.electronApp.NewWindow(url, winOpt)
 	if err != nil {
 		return log.Error(err.Error())
@@ -207,7 +233,25 @@ func (this *App) createGameWindow(url string) error {
 	if err != nil {
 		return log.Error(err.Error())
 	}
+	this.gameWindow.On(astilectron.EventNameWindowEventResize, func(e astilectron.Event) (deleteListener bool) {
+		this.config.Set("width",reformWidth(*(e.WindowOptions.Width)))
+		this.config.Set("height",reformHeight(*(e.WindowOptions.Height)))
+		this.config.Save()
+		return false
+	})
 	return nil
+}
+
+func (this *App) ResetSize(){
+	width:=1280
+	height:=720
+	if this.config.GetInt("width")!=0 {
+		width=this.config.GetInt("width")
+	}
+	if this.config.GetInt("height")!=0 {
+		height=this.config.GetInt("height")
+	}
+	this.gameWindow.Resize(reformWidth(width),reformHeight(height))
 }
 
 func (this *App) closeGameWindow() error {
@@ -293,6 +337,9 @@ LOOP:
 	log.Warnf("stop")
 }
 
+func (this *App) Resize(width,height int){
+	this.gameWindow.Resize(width,height)
+}
 
 func (this *App) Clear() {
 

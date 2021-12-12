@@ -38,9 +38,9 @@ require (
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/noaway/dateparse v0.0.0-20171117034806-ad2b19d7b298 // indirect
 	github.com/nomos/clipboard v0.5.7
-	github.com/nomos/go-lokas v0.1.36
+	github.com/nomos/go-lokas v0.1.38
 	github.com/nomos/jwt-go v3.2.0+incompatible // indirect
-	github.com/nomos/qmgo v1.9.6 // indirect
+	github.com/nomos/qmgo v1.9.7 // indirect
 	github.com/pelletier/go-toml v1.7.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pkg/sftp v1.13.0 // indirect
@@ -86,6 +86,7 @@ require (
 )
 
 require (
-	github.com/disintegration/imaging v1.6.2 // indirect
-	howett.net/plist v1.0.0 // indirect
+	golang.design/x/clipboard v0.5.3 // indirect
+	golang.org/x/exp v0.0.0-20191030013958-a1ab85dbe136 // indirect
+	golang.org/x/mobile v0.0.0-20210716004757-34ab1303b554 // indirect
 )

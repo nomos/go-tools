@@ -17,6 +17,7 @@ const (
 	OPEN_DIALOG_MSG = "open_dialog_msg"
 	OPEN_DEV_TOOL = "open_dev_tool"
 	CLOSE_DEV_TOOL = "close_dev_tool"
+	RESET_SIZE = "reset_size"
 
 	LOAD_COCOS_PROJECT = "load_cocos_project"
 	BUILD_COCOS_PROJECT = "build_cocos_project"

@@ -16,4 +16,8 @@ func init(){
 		Instance().SetDevTool(false)
 		return nil,nil
 	})
+	rpc.RegisterAdminFunc(RESET_SIZE, func(cmd *lox.AdminCommand, params *cmds.ParamsValue, logger log.ILogger) ([]byte, error) {
+		Instance().ResetSize()
+		return nil,nil
+	})
 }
