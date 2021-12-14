@@ -202,10 +202,16 @@ func (this *App) stop() error {
 }
 
 func reformWidth(s int)int{
-	return (s+1)/2*2-1
+	if runtime.GOOS == "windows" {
+		return (s-1)/2*2+1
+	}
+	return (s-1)/2*2+1
 }
 
 func reformHeight(s int)int{
+	if runtime.GOOS == "windows" {
+		return (s-1)/2*2+1
+	}
 	return (s)/2*2
 }
 
@@ -234,6 +240,7 @@ func (this *App) createGameWindow(url string) error {
 		return log.Error(err.Error())
 	}
 	this.gameWindow.On(astilectron.EventNameWindowEventResize, func(e astilectron.Event) (deleteListener bool) {
+		log.Infof(this.config,e)
 		this.config.Set("width",reformWidth(*(e.WindowOptions.Width)))
 		this.config.Set("height",reformHeight(*(e.WindowOptions.Height)))
 		this.config.Save()
