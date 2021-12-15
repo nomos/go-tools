@@ -243,7 +243,6 @@ func (this *App) createGameWindow(url string) error {
 		log.Infof(this.config,e)
 		this.config.Set("width",reformWidth(*(e.WindowOptions.Width)))
 		this.config.Set("height",reformHeight(*(e.WindowOptions.Height)))
-		this.config.Save()
 		return false
 	})
 	return nil
@@ -324,6 +323,7 @@ func (this *App) Start() {
 	this.Gate.Start()
 	this.start()
 	util.WaitForTerminate()
+	this.config.Save()
 }
 
 func (this *App) mainLoop() {
