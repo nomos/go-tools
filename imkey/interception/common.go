@@ -103,7 +103,7 @@ func (this *InterceptionDLL) Release() error {
 
 func (this *InterceptionDLL) SendKeyStoke(code keys.KEY,event_type keys.KEY_EVENT_TYPE )error {
 	stroke:=&InterceptionKeyStroke{
-		code:        uint16(code),
+		code:        uint16(code.ScanCode()),
 		information: 0,
 	}
 	switch event_type {
@@ -115,10 +115,7 @@ func (this *InterceptionDLL) SendKeyStoke(code keys.KEY,event_type keys.KEY_EVEN
 		log.Warnf("undefined event",event_type)
 		return nil
 	}
-	_,_,err:=this.interception_send.Call(this.context,KEYBOARD,uintptr(unsafe.Pointer(stroke)),1)
-	if err!=nil {
-		log.Error(err.Error())
-	}
+	this.interception_send.Call(this.context,KEYBOARD,uintptr(unsafe.Pointer(stroke)),1)
 	return nil
 }
 

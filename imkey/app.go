@@ -1,7 +1,6 @@
 package imkey
 
 import (
-	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-lokas/util/keys"
 	"sync"
 )
@@ -42,8 +41,16 @@ func (this *App) Stop()error{
 	return this.stop()
 }
 
-func (this *App) SendKeyboardEvent(event *keys.KeyEvent){
-	this.sendKeyboardEvent(event)
+func (this *App) PressKey(key keys.KEY){
+	this.SendKeyEvent(key,keys.KEY_EVENT_TYPE_DOWN)
+}
+
+func (this *App) ReleaseKey(key keys.KEY){
+	this.SendKeyEvent(key,keys.KEY_EVENT_TYPE_UP)
+}
+
+func (this *App) SendKeyEvent(key keys.KEY,event_type keys.KEY_EVENT_TYPE){
+	this.sendKeyboardEvent(key,event_type)
 }
 
 func (this *App) SendMouseEvent(event *keys.MouseEvent){
@@ -65,11 +72,7 @@ func (this *App) emitMouseEvent(e *keys.MouseEvent){
 }
 
 func (this *App) emitKeyEvent(e *keys.KeyEvent){
-	log.Warnf(e.Event.ToString(),e.Code.ToString())
 	if this.keyEventHandler!=nil {
 		this.keyEventHandler(e)
 	}
 }
-
-
-

@@ -5,11 +5,15 @@ import (
 	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-lokas/lox/flog"
 	"github.com/nomos/go-lokas/util/keys"
+	"github.com/nomos/go-tools/imkey/interception"
+	"github.com/nomos/go-tools/imkey/kernel32"
 	"github.com/nomos/go-tools/imkey/user32"
 )
 
 type app struct {
+	k32 *kernel32.Kernel32DLL
 	user32 *user32.User32DLL
+	interception *interception.InterceptionDLL
 	keyboardListener *user32.LowLevelKeyboardEventListener
 	mouseListener *user32.LowLevelMouseEventListener
 }
@@ -20,10 +24,19 @@ func (this *App) init(){
 
 func (this *App) start()error{
 	var err error
+	this.k32,err= kernel32.LoadKernel32Dll()
+	if err!=nil {
+		log.Error("load kernel32.dll error",flog.Error(err))
+	}
+	process:=this.k32.GetCurrentProcess()
+	this.k32.SetPriorityClass(process, kernel32.HIGH_PRIORITY_CLASS)
+	this.interception,err = interception.LoadInterceptionDll()
+	if err != nil {
+		log.Error("load interception.dll error",flog.Error(err))
+	}
 	this.user32, err = user32.LoadUser32DLL()
 	if err != nil {
-		log.Error("load dll error",flog.Error(err))
-		// Error handling.
+		log.Error("load user32.dll error",flog.Error(err))
 	}
 	this.keyboardListener, err = user32.NewLowLevelKeyboardListener(func(event user32.LowLevelKeyboardEvent) {
 		a:=event.KeyboardButtonAction()
@@ -166,21 +179,15 @@ func (this *App) start()error{
 func (this *App) stop()error{
 	this.keyboardListener.Release()
 	this.mouseListener.Release()
+	this.k32.Release()
+	this.interception.Release()
 	return nil
 }
 
-func (this *App) sendKeyboardEvent(event *keys.KeyEvent){
-
+func (this *App) sendKeyboardEvent(key keys.KEY,event_type keys.KEY_EVENT_TYPE){
+	this.interception.SendKeyStoke(key,event_type)
 }
 
 func (this *App) sendMouseEvent(event *keys.MouseEvent){
-
-}
-
-func (this *App) onKeyboardEvent(event *keys.KeyEvent){
-
-}
-
-func (this *App) onMouseEvent(event *keys.MouseEvent){
 
 }

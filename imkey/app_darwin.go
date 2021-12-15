@@ -55,11 +55,3 @@ func (this *App) sendKeyboardEvent(event *keys.KeyEvent){
 func (this *App) sendMouseEvent(event *keys.MouseEvent){
 
 }
-
-func (this *App) onKeyboardEvent(event *keys.KeyEvent){
-
-}
-
-func (this *App) onMouseEvent(event *keys.MouseEvent){
-
-}
