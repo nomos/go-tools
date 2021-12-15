@@ -26,4 +26,5 @@ require (
 	github.com/go-vgo/robotgo v0.100.10
 	github.com/robotn/gohook v0.31.3
 	golang.design/x/clipboard v0.5.3 // indirect
+	golang.org/x/sys v0.0.0-20211123173158-ef496fb156ab
 )

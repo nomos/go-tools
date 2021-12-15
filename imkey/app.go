@@ -1,6 +1,7 @@
 package imkey
 
 import (
+	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-lokas/util/keys"
 	"sync"
 )
@@ -64,6 +65,7 @@ func (this *App) emitMouseEvent(e *keys.MouseEvent){
 }
 
 func (this *App) emitKeyEvent(e *keys.KeyEvent){
+	log.Warnf(e.Event.ToString(),e.Code.ToString())
 	if this.keyEventHandler!=nil {
 		this.keyEventHandler(e)
 	}

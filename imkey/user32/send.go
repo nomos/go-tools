@@ -1,4 +1,4 @@
-package user32util
+package user32
 
 import (
 	"fmt"
