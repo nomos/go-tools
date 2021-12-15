@@ -71,10 +71,10 @@ require (
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.17.0
 	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a
-	golang.org/x/image v0.0.0-20210628002857-a66eb6448b8d
+	golang.org/x/image v0.0.0-20211028202545-6944b10bf410
 	golang.org/x/net v0.0.0-20210415231046-e915ea6b2b7d // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
-	golang.org/x/sys v0.0.0-20210510120138-977fb7262007 // indirect
+	golang.org/x/sys v0.0.0-20211123173158-ef496fb156ab // indirect
 	golang.org/x/text v0.3.6 // indirect
 	google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013 // indirect
 	google.golang.org/grpc v1.37.0 // indirect
@@ -86,6 +86,21 @@ require (
 )
 
 require (
+	github.com/StackExchange/wmi v1.2.1 // indirect
+	github.com/go-ole/go-ole v1.2.6 // indirect
+	github.com/go-vgo/robotgo v0.100.10 // indirect
+	github.com/lxn/win v0.0.0-20210218163916-a377121e959e // indirect
+	github.com/otiai10/gosseract v2.2.1+incompatible // indirect
+	github.com/robotn/gohook v0.31.3 // indirect
+	github.com/robotn/xgb v0.0.0-20190912153532-2cb92d044934 // indirect
+	github.com/robotn/xgbutil v0.0.0-20190912154524-c861d6f87770 // indirect
+	github.com/shirou/gopsutil v3.21.10+incompatible // indirect
+	github.com/tklauser/go-sysconf v0.3.9 // indirect
+	github.com/tklauser/numcpus v0.3.0 // indirect
+	github.com/vcaesar/gops v0.21.3 // indirect
+	github.com/vcaesar/imgo v0.30.0 // indirect
+	github.com/vcaesar/keycode v0.10.0 // indirect
+	github.com/vcaesar/tt v0.20.0 // indirect
 	golang.design/x/clipboard v0.5.3 // indirect
 	golang.org/x/exp v0.0.0-20191030013958-a1ab85dbe136 // indirect
 	golang.org/x/mobile v0.0.0-20210716004757-34ab1303b554 // indirect

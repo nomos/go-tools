@@ -15,7 +15,7 @@ func TestDDS(t *testing.T) {
 	}
 	defer file.Close()
 
-	tex, err := Decode(file)
+	tex, err := Decode(file,true)
 	if err != nil {
 		fmt.Println("decode errror", err)
 	}
