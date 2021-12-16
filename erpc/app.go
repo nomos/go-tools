@@ -9,6 +9,7 @@ import (
 	"github.com/nomos/go-lokas"
 	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-lokas/lox"
+	"github.com/nomos/go-lokas/lox/errs"
 	"github.com/nomos/go-lokas/network"
 	"github.com/nomos/go-lokas/protocol"
 	"github.com/nomos/go-lokas/util"
@@ -69,6 +70,23 @@ var defaultWinOpt = &astilectron.WindowOptions{
 	WebPreferences: &astilectron.WebPreferences{
 		WebSecurity: astikit.BoolPtr(false),
 	},
+}
+
+func WithHandler(handler func(msg *protocol.BinaryMessage)(protocol.ISerializable,error))Option {
+	return func(app *App) {
+		app.handler = func(msg *protocol.BinaryMessage, session *Session) {
+			ret,err:=handler(msg)
+			if err!=nil {
+				if e,ok:=err.(*protocol.ErrMsg);ok {
+					session.SendMessage(0,msg.TransId,e)
+				} else {
+					session.SendMessage(0,msg.TransId,protocol.NewError(errs.ERR_INTERNAL_SERVER))
+				}
+				return
+			}
+			session.SendMessage(0,msg.TransId,ret)
+		}
+	}
 }
 
 func WithElectron(name string, defaultUrl string) Option {
@@ -143,7 +161,7 @@ type App struct {
 	*lox.Gate
 	Port string
 	*Session
-
+	handler func(msg *protocol.BinaryMessage,session *Session)
 	electronApp   *astilectron.Astilectron
 	gameWindow    *astilectron.Window
 	gameWindowOpt *astilectron.WindowOptions
@@ -316,7 +334,7 @@ func (this *App) SessionCreator(conn lokas.IConn) lokas.ISession {
 		this.Session.Conn.Close()
 		this.Session = nil
 	}
-	this.Session = NewSession(conn, this.genId(), this)
+	this.Session = NewSession(conn, this.genId(), this, WithSessionHandler(this.handler))
 	go this.Session.Start()
 	return this.Session
 }
@@ -324,9 +342,8 @@ func (this *App) SessionCreator(conn lokas.IConn) lokas.ISession {
 func (this *App) Start() {
 	this.Gate.LoadCustom("0.0.0.0", this.Port, protocol.BINARY, lox.Websocket)
 	this.Gate.Start()
-	this.start()
 	this.Emit("start")
-	util.WaitForTerminate()
+	this.start()
 	this.Emit("stop")
 	this.config.Save()
 }

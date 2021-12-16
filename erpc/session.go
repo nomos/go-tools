@@ -23,6 +23,12 @@ const (
 
 type SessionOption func(*Session)
 
+func WithSessionHandler(handler func(msg *protocol.BinaryMessage,session *Session))SessionOption{
+	return func(session *Session) {
+		session.ClientMsgHandler = handler
+	}
+}
+
 var _ lokas.ISession = &Session{}
 var _ lokas.IActor = &Session{}
 
@@ -211,18 +217,15 @@ func (this *Session) handAdminCommand(msg *protocol.BinaryMessage){
 		if err!=nil {
 			log.Error(err.Error())
 			ret:=lox.NewAdminCommandResult(cmd,false,[]byte(err.Error()))
-			data, _ := protocol.MarshalMessage(msg.TransId, ret, protocol.BINARY)
-			this.Conn.Write(data)
+			this.SendMessage(0,msg.TransId,ret)
 			return
 		}
 		ret:=lox.NewAdminCommandResult(cmd,true,res)
-		data, _ := protocol.MarshalMessage(msg.TransId, ret, protocol.BINARY)
-		this.Conn.Write(data)
+		this.SendMessage(0,msg.TransId,ret)
 	} else {
 		log.Errorf("Admin Command not found",cmd.Command)
 		ret:=lox.NewAdminCommandResult(cmd,false,[]byte("admin cmd not found"))
-		data, _ := protocol.MarshalMessage(msg.TransId, ret, protocol.BINARY)
-		this.Conn.Write(data)
+		this.SendMessage(0,msg.TransId,ret)
 	}
 }
 
