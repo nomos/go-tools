@@ -7,7 +7,10 @@ import (
 	hook "github.com/robotn/gohook"
 )
 
-func (this *App) start()error{
+type app struct {
+}
+
+func (this *App) start() error {
 	addEvent()
 	addMouse()
 	return nil
@@ -43,15 +46,23 @@ func addMouse() {
 	<-robotgo.EventProcess(s)
 }
 
-func (this *App) stop()error{
+func (this *App) init() error {
+	return nil
+}
+
+func (this *App) stop() error {
 
 	return nil
 }
 
-func (this *App) sendKeyboardEvent(event *keys.KeyEvent){
+func (this *App) hasWindow(str string) bool {
+	return false
+}
+
+func (this *App) sendKeyboardEvent(key keys.KEY, event_type keys.KEY_EVENT_TYPE) {
 
 }
 
-func (this *App) sendMouseEvent(event *keys.MouseEvent){
+func (this *App) sendMouseEvent(event *keys.MouseEvent) {
 
 }
