@@ -74,6 +74,7 @@ func (this *Task) Run() {
 type TaskFunc func(task *Task)
 
 func (this *App) Init() {
+	this.keyStatus = map[keys.KEY]bool{}
 	this.init()
 }
 

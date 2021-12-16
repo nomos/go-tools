@@ -90,7 +90,7 @@ func (this *InterceptionDLL) init() error {
 	var err error
 	this.context, _, err = this.interception_create_context.Call()
 	if err != nil {
-		log.Error(err.Error())
+		//log.Error(err.Error())
 	}
 	return nil
 }

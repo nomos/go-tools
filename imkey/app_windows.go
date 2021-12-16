@@ -1,6 +1,7 @@
 package imkey
 
 import (
+	"github.com/lxn/win"
 	"github.com/nomos/go-lokas/ecs"
 	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-lokas/lox/flog"
@@ -8,6 +9,7 @@ import (
 	"github.com/nomos/go-tools/imkey/interception"
 	"github.com/nomos/go-tools/imkey/kernel32"
 	"github.com/nomos/go-tools/imkey/user32"
+	"syscall"
 )
 
 type app struct {
