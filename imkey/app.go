@@ -29,7 +29,7 @@ type App struct {
 	*app
 	keyEventHandler   KeyEventHandler
 	mouseEventHandler MouseEventHandler
-	tasks             map[string]*Task
+	tasks             map[string]ITask
 	enabled           bool
 	keyStatus         map[keys.KEY]bool
 	taskMutex         sync.Mutex
@@ -71,7 +71,11 @@ func (this *Task) Run() {
 	this.taskOn = false
 	this.taskFunc(this)
 	this.taskOn = true
-	this.App.removeTask(this.Name)
+	this.App.RemoveTask(this.Name)
+}
+
+func (this *Task) TaskOff() {
+	this.taskOn = false
 }
 
 type TaskFunc func(task *Task)
@@ -104,7 +108,7 @@ func (this *App) ResetAllKeys() {
 
 func (this *App) Stop() error {
 	this.enabled = false
-	this.stopAllTask()
+	this.StopAllTask()
 	this.ResetAllKeys()
 	return this.stop()
 }
@@ -146,17 +150,31 @@ func (this *App) RunTask(name string, taskFunc TaskFunc) {
 	go t.Run()
 }
 
+func (this *App) AddTask(name string,task ITask){
+	if !this.enabled {
+		return
+	}
+	this.taskMutex.Lock()
+	t := this.tasks[name]
+	if t != nil {
+		this.taskMutex.Unlock()
+		return
+	}
+	this.tasks[name] = task
+	go task.Run()
+}
+
 func (this *App) StopTask(name string) {
 	this.taskMutex.Lock()
 	defer this.taskMutex.Unlock()
 	t := this.tasks[name]
-	t.taskOn = false
+	t.TaskOff()
 }
 
-func (this *App) stopAllTask() {
+func (this *App) StopAllTask() {
 	this.taskMutex.Lock()
 	for _, v := range this.tasks {
-		v.taskOn = false
+		v.TaskOff()
 	}
 	this.taskMutex.Unlock()
 	for {
@@ -170,13 +188,13 @@ func (this *App) HasWindow(str string) bool {
 	return this.hasWindow(str)
 }
 
-func (this *App) removeTask(name string) {
+func (this *App) RemoveTask(name string) {
 	this.taskMutex.Lock()
 	defer this.taskMutex.Unlock()
 	delete(this.tasks, name)
 }
 
-func (this *App) getTask(name string) *Task {
+func (this *App) GetTask(name string) ITask {
 	this.taskMutex.Lock()
 	defer this.taskMutex.Unlock()
 	return this.tasks[name]
