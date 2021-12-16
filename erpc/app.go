@@ -204,9 +204,9 @@ func (this *App) start() error {
 			this.gameWindow.OpenDevTools()
 		}
 		this.electronApp.Wait()
-		os.Exit(1)
+		this.Gate.Stop()
+		this.electronApp.Close()
 	}
-
 	return nil
 }
 
@@ -346,6 +346,8 @@ func (this *App) Start() {
 	this.start()
 	this.Emit("stop")
 	this.config.Save()
+	log.Warn("save complete")
+	os.Exit(1)
 }
 
 func (this *App) mainLoop() {
@@ -378,15 +380,18 @@ func (this *App) Stop() error {
 	if this.done!=nil {
 		this.done <- struct{}{}
 	}
+	log.Error("Stop1")
 	err := this.stop()
 	if err != nil {
 		log.Error(err.Error())
 		return err
 	}
+	log.Error("Stop2")
 	err = this.Gate.Stop()
 	if err != nil {
 		log.Error(err.Error())
 		return err
 	}
+	log.Error("Stop3")
 	return nil
 }
