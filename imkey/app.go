@@ -2,6 +2,7 @@ package imkey
 
 import (
 	"github.com/nomos/go-lokas/log"
+	"github.com/nomos/go-lokas/util/events"
 	"github.com/nomos/go-lokas/util/keys"
 	"sync"
 	"time"
@@ -14,6 +15,7 @@ func Instance() *App {
 	once.Do(func() {
 		if instance == nil {
 			instance = &App{
+				EventEmmiter:events.New(),
 				app: &app{},
 			}
 			instance.Init()
@@ -23,6 +25,7 @@ func Instance() *App {
 }
 
 type App struct {
+	events.EventEmmiter
 	*app
 	keyEventHandler   KeyEventHandler
 	mouseEventHandler MouseEventHandler
@@ -77,6 +80,7 @@ func (this *App) Init() {
 	this.keyStatus = map[keys.KEY]bool{}
 	this.init()
 }
+
 
 func (this *App) Start() error {
 	err := this.start()

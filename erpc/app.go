@@ -12,6 +12,7 @@ import (
 	"github.com/nomos/go-lokas/network"
 	"github.com/nomos/go-lokas/protocol"
 	"github.com/nomos/go-lokas/util"
+	"github.com/nomos/go-lokas/util/events"
 	"golang.org/x/image/tiff"
 	"image"
 	"os"
@@ -138,6 +139,7 @@ func Close() error {
 }
 
 type App struct {
+	events.EventEmmiter
 	*lox.Gate
 	Port string
 	*Session
@@ -157,6 +159,7 @@ type App struct {
 
 func NewApp(opts ...Option) *App {
 	ret := &App{
+		EventEmmiter:events.New(),
 		Gate: &lox.Gate{
 			Actor:           lox.NewActor(),
 			ISessionManager: network.NewDefaultSessionManager(true),
@@ -322,7 +325,9 @@ func (this *App) Start() {
 	this.Gate.LoadCustom("0.0.0.0", this.Port, protocol.BINARY, lox.Websocket)
 	this.Gate.Start()
 	this.start()
+	this.Emit("start")
 	util.WaitForTerminate()
+	this.Emit("stop")
 	this.config.Save()
 }
 
