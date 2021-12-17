@@ -66,3 +66,16 @@ func (this *App) sendKeyboardEvent(key keys.KEY, event_type keys.KEY_EVENT_TYPE)
 func (this *App) sendMouseEvent(event *keys.MouseEvent) {
 
 }
+
+func (this *App) setActiveWindow(str string) {
+
+}
+
+func (this *App) isActiveWindow(str string)bool{
+	return true
+}
+
+func (this *App) getWindowRect(str string) (int32,int32,int32,int32,error) {
+	return 0,0,0,0,nil
+}
+

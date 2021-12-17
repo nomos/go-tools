@@ -175,7 +175,7 @@ func (this *App) ScreenCapture(x,y,w,h int)(*image.RGBA,error){
 	return screenshot.Capture(x,y,w,h)
 }
 
-func (this *App) GetScreenPixel(x,y int)(*colors.Color,error){
+func (this *App) ScreenPixel(x,y int)(*colors.Color,error){
 	img,err:=screenshot.Capture(x,y,1,1)
 	var ret colors.Color
 	if err!=nil {
