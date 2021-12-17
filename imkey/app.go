@@ -1,9 +1,12 @@
 package imkey
 
 import (
+	"github.com/kbinani/screenshot"
 	"github.com/nomos/go-lokas/log"
+	"github.com/nomos/go-lokas/util/colors"
 	"github.com/nomos/go-lokas/util/events"
 	"github.com/nomos/go-lokas/util/keys"
+	"image"
 	"sync"
 	"time"
 )
@@ -164,6 +167,24 @@ func (this *App) AddTask(name string,task ITask){
 	go task.Run()
 }
 
+func (this *App) ScreenShot()(*image.RGBA,error){
+	return screenshot.CaptureDisplay(0)
+}
+
+func (this *App) ScreenCapture(x,y,w,h int)(*image.RGBA,error){
+	return screenshot.Capture(x,y,w,h)
+}
+
+func (this *App) GetScreenPixel(x,y int)(*colors.Color,error){
+	img,err:=screenshot.Capture(x,y,1,1)
+	var ret colors.Color
+	if err!=nil {
+		return nil,err
+	}
+	ret = colors.NewColorRGBA(img.Pix[0],img.Pix[1],img.Pix[2],img.Pix[3])
+	return &ret,nil
+}
+
 func (this *App) StopTask(name string) {
 	this.taskMutex.Lock()
 	defer this.taskMutex.Unlock()
@@ -186,6 +207,18 @@ func (this *App) StopAllTask() {
 
 func (this *App) HasWindow(str string) bool {
 	return this.hasWindow(str)
+}
+
+func (this *App) SetActiveWindow(str string){
+	this.setActiveWindow(str)
+}
+
+func (this *App) IsActiveWindow(str string)bool{
+	return this.isActiveWindow(str)
+}
+
+func (this *App) GetWindowRect(str string) (int32,int32,int32,int32,error) {
+	return this.getWindowRect(str)
 }
 
 func (this *App) RemoveTask(name string) {

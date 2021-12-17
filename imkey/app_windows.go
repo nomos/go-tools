@@ -1,6 +1,7 @@
 package imkey
 
 import (
+	"errors"
 	"github.com/lxn/win"
 	"github.com/nomos/go-lokas/ecs"
 	"github.com/nomos/go-lokas/log"
@@ -181,6 +182,43 @@ func (this *App) start() error {
 func (this *App) getWindow(str string) win.HWND {
 	hwnd := win.FindWindow(nil, syscall.StringToUTF16Ptr(str))
 	return hwnd
+}
+
+func (this *App) setActiveWindow(str string)win.HWND{
+	hwnd:=this.getWindow(str)
+	if hwnd==0 {
+		return 0
+	}
+	return win.SetActiveWindow(hwnd)
+}
+
+func (this *App) getDesktopRect() (int32,int32,int32,int32,error){
+	return this.getWindowRectHwnd(win.GetDesktopWindow())
+}
+
+func (this *App) isActiveWindow(str string)bool{
+	hwnd:=this.getWindow(str)
+	activeHwnd:=win.GetActiveWindow()
+	return hwnd!=0&&activeHwnd==hwnd
+}
+
+func (this *App) getWindowRectHwnd(hwnd win.HWND) (int32,int32,int32,int32,error) {
+
+	var rect win.RECT
+	ret:=win.GetWindowRect(hwnd,&rect)
+	if !ret {
+		return 0,0,0,0,errors.New("windows not found")
+	}
+	log.Infof("left",rect.Left,"right",rect.Right,"top",rect.Top,"right",rect.Right)
+	return rect.Left,rect.Bottom,rect.Top,rect.Right,nil
+}
+
+func (this *App) getWindowRect(str string) (int32,int32,int32,int32,error) {
+	hwnd:=this.getWindow(str)
+	if hwnd==0 {
+		return 0,0,0,0,errors.New("windows not found")
+	}
+	return this.getWindowRectHwnd(hwnd)
 }
 
 func (this *App) hasWindow(str string) bool {
