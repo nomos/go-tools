@@ -11,8 +11,8 @@ type app struct {
 }
 
 func (this *App) start() error {
-	addEvent()
-	addMouse()
+	//addEvent()
+	//addMouse()
 	return nil
 }
 
