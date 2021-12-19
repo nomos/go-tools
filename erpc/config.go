@@ -34,7 +34,7 @@ func init(){
 				break
 			}
 		}
-		v:=Instance().GetConfig(key,subs...)
+		v:=Instance().GetConfigValue(key,subs...)
 		return []byte(v),nil
 	})
 	rpc.RegisterAdminFunc(SET_CONF, func(cmd *lox.AdminCommand, params *cmds.ParamsValue,logger log.ILogger) ([]byte, error) {
@@ -48,7 +48,7 @@ func init(){
 				break
 			}
 		}
-		Instance().SetConfig(key,value,subs...)
+		Instance().SetConfigValue(key,value,subs...)
 		return nil,nil
 	})
 }
@@ -73,12 +73,17 @@ func (this *App) SubConfig(subNames ... string)lokas.IConfig{
 	return conf
 }
 
-func (this *App) GetConfig(key string,subNames... string)string{
+func (this *App) GetConfigValue(key string,subNames... string)string{
 	conf:=this.SubConfig(subNames...)
 	return conf.GetString(key)
 }
 
-func (this *App) SetConfig(key string,value string,subNames... string){
+func (this *App) GetConfig()lokas.IConfig{
+	return this.config
+}
+
+
+func (this *App) SetConfigValue(key string,value interface{},subNames... string){
 	conf:=this.SubConfig(subNames...)
 	conf.Set(key,value)
 }

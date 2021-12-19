@@ -37,6 +37,8 @@ type App struct {
 	keyStatus         map[keys.KEY]bool
 	taskMutex         sync.Mutex
 	resetMutex        sync.Mutex
+	mouseX int32
+	mouseY int32
 }
 
 type KeyEventHandler func(event *keys.KeyEvent)
@@ -171,12 +173,12 @@ func (this *App) ScreenShot()(*image.RGBA,error){
 	return screenshot.CaptureDisplay(0)
 }
 
-func (this *App) ScreenCapture(x,y,w,h int)(*image.RGBA,error){
-	return screenshot.Capture(x,y,w,h)
+func (this *App) ScreenCapture(x,y,w,h int32)(*image.RGBA,error){
+	return screenshot.Capture(int(x),int(y),int(w),int(h))
 }
 
-func (this *App) ScreenPixel(x,y int)(*colors.Color,error){
-	img,err:=screenshot.Capture(x,y,1,1)
+func (this *App) ScreenPixel(x,y int32)(*colors.Color,error){
+	img,err:=screenshot.Capture(int(x),int(y),1,1)
 	var ret colors.Color
 	if err!=nil {
 		return nil,err
@@ -205,22 +207,36 @@ func (this *App) StopAllTask() {
 	}
 }
 
+func (this *App) MoveMouseTo(x,y int32){
+	deltaX :=x-this.mouseX
+	deltaY :=y-this.mouseY
+	this.MoveMouseRelative(deltaX,deltaY)
+}
+
+func (this *App) MoveMouseRelative(x,y int32){
+	e:=keys.NewMouseEvent()
+	e.Event = keys.MOUSE_EVENT_TYPE_MOVE_RELATIVE
+	e.X = x
+	e.Y = y
+	this.sendMouseEvent(e)
+}
+
 func (this *App) HasWindow(str string) bool {
 	return this.hasWindow(str)
 }
 
-func (this *App) SetActiveWindow(str string){
-	this.setActiveWindow(str)
-}
-
 func (this *App) IsActiveWindow(str string)bool{
-	return this.isActiveWindow(str)
+	return this.isForegroundWindow(str)
 }
 
 func (this *App) GetWindowRect(str string) (int32,int32,int32,int32,error) {
 	return this.getWindowRect(str)
 }
 
+
+func (this *App) GetDesktopRect() (int32,int32,int32,int32) {
+	return this.getDesktopRect()
+}
 func (this *App) RemoveTask(name string) {
 	this.taskMutex.Lock()
 	defer this.taskMutex.Unlock()
@@ -248,7 +264,19 @@ func (this *App) SetOnMouseEvent(f MouseEventHandler) {
 	this.mouseEventHandler = f
 }
 
+func (this *App) GetMouseX()int32 {
+	return this.mouseX
+}
+
+func (this *App) GetMouseY()int32 {
+	return this.mouseY
+}
+
 func (this *App) emitMouseEvent(e *keys.MouseEvent) {
+	if e.Event==keys.MOUSE_EVENT_TYPE_MOVE {
+		this.mouseX = e.X
+		this.mouseY = e.Y
+	}
 	if !this.enabled {
 		return
 	}

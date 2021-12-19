@@ -24,8 +24,27 @@ type app struct {
 func (this *App) init() {
 
 }
-
 func (this *App) start() error {
+	//return this.startUseInterception()
+	return this.startUseUser32()
+}
+
+func (this *App) startUseInterception()error {
+	var err error
+	this.k32, err = kernel32.LoadKernel32Dll()
+	if err != nil {
+		log.Error("load kernel32.dll error", flog.Error(err))
+	}
+	process := this.k32.GetCurrentProcess()
+	this.k32.SetPriorityClass(process, kernel32.HIGH_PRIORITY_CLASS)
+	this.interception, err = interception.LoadInterceptionDll()
+	if err != nil {
+		log.Error("load interception.dll error", flog.Error(err))
+	}
+	return nil
+}
+
+func (this *App) startUseUser32() error {
 	var err error
 	this.k32, err = kernel32.LoadKernel32Dll()
 	if err != nil {
@@ -80,6 +99,13 @@ func (this *App) start() error {
 			})
 		case user32.WMMouseMove:
 
+			this.emitMouseEvent(&keys.MouseEvent{
+				Event:  keys.MOUSE_EVENT_TYPE_MOVE,
+				Button: keys.MOUSE_BUTTON_LEFT,
+				X:      event.Struct.Point.X,
+				Y:      event.Struct.Point.Y,
+				Num:    0,
+			})
 		case user32.WMMouseWheel:
 			if event.Struct.MouseData == 4287102976 {
 				this.emitMouseEvent(&keys.MouseEvent{
@@ -184,21 +210,15 @@ func (this *App) getWindow(str string) win.HWND {
 	return hwnd
 }
 
-func (this *App) setActiveWindow(str string)win.HWND{
-	hwnd:=this.getWindow(str)
-	if hwnd==0 {
-		return 0
-	}
-	return win.SetActiveWindow(hwnd)
+func (this *App) getDesktopRect() (int32,int32,int32,int32){
+	left,top,right,bottom,_:= this.getWindowRectHwnd(win.GetDesktopWindow())
+	return left,top,right,bottom
 }
 
-func (this *App) getDesktopRect() (int32,int32,int32,int32,error){
-	return this.getWindowRectHwnd(win.GetDesktopWindow())
-}
-
-func (this *App) isActiveWindow(str string)bool{
+func (this *App) isForegroundWindow(str string)bool{
 	hwnd:=this.getWindow(str)
-	activeHwnd:=win.GetActiveWindow()
+	activeHwnd:=win.GetForegroundWindow()
+	log.Infof("checkActive",activeHwnd,hwnd)
 	return hwnd!=0&&activeHwnd==hwnd
 }
 
@@ -209,8 +229,7 @@ func (this *App) getWindowRectHwnd(hwnd win.HWND) (int32,int32,int32,int32,error
 	if !ret {
 		return 0,0,0,0,errors.New("windows not found")
 	}
-	log.Infof("left",rect.Left,"right",rect.Right,"top",rect.Top,"right",rect.Right)
-	return rect.Left,rect.Bottom,rect.Top,rect.Right,nil
+	return rect.Left,rect.Top,rect.Right,rect.Bottom,nil
 }
 
 func (this *App) getWindowRect(str string) (int32,int32,int32,int32,error) {
@@ -238,5 +257,9 @@ func (this *App) sendKeyboardEvent(key keys.KEY, event_type keys.KEY_EVENT_TYPE)
 }
 
 func (this *App) sendMouseEvent(event *keys.MouseEvent) {
-
+	if event.Event == keys.MOUSE_EVENT_TYPE_MOVE {
+		this.interception.SendMouseMoveTo(event.X,event.Y)
+	} else if event.Event == keys.MOUSE_EVENT_TYPE_MOVE_RELATIVE {
+		this.interception.SendMouseMoveRelative(event.X,event.Y)
+	}
 }

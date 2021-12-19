@@ -1,6 +1,8 @@
 package user32
 
 import (
+	"github.com/lxn/win"
+	"github.com/nomos/go-lokas/log"
 	"golang.org/x/sys/windows"
 	"runtime"
 	"unsafe"
@@ -22,6 +24,8 @@ const (
 	sendInputName           = "SendInput"
 	postThreadMessageWName  = "PostThreadMessageW"
 	setCursorPosName        = "SetCursorPos"
+
+	switchToThisWindow = "SwitchToThisWindow"
 )
 
 // LoadUser32DLL loads the user32 DLL into memory.
@@ -77,6 +81,10 @@ func LoadUser32DLL() (*User32DLL, error) {
 		return nil, err
 	}
 
+	switchToThisWindow, err := user32.FindProc(switchToThisWindow)
+	if err != nil {
+		return nil, err
+	}
 	return &User32DLL{
 		user32:              user32,
 		setWindowsHookExW:   setWindowsHookExW,
@@ -86,6 +94,7 @@ func LoadUser32DLL() (*User32DLL, error) {
 		sendInput:           sendInput,
 		postThreadMessageW:  postThreadMessageW,
 		setCursorPos:        setCursorPos,
+		switchToThisWindow:  switchToThisWindow,
 	}, nil
 }
 
@@ -100,11 +109,17 @@ type User32DLL struct {
 	sendInput           *windows.Proc
 	postThreadMessageW  *windows.Proc
 	setCursorPos        *windows.Proc
+	switchToThisWindow  *windows.Proc
 }
 
 // Release releases the underlying DLL.
 func (o *User32DLL) Release() error {
 	return o.user32.Release()
+}
+func (o *User32DLL) SwitchToThisWindow(hwnd win.HWND, fAttach bool) bool {
+	_,_,err:=o.switchToThisWindow.Call(uintptr(hwnd), uintptr(win.BoolToBOOL(fAttach)))
+	log.Error(err.Error())
+	return true
 }
 
 // onHookCalledFunc defines what happens when a Windows hook created using

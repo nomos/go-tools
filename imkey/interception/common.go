@@ -8,9 +8,9 @@ import (
 )
 
 const (
-	interceptionDllName       = "interception.dll"
-	MOUSE          uintptr      = 11
-	KEYBOARD         uintptr    = 1
+	interceptionDllName         = "interception.dll"
+	MOUSE               uintptr = 11
+	KEYBOARD            uintptr = 1
 )
 
 func LoadInterceptionDll() (*InterceptionDLL, error) {
@@ -100,9 +100,38 @@ func (this *InterceptionDLL) Release() error {
 	return this.interception.Release()
 }
 
+func (this *InterceptionDLL) SendMouseMoveRelative(x, y int32) error {
+	stroke := &InterceptionMouseStroke{
+		Code:        0,
+		State:       uint16(INTERCEPTION_MOUSE_MOVE_RELATIVE),
+		Rolling:     0,
+		X:           x,
+		Y:           y,
+		Information: 0,
+	}
+	this.interception_send.Call(this.context, MOUSE, uintptr(unsafe.Pointer(stroke)), 1)
+	return nil
+}
+func (this *InterceptionDLL) SetFilter(){
+	this.interception_set_filter.Call(this.context,this.interception_is_keyboard.Addr())
+	this.interception_set_filter.Call(this.context,this.interception_is_mouse.Addr())
+}
 
-func (this *InterceptionDLL) SendKeyStoke(code keys.KEY,event_type keys.KEY_EVENT_TYPE )error {
-	stroke:=&InterceptionKeyStroke{
+func (this *InterceptionDLL) SendMouseMoveTo(x, y int32) error {
+	stroke := &InterceptionMouseStroke{
+		Code:        0,
+		State:       uint16(INTERCEPTION_MOUSE_MOVE_ABSOLUTE),
+		Rolling:     0,
+		X:           x,
+		Y:           y,
+		Information: 0,
+	}
+	this.interception_send.Call(this.context, MOUSE, uintptr(unsafe.Pointer(stroke)), 1)
+	return nil
+}
+
+func (this *InterceptionDLL) SendKeyStoke(code keys.KEY, event_type keys.KEY_EVENT_TYPE) error {
+	stroke := &InterceptionKeyStroke{
 		code:        uint16(code.ScanCode()),
 		information: 0,
 	}
@@ -112,27 +141,27 @@ func (this *InterceptionDLL) SendKeyStoke(code keys.KEY,event_type keys.KEY_EVEN
 	case keys.KEY_EVENT_TYPE_UP:
 		stroke.state = uint16(INTERCEPTION_KEY_UP)
 	default:
-		log.Warnf("undefined event",event_type)
+		log.Warnf("undefined event", event_type)
 		return nil
 	}
-	this.interception_send.Call(this.context,KEYBOARD,uintptr(unsafe.Pointer(stroke)),1)
+	this.interception_send.Call(this.context, KEYBOARD, uintptr(unsafe.Pointer(stroke)), 1)
 	return nil
 }
 
-func (this *InterceptionDLL) Receive(device uintptr,stroke *InterceptionKeyStroke)uintptr{
-	ret,_,_:=this.interception_receive.Call(this.context,device,uintptr(unsafe.Pointer(stroke)),1)
+func (this *InterceptionDLL) Receive(device uintptr, stroke *InterceptionKeyStroke) uintptr {
+	ret, _, _ := this.interception_receive.Call(this.context, device, uintptr(unsafe.Pointer(stroke)), 1)
 	return ret
 }
 
-func (this *InterceptionDLL) GetContext()uintptr{
+func (this *InterceptionDLL) GetContext() uintptr {
 	return this.context
 }
 
-func (this *InterceptionDLL) Wait()uintptr{
-	ret,_,err:=this.interception_wait.Call(this.context)
-	if err!=nil {
+func (this *InterceptionDLL) Wait() uintptr {
+	ret, _, err := this.interception_wait.Call(this.context)
+	if err != nil {
 		log.Error(err.Error())
 	}
-	log.Infof("ret",ret)
+	log.Infof("ret", ret)
 	return ret
 }
