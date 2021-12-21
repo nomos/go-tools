@@ -3,6 +3,7 @@ package user32
 import (
 	"github.com/lxn/win"
 	"github.com/nomos/go-lokas/log"
+	"github.com/nomos/go-lokas/util/keys"
 	"golang.org/x/sys/windows"
 	"runtime"
 	"unsafe"
@@ -24,7 +25,7 @@ const (
 	sendInputName           = "SendInput"
 	postThreadMessageWName  = "PostThreadMessageW"
 	setCursorPosName        = "SetCursorPos"
-
+	getKeyState				= "GetKeyState"
 	switchToThisWindow = "SwitchToThisWindow"
 )
 
@@ -55,6 +56,8 @@ func LoadUser32DLL() (*User32DLL, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	getKeyState,err := user32.FindProc(getKeyState)
 
 	unhook, err := user32.FindProc(unhookWindowsHookExName)
 	if err != nil {
@@ -95,6 +98,7 @@ func LoadUser32DLL() (*User32DLL, error) {
 		postThreadMessageW:  postThreadMessageW,
 		setCursorPos:        setCursorPos,
 		switchToThisWindow:  switchToThisWindow,
+		getKeyState:	getKeyState,
 	}, nil
 }
 
@@ -110,12 +114,32 @@ type User32DLL struct {
 	postThreadMessageW  *windows.Proc
 	setCursorPos        *windows.Proc
 	switchToThisWindow  *windows.Proc
+	getKeyState			*windows.Proc
 }
 
 // Release releases the underlying DLL.
 func (o *User32DLL) Release() error {
 	return o.user32.Release()
 }
+
+
+func (o *User32DLL) GetKeyState(code keys.KEY) int16 {
+	ret,_,err:=o.getKeyState.Call(uintptr(code))
+	log.Error(err.Error())
+	return int16(ret)
+}
+
+
+func (o *User32DLL) KeyPressed(code keys.KEY) bool {
+	return o.GetKeyState(code)<0
+}
+
+
+func (o *User32DLL) KeyReleased(code keys.KEY) bool {
+	return !o.KeyPressed(code)
+}
+
+
 func (o *User32DLL) SwitchToThisWindow(hwnd win.HWND, fAttach bool) bool {
 	_,_,err:=o.switchToThisWindow.Call(uintptr(hwnd), uintptr(win.BoolToBOOL(fAttach)))
 	log.Error(err.Error())
