@@ -79,3 +79,11 @@ func (this *App) getWindowRect(str string) (int32,int32,int32,int32,error) {
 	return 0,0,0,0,nil
 }
 
+
+func (this *App) getDesktopRect() (int32,int32,int32,int32){
+	return 0,0,0,0
+}
+
+func (this *App) isForegroundWindow(str string)bool{
+	return true
+}
