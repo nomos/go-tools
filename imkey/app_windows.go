@@ -11,6 +11,7 @@ import (
 	"github.com/nomos/go-tools/imkey/kernel32"
 	"github.com/nomos/go-tools/imkey/user32"
 	"syscall"
+	"time"
 )
 
 type app struct {
@@ -218,7 +219,6 @@ func (this *App) getDesktopRect() (int32,int32,int32,int32){
 func (this *App) isForegroundWindow(str string)bool{
 	hwnd:=this.getWindow(str)
 	activeHwnd:=win.GetForegroundWindow()
-	log.Infof("checkActive",activeHwnd,hwnd)
 	return hwnd!=0&&activeHwnd==hwnd
 }
 
@@ -257,9 +257,19 @@ func (this *App) sendKeyboardEvent(key keys.KEY, event_type keys.KEY_EVENT_TYPE)
 }
 
 func (this *App) sendMouseEvent(event *keys.MouseEvent) {
+
 	if event.Event == keys.MOUSE_EVENT_TYPE_MOVE {
 		this.interception.SendMouseMoveTo(event.X,event.Y)
 	} else if event.Event == keys.MOUSE_EVENT_TYPE_MOVE_RELATIVE {
 		this.interception.SendMouseMoveRelative(event.X,event.Y)
+	} else if event.Event == keys.MOUSE_EVENT_TYPE_UP {
+
+		this.interception.SendMouseButtonRelease(event.Button)
+	} else if event.Event == keys.MOUSE_EVENT_TYPE_DOWN {
+		this.interception.SendMouseButtonPress(event.Button)
+	} else if event.Event == keys.MOUSE_EVENT_TYPE_PRESS {
+		this.interception.SendMouseButtonPress(event.Button)
+		time.Sleep(time.Millisecond*10)
+		this.interception.SendMouseButtonRelease(event.Button)
 	}
 }

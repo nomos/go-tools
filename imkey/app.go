@@ -109,6 +109,9 @@ func (this *App) ResetAllKeys() {
 			this.sendKeyEvent(k, keys.KEY_EVENT_TYPE_UP)
 		}
 	}
+	for _,b:=range keys.ALL_MOUSE_BUTTON {
+		this.ReleaseMouseButton(keys.MOUSE_BUTTON(b.Enum()))
+	}
 }
 
 func (this *App) Stop() error {
@@ -129,6 +132,16 @@ func (this *App) ReleaseKey(key keys.KEY) {
 	if !this.enabled {
 		return
 	}
+	this.sendKeyEvent(key, keys.KEY_EVENT_TYPE_UP)
+}
+
+func (this *App) ClickKey(key keys.KEY){
+
+	if !this.enabled {
+		return
+	}
+	this.sendKeyEvent(key, keys.KEY_EVENT_TYPE_DOWN)
+	time.Sleep(time.Millisecond*50)
 	this.sendKeyEvent(key, keys.KEY_EVENT_TYPE_UP)
 }
 
@@ -208,9 +221,42 @@ func (this *App) StopAllTask() {
 }
 
 func (this *App) MoveMouseTo(x,y int32){
+	if !this.enabled {
+		return
+	}
 	deltaX :=x-this.mouseX
 	deltaY :=y-this.mouseY
 	this.MoveMouseRelative(deltaX,deltaY)
+}
+
+func (this *App) PressMouseButton(button keys.MOUSE_BUTTON){
+	if !this.enabled {
+		return
+	}
+	e:=keys.NewMouseEvent()
+	e.Event = keys.MOUSE_EVENT_TYPE_DOWN
+	e.Button = button
+	this.sendMouseEvent(e)
+}
+
+func (this *App) ReleaseMouseButton(button keys.MOUSE_BUTTON){
+	if !this.enabled {
+		return
+	}
+	e:=keys.NewMouseEvent()
+	e.Event = keys.MOUSE_EVENT_TYPE_UP
+	e.Button = button
+	this.sendMouseEvent(e)
+}
+
+func (this *App) ClickMouseButton(button keys.MOUSE_BUTTON){
+	if !this.enabled {
+		return
+	}
+	e:=keys.NewMouseEvent()
+	e.Event = keys.MOUSE_EVENT_TYPE_PRESS
+	e.Button = button
+	this.sendMouseEvent(e)
 }
 
 func (this *App) MoveMouseRelative(x,y int32){

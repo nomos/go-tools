@@ -122,9 +122,59 @@ func (this *InterceptionDLL) SendMouseMoveTo(x, y int32) error {
 		Code:        0,
 		State:       uint16(INTERCEPTION_MOUSE_MOVE_ABSOLUTE),
 		Rolling:     0,
-		X:           x,
-		Y:           y,
+		X:           0,
+		Y:           0,
 		Information: 0,
+	}
+	this.interception_send.Call(this.context, MOUSE, uintptr(unsafe.Pointer(stroke)), 1)
+	return nil
+}
+
+func (this *InterceptionDLL) SendMouseButtonPress(button keys.MOUSE_BUTTON) error {
+	stroke := &InterceptionMouseStroke{
+		Code:        0,
+		State: uint16(INTERCEPTION_MOUSE_CUSTOM),
+		Rolling:     0,
+		X:           0,
+		Y:           0,
+		Information: 0,
+	}
+	switch button {
+	case keys.MOUSE_BUTTON_LEFT:
+		stroke.Code = uint16(INTERCEPTION_MOUSE_BUTTON_1_DOWN)
+	case keys.MOUSE_BUTTON_RIGHT:
+		stroke.Code = uint16(INTERCEPTION_MOUSE_BUTTON_2_DOWN)
+	case keys.MOUSE_BUTTON_MIDDLE:
+		stroke.Code = uint16(INTERCEPTION_MOUSE_BUTTON_3_DOWN)
+	case keys.MOUSE_BUTTON_EXTRA_1:
+		stroke.Code = uint16(INTERCEPTION_MOUSE_BUTTON_4_DOWN)
+	case keys.MOUSE_BUTTON_EXTRA_2:
+		stroke.Code = uint16(INTERCEPTION_MOUSE_BUTTON_5_DOWN)
+	}
+	this.interception_send.Call(this.context, MOUSE, uintptr(unsafe.Pointer(stroke)), 1)
+	return nil
+}
+
+func (this *InterceptionDLL) SendMouseButtonRelease(button keys.MOUSE_BUTTON) error {
+	stroke := &InterceptionMouseStroke{
+		Code:        0,
+		State: uint16(INTERCEPTION_MOUSE_CUSTOM),
+		Rolling:     0,
+		X:           0,
+		Y:           0,
+		Information: 0,
+	}
+	switch button {
+	case keys.MOUSE_BUTTON_LEFT:
+		stroke.Code = uint16(INTERCEPTION_MOUSE_BUTTON_1_UP)
+	case keys.MOUSE_BUTTON_RIGHT:
+		stroke.Code = uint16(INTERCEPTION_MOUSE_BUTTON_2_UP)
+	case keys.MOUSE_BUTTON_MIDDLE:
+		stroke.Code = uint16(INTERCEPTION_MOUSE_BUTTON_3_UP)
+	case keys.MOUSE_BUTTON_EXTRA_1:
+		stroke.Code = uint16(INTERCEPTION_MOUSE_BUTTON_4_UP)
+	case keys.MOUSE_BUTTON_EXTRA_2:
+		stroke.Code = uint16(INTERCEPTION_MOUSE_BUTTON_5_UP)
 	}
 	this.interception_send.Call(this.context, MOUSE, uintptr(unsafe.Pointer(stroke)), 1)
 	return nil
