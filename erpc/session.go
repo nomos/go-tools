@@ -63,6 +63,7 @@ type Session struct {
 	ClientMsgHandler func(msg *protocol.BinaryMessage,session *Session)
 	timeout          time.Duration
 	ticker           *time.Ticker
+	outchan			chan[]byte
 }
 
 func (this *Session) WriteString(s string) {
@@ -152,7 +153,7 @@ func (this *Session) SendMessage(actorId util.ID, transId uint32, msg protocol.I
 		log.Error(err.Error())
 		return err
 	}
-	this.Conn.Write(data)
+	this.outchan<-data
 	return nil
 }
 
@@ -167,6 +168,7 @@ func (this *Session) GetConn() lokas.IConn {
 func (this *Session) StartMessagePump() {
 
 	this.done = make(chan struct{})
+	this.outchan =make(chan []byte,100)
 	go func() {
 		defer func() {
 			if r := recover(); r != nil {
@@ -206,6 +208,23 @@ func (this *Session) StartMessagePump() {
 		}
 		close(this.done)
 		close(this.Messages)
+	}()
+	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				util.Recover(r,false)
+			}
+		}()
+	WRITE_LOOP :
+		for {
+			select {
+			case msg:= <-this.outchan :
+				this.Conn.Write(msg)
+			case <-this.done:
+				break WRITE_LOOP
+			}
+		}
+		close(this.outchan)
 	}()
 }
 

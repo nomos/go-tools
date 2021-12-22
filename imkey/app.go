@@ -19,6 +19,8 @@ func Instance() *App {
 		if instance == nil {
 			instance = &App{
 				EventEmmiter:events.New(),
+				tasks: map[string]ITask{},
+				keyStatus: map[keys.KEY]bool{},
 				app: &app{},
 			}
 			instance.Init()
@@ -61,15 +63,14 @@ func NewTask(name string, app *App, taskFunc TaskFunc) *Task {
 	return ret
 }
 
-func (this *Task) Sleep(duration time.Duration) {
-	iterNum := duration / time.Millisecond
-	var i time.Duration = 0
-	for i = 0; i < iterNum; i++ {
-		if this.taskOn {
-			return
+func (this *Task) Sleep(duration int)bool {
+	for i := 0; i < duration; i++ {
+		if !this.taskOn {
+			return true
 		}
 		time.Sleep(time.Millisecond)
 	}
+	return false
 }
 
 func (this *Task) Run() {
@@ -102,12 +103,16 @@ func (this *App) Start() error {
 }
 
 func (this *App) ResetAllKeys() {
+	ks:=[]keys.KEY{}
 	this.resetMutex.Lock()
-	defer this.resetMutex.Unlock()
 	for k, v := range this.keyStatus {
 		if v {
-			this.sendKeyEvent(k, keys.KEY_EVENT_TYPE_UP)
+			ks = append(ks, k)
 		}
+	}
+	this.resetMutex.Unlock()
+	for _, v := range ks {
+		this.sendKeyEvent(v, keys.KEY_EVENT_TYPE_UP)
 	}
 	for _,b:=range keys.ALL_MOUSE_BUTTON {
 		this.ReleaseMouseButton(keys.MOUSE_BUTTON(b.Enum()))
@@ -146,6 +151,8 @@ func (this *App) ClickKey(key keys.KEY){
 }
 
 func (this *App) IsKeyPressed(key keys.KEY) bool {
+	this.resetMutex.Lock()
+	defer this.resetMutex.Unlock()
 	return this.keyStatus[key]
 }
 
@@ -179,6 +186,7 @@ func (this *App) AddTask(name string,task ITask){
 		return
 	}
 	this.tasks[name] = task
+	this.taskMutex.Unlock()
 	go task.Run()
 }
 
@@ -204,7 +212,9 @@ func (this *App) StopTask(name string) {
 	this.taskMutex.Lock()
 	defer this.taskMutex.Unlock()
 	t := this.tasks[name]
-	t.TaskOff()
+	if t!=nil {
+		t.TaskOff()
+	}
 }
 
 func (this *App) StopAllTask() {
@@ -283,6 +293,7 @@ func (this *App) GetWindowRect(str string) (int32,int32,int32,int32,error) {
 func (this *App) GetDesktopRect() (int32,int32,int32,int32) {
 	return this.getDesktopRect()
 }
+
 func (this *App) RemoveTask(name string) {
 	this.taskMutex.Lock()
 	defer this.taskMutex.Unlock()
@@ -331,11 +342,22 @@ func (this *App) emitMouseEvent(e *keys.MouseEvent) {
 	}
 }
 
+func (this *App) setKeyStatus(key keys.KEY,v bool){
+	this.resetMutex.Lock()
+	defer this.resetMutex.Unlock()
+	this.keyStatus[key] = v
+}
+func (this *App) clearKeyStatus(key keys.KEY,v bool){
+	this.resetMutex.Lock()
+	defer this.resetMutex.Unlock()
+	this.keyStatus[key] = v
+}
+
 func (this *App) emitKeyEvent(e *keys.KeyEvent) {
 	if e.Event == keys.KEY_EVENT_TYPE_UP {
-		this.keyStatus[e.Code] = false
+		this.setKeyStatus(e.Code,false)
 	} else {
-		this.keyStatus[e.Code] = true
+		this.setKeyStatus(e.Code,true)
 	}
 	if !this.enabled {
 		return

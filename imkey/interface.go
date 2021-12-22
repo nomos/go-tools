@@ -1,9 +1,7 @@
 package imkey
 
-import "time"
-
 type ITask interface {
-	Sleep(duration time.Duration)
+	Sleep(duration int)bool
 	Run()
 	TaskOff()
 }
