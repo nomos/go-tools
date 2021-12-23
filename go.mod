@@ -1,6 +1,6 @@
 module github.com/nomos/go-tools
 
-go 1.18
+go 1.17
 
 require (
 	github.com/360EntSecGroup-Skylar/excelize/v2 v2.4.0
@@ -82,6 +82,7 @@ require (
 	github.com/spf13/pflag v1.0.3 // indirect
 	github.com/spf13/viper v1.7.1 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
+	github.com/super-l/machine-code v0.0.0-20210720085303-62525d58dab0 // indirect
 	github.com/tklauser/go-sysconf v0.3.9 // indirect
 	github.com/tklauser/numcpus v0.3.0 // indirect
 	github.com/vcaesar/gops v0.21.3 // indirect

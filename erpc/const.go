@@ -11,6 +11,7 @@ const (
 	LOAD_CONF = "load_conf"
 	GET_CONF = "get_conf"
 	SET_CONF = "set_conf"
+	MACHINE_DATA = "machine_data"
 
 	OPEN_DIALOG_FILE = "open_dialog_file"
 	OPEN_DIALOG_DIR = "open_dialog_dir"

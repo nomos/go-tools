@@ -14,6 +14,7 @@ import (
 	"github.com/nomos/go-lokas/protocol"
 	"github.com/nomos/go-lokas/util"
 	"github.com/nomos/go-lokas/util/events"
+	"github.com/super-l/machine-code/machine"
 	"golang.org/x/image/tiff"
 	"image"
 	"os"
@@ -41,57 +42,57 @@ func (this *App) watchImgClipBoard() {
 	}()
 }
 
-func (this *App) GetClipBoardImg()(image.Image,error){
+func (this *App) GetClipBoardImg() (image.Image, error) {
 	var img image.Image
 	var err error
-	if runtime.GOOS=="darwin" {
-		img,err=tiff.Decode(bytes.NewBuffer(this.clipImgData))
+	if runtime.GOOS == "darwin" {
+		img, err = tiff.Decode(bytes.NewBuffer(this.clipImgData))
 		if err != nil {
 			log.Error(err.Error())
-			return nil,err
+			return nil, err
 		}
-		return img,nil
+		return img, nil
 	}
 	img, _, err = image.Decode(bytes.NewBuffer(this.clipImgData))
 	if err != nil {
 		log.Error(err.Error())
-		return nil,err
+		return nil, err
 	}
-	return img,nil
+	return img, nil
 }
 
 var defaultWinOpt = &astilectron.WindowOptions{
-	Center: astikit.BoolPtr(true),
-	Height: astikit.IntPtr(800),
-	Width:  astikit.IntPtr(1580),
-	MinWidth: astikit.IntPtr(960),
+	Center:    astikit.BoolPtr(true),
+	Height:    astikit.IntPtr(800),
+	Width:     astikit.IntPtr(1580),
+	MinWidth:  astikit.IntPtr(960),
 	MinHeight: astikit.IntPtr(480),
-	Title:  astikit.StrPtr(""),
+	Title:     astikit.StrPtr(""),
 	WebPreferences: &astilectron.WebPreferences{
 		WebSecurity: astikit.BoolPtr(false),
 	},
 }
 
-func WithHandler(handler func(msg *protocol.BinaryMessage)(protocol.ISerializable,error))Option {
+func WithHandler(handler func(msg *protocol.BinaryMessage) (protocol.ISerializable, error)) Option {
 	return func(app *App) {
 		app.handler = func(msg *protocol.BinaryMessage, session *Session) {
-			ret,err:=handler(msg)
-			if err!=nil {
-				if e,ok:=err.(*protocol.ErrMsg);ok {
-					session.SendMessage(0,msg.TransId,e)
+			ret, err := handler(msg)
+			if err != nil {
+				if e, ok := err.(*protocol.ErrMsg); ok {
+					session.SendMessage(0, msg.TransId, e)
 				} else {
-					session.SendMessage(0,msg.TransId,protocol.NewError(errs.ERR_INTERNAL_SERVER))
+					session.SendMessage(0, msg.TransId, protocol.NewError(errs.ERR_INTERNAL_SERVER))
 				}
 				return
 			}
-			session.SendMessage(0,msg.TransId,ret)
+			session.SendMessage(0, msg.TransId, ret)
 		}
 	}
 }
 
 func WithElectron(name string, defaultUrl string) Option {
 	return func(a *App) {
-		pwd:=filepath.Dir(os.Args[0])
+		pwd := filepath.Dir(os.Args[0])
 		a.electronApp, _ = astilectron.New(log.NewAstilecTronLogger(false), astilectron.Options{
 			AppName:           name,
 			BaseDirectoryPath: pwd + "/astiletron/",
@@ -161,23 +162,23 @@ type App struct {
 	*lox.Gate
 	Port string
 	*Session
-	handler func(msg *protocol.BinaryMessage,session *Session)
+	handler       func(msg *protocol.BinaryMessage, session *Session)
 	electronApp   *astilectron.Astilectron
 	gameWindow    *astilectron.Window
 	gameWindowOpt *astilectron.WindowOptions
 	config        lokas.IConfig
-
-	devTool bool
-	url     string
-	sid     util.ID
-	mutex   sync.Mutex
-	done    chan struct{}
-	clipImgData []byte
+	MachineData   machine.MachineData
+	devTool       bool
+	url           string
+	sid           util.ID
+	mutex         sync.Mutex
+	done          chan struct{}
+	clipImgData   []byte
 }
 
 func NewApp(opts ...Option) *App {
 	ret := &App{
-		EventEmmiter:events.New(),
+		EventEmmiter: events.New(),
 		Gate: &lox.Gate{
 			Actor:           lox.NewActor(),
 			ISessionManager: network.NewDefaultSessionManager(true),
@@ -186,6 +187,7 @@ func NewApp(opts ...Option) *App {
 	for _, o := range opts {
 		o(ret)
 	}
+	ret.GetMachineData()
 	ret.SessionCreatorFunc = ret.SessionCreator
 	return ret
 }
@@ -222,18 +224,18 @@ func (this *App) stop() error {
 	return nil
 }
 
-func reformWidth(s int)int{
+func reformWidth(s int) int {
 	if runtime.GOOS == "windows" {
-		return (s-1)/2*2+1
+		return (s-1)/2*2 + 1
 	}
-	return (s-1)/2*2+1
+	return (s-1)/2*2 + 1
 }
 
-func reformHeight(s int)int{
+func reformHeight(s int) int {
 	if runtime.GOOS == "windows" {
-		return (s-1)/2*2+1
+		return (s-1)/2*2 + 1
 	}
-	return (s)/2*2
+	return (s) / 2 * 2
 }
 
 func (this *App) createGameWindow(url string) error {
@@ -242,13 +244,13 @@ func (this *App) createGameWindow(url string) error {
 	if this.gameWindowOpt != nil {
 		winOpt = this.gameWindowOpt
 	}
-	width:=1280
-	height:=720
-	if this.config.GetInt("width")!=0 {
-		width=this.config.GetInt("width")
+	width := 1280
+	height := 720
+	if this.config.GetInt("width") != 0 {
+		width = this.config.GetInt("width")
 	}
-	if this.config.GetInt("height")!=0 {
-		height=this.config.GetInt("height")
+	if this.config.GetInt("height") != 0 {
+		height = this.config.GetInt("height")
 	}
 	*(winOpt.Width) = reformWidth(width)
 	*(winOpt.Height) = reformHeight(height)
@@ -261,24 +263,24 @@ func (this *App) createGameWindow(url string) error {
 		return log.Error(err.Error())
 	}
 	this.gameWindow.On(astilectron.EventNameWindowEventResize, func(e astilectron.Event) (deleteListener bool) {
-		log.Infof(this.config,e)
-		this.config.Set("width",reformWidth(*(e.WindowOptions.Width)))
-		this.config.Set("height",reformHeight(*(e.WindowOptions.Height)))
+		log.Infof(this.config, e)
+		this.config.Set("width", reformWidth(*(e.WindowOptions.Width)))
+		this.config.Set("height", reformHeight(*(e.WindowOptions.Height)))
 		return false
 	})
 	return nil
 }
 
-func (this *App) ResetSize(){
-	width:=1280
-	height:=720
-	if this.config.GetInt("width")!=0 {
-		width=this.config.GetInt("width")
+func (this *App) ResetSize() {
+	width := 1280
+	height := 720
+	if this.config.GetInt("width") != 0 {
+		width = this.config.GetInt("width")
 	}
-	if this.config.GetInt("height")!=0 {
-		height=this.config.GetInt("height")
+	if this.config.GetInt("height") != 0 {
+		height = this.config.GetInt("height")
 	}
-	this.gameWindow.Resize(reformWidth(width),reformHeight(height))
+	this.gameWindow.Resize(reformWidth(width), reformHeight(height))
 }
 
 func (this *App) closeGameWindow() error {
@@ -368,8 +370,8 @@ LOOP:
 	log.Warnf("stop")
 }
 
-func (this *App) Resize(width,height int){
-	this.gameWindow.Resize(width,height)
+func (this *App) Resize(width, height int) {
+	this.gameWindow.Resize(width, height)
 }
 
 func (this *App) Clear() {
@@ -377,7 +379,7 @@ func (this *App) Clear() {
 }
 
 func (this *App) Stop() error {
-	if this.done!=nil {
+	if this.done != nil {
 		this.done <- struct{}{}
 	}
 	log.Error("Stop1")
