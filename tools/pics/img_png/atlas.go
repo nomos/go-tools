@@ -53,6 +53,19 @@ type PixImg struct {
 	Data []byte
 }
 
+func (this *PixImg) ToFrameV0()*FrameV0{
+	return &FrameV0{
+		Height:         int(this.Height),
+		Width:          int(this.Width),
+		X:              int(this.OriginX),
+		Y:              int(this.OriginY),
+		OriginalWidth:  int(this.Width),
+		OriginalHeight: int(this.Height),
+		OffsetX:        0,
+		OffsetY:        0,
+	}
+}
+
 func (this *PixImg) OnAdd(e lokas.IEntity, r lokas.IRuntime) {
 
 }
@@ -87,6 +100,14 @@ type PixAtlasFile struct {
 	Bleeding bool
 	AntiAlias bool
 	Images map[string]*PixImg
+}
+
+func (this *PixAtlasFile) ToPlistV0()*PlistV0{
+	ret:=&PlistV0{Frames: map[string]*FrameV0{}}
+	for k,v:=range this.Images {
+		ret.Frames[k] = v.ToFrameV0()
+	}
+	return ret
 }
 
 func (this *PixAtlasFile) OnAdd(e lokas.IEntity, r lokas.IRuntime) {
