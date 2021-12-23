@@ -50,7 +50,7 @@ func init() {
 		p := params.String()
 		width := params.Int()
 		height := params.Int()
-		err := img_png.SubImage(p, width, height, logger)
+		err := img_png.SplitImage(p, width, height, logger)
 		if err != nil {
 			log.Error(err.Error())
 		}

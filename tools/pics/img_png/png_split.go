@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-func subImage(img image.Image,width,height int) []image.Image {
+func splitImage(img image.Image,width,height int) []image.Image {
 	rectangle := img.Bounds()
 	imgWidth:=rectangle.Max.X-rectangle.Min.X
 	imgHeight:=rectangle.Max.Y-rectangle.Min.Y
@@ -58,7 +58,7 @@ func subImage(img image.Image,width,height int) []image.Image {
 	return ret
 }
 
-func SubImage(imgPath string,width,height int,logger log.ILogger)error{
+func SplitImage(imgPath string,width,height int,logger log.ILogger)error{
 	if logger==nil {
 		logger = log.DefaultLogger()
 	}
@@ -67,7 +67,7 @@ func SubImage(imgPath string,width,height int,logger log.ILogger)error{
 		logger.Error(err.Error())
 		return err
 	}
-	imgs:=subImage(img,width,height)
+	imgs:= splitImage(img,width,height)
 	ext:=path.Ext(imgPath)
 	path1:=strings.Replace(imgPath,ext,"",1)
 	digital:=util.DigitalNum(len(imgs)+1)

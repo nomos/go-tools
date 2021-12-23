@@ -33,9 +33,12 @@ require (
 
 require (
 	github.com/StackExchange/wmi v1.2.1 // indirect
+	github.com/alexflint/go-arg v1.4.2 // indirect
+	github.com/alexflint/go-scalar v1.0.0 // indirect
 	github.com/aws/aws-sdk-go v1.34.28 // indirect
 	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/coreos/go-systemd/v22 v22.3.1 // indirect
+	github.com/disintegration/imaging v1.6.2 // indirect
 	github.com/fsnotify/fsnotify v1.4.7 // indirect
 	github.com/gen2brain/shm v0.0.0-20200228170931-49f9650110c5 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
@@ -111,4 +114,5 @@ require (
 	gopkg.in/ini.v1 v1.51.0 // indirect
 	gopkg.in/webnice/b64.v1 v1.0.0 // indirect
 	gopkg.in/yaml.v2 v2.2.8 // indirect
+	howett.net/plist v1.0.0 // indirect
 )
