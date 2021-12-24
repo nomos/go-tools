@@ -3,11 +3,13 @@ package imkey
 import (
 	"github.com/kbinani/screenshot"
 	"github.com/nomos/go-lokas/log"
+	"github.com/nomos/go-lokas/util"
 	"github.com/nomos/go-lokas/util/colors"
 	"github.com/nomos/go-lokas/util/events"
 	"github.com/nomos/go-lokas/util/keys"
 	"image"
 	"sync"
+	"syscall"
 	"time"
 )
 
@@ -66,11 +68,19 @@ func NewTask(name string, app *App, taskFunc TaskFunc) *Task {
 }
 
 func (this *Task) Sleep(duration int) bool {
-	for i := 0; i < duration; i++ {
+	var tv syscall.Timeval
+	_ = syscall.Gettimeofday(&tv)
+	util.SleepUtil(int64(duration), func() bool {
+		return !this.taskOn
+	})
+	startTick := int64(tv.Sec)*int64(1000000) + int64(tv.Usec) + int64(duration)*1000
+	endTick := int64(0)
+	for endTick < startTick {
 		if !this.taskOn {
 			return true
 		}
-		time.Sleep(time.Millisecond)
+		_ = syscall.Gettimeofday(&tv)
+		endTick = int64(tv.Sec)*int64(1000000) + int64(tv.Usec)
 	}
 	return false
 }
@@ -147,7 +157,7 @@ func (this *App) ClickKey(key keys.KEY) {
 	}
 	go func() {
 		go this.sendKeyEvent(key, keys.KEY_EVENT_TYPE_DOWN)
-		time.Sleep(time.Millisecond * 100)
+		util.Sleep(10)
 		this.sendKeyEvent(key, keys.KEY_EVENT_TYPE_UP)
 	}()
 }

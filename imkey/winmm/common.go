@@ -1,5 +1,7 @@
 package winmm
 
+import "golang.org/x/sys/windows"
+
 const (
 	WinMMDllName = "winmm.dll"
 )
@@ -22,7 +24,7 @@ func LoadWinMMDll() (*WinMMDLL, error) {
 	if err != nil {
 		return nil, err
 	}
-	timeBeginPeriod, err := WinMM.FindProc("timeBeginPeriod")
+	timeEndPeriod, err := WinMM.FindProc("timeEndPeriod")
 	if err != nil {
 		return nil, err
 	}
