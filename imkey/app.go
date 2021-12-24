@@ -18,10 +18,11 @@ func Instance() *App {
 	once.Do(func() {
 		if instance == nil {
 			instance = &App{
-				EventEmmiter:events.New(),
-				tasks: map[string]ITask{},
-				keyStatus: map[keys.KEY]bool{},
-				app: &app{},
+				EventEmmiter: events.New(),
+				tasks:        map[string]ITask{},
+				keyStatus:    map[keys.KEY]bool{},
+				mouseStatus: map[keys.MOUSE_BUTTON]bool{},
+				app:          &app{},
 			}
 			instance.Init()
 		}
@@ -37,10 +38,11 @@ type App struct {
 	tasks             map[string]ITask
 	enabled           bool
 	keyStatus         map[keys.KEY]bool
+	mouseStatus       map[keys.MOUSE_BUTTON]bool
 	taskMutex         sync.Mutex
 	resetMutex        sync.Mutex
-	mouseX int32
-	mouseY int32
+	mouseX            int32
+	mouseY            int32
 }
 
 type KeyEventHandler func(event *keys.KeyEvent)
@@ -63,7 +65,7 @@ func NewTask(name string, app *App, taskFunc TaskFunc) *Task {
 	return ret
 }
 
-func (this *Task) Sleep(duration int)bool {
+func (this *Task) Sleep(duration int) bool {
 	for i := 0; i < duration; i++ {
 		if !this.taskOn {
 			return true
@@ -91,7 +93,6 @@ func (this *App) Init() {
 	this.init()
 }
 
-
 func (this *App) Start() error {
 	err := this.start()
 	if err != nil {
@@ -103,7 +104,7 @@ func (this *App) Start() error {
 }
 
 func (this *App) ResetAllKeys() {
-	ks:=[]keys.KEY{}
+	ks := []keys.KEY{}
 	this.resetMutex.Lock()
 	for k, v := range this.keyStatus {
 		if v {
@@ -114,7 +115,7 @@ func (this *App) ResetAllKeys() {
 	for _, v := range ks {
 		this.sendKeyEvent(v, keys.KEY_EVENT_TYPE_UP)
 	}
-	for _,b:=range keys.ALL_MOUSE_BUTTON {
+	for _, b := range keys.ALL_MOUSE_BUTTON {
 		this.ReleaseMouseButton(keys.MOUSE_BUTTON(b.Enum()))
 	}
 }
@@ -130,30 +131,37 @@ func (this *App) PressKey(key keys.KEY) {
 	if !this.enabled {
 		return
 	}
-	this.sendKeyEvent(key, keys.KEY_EVENT_TYPE_DOWN)
+	go this.sendKeyEvent(key, keys.KEY_EVENT_TYPE_DOWN)
 }
 
 func (this *App) ReleaseKey(key keys.KEY) {
 	if !this.enabled {
 		return
 	}
-	this.sendKeyEvent(key, keys.KEY_EVENT_TYPE_UP)
+	go this.sendKeyEvent(key, keys.KEY_EVENT_TYPE_UP)
 }
 
-func (this *App) ClickKey(key keys.KEY){
-
+func (this *App) ClickKey(key keys.KEY) {
 	if !this.enabled {
 		return
 	}
-	this.sendKeyEvent(key, keys.KEY_EVENT_TYPE_DOWN)
-	time.Sleep(time.Millisecond*50)
-	this.sendKeyEvent(key, keys.KEY_EVENT_TYPE_UP)
+	go func() {
+		go this.sendKeyEvent(key, keys.KEY_EVENT_TYPE_DOWN)
+		time.Sleep(time.Millisecond * 100)
+		this.sendKeyEvent(key, keys.KEY_EVENT_TYPE_UP)
+	}()
 }
 
 func (this *App) IsKeyPressed(key keys.KEY) bool {
 	this.resetMutex.Lock()
 	defer this.resetMutex.Unlock()
 	return this.keyStatus[key]
+}
+
+func (this *App) IsMousePressed(btn keys.MOUSE_BUTTON) bool {
+	this.resetMutex.Lock()
+	defer this.resetMutex.Unlock()
+	return this.mouseStatus[btn]
 }
 
 func (this *App) sendKeyEvent(key keys.KEY, event_type keys.KEY_EVENT_TYPE) {
@@ -175,7 +183,7 @@ func (this *App) RunTask(name string, taskFunc TaskFunc) {
 	go t.Run()
 }
 
-func (this *App) AddTask(name string,task ITask){
+func (this *App) AddTask(name string, task ITask) {
 	if !this.enabled {
 		return
 	}
@@ -190,29 +198,29 @@ func (this *App) AddTask(name string,task ITask){
 	go task.Run()
 }
 
-func (this *App) ScreenShot()(*image.RGBA,error){
+func (this *App) ScreenShot() (*image.RGBA, error) {
 	return screenshot.CaptureDisplay(0)
 }
 
-func (this *App) ScreenCapture(x,y,w,h int32)(*image.RGBA,error){
-	return screenshot.Capture(int(x),int(y),int(w),int(h))
+func (this *App) ScreenCapture(x, y, w, h int32) (*image.RGBA, error) {
+	return screenshot.Capture(int(x), int(y), int(w), int(h))
 }
 
-func (this *App) ScreenPixel(x,y int32)(*colors.Color,error){
-	img,err:=screenshot.Capture(int(x),int(y),1,1)
+func (this *App) ScreenPixel(x, y int32) (*colors.Color, error) {
+	img, err := screenshot.Capture(int(x), int(y), 1, 1)
 	var ret colors.Color
-	if err!=nil {
-		return nil,err
+	if err != nil {
+		return nil, err
 	}
-	ret = colors.NewColorRGBA(img.Pix[0],img.Pix[1],img.Pix[2],img.Pix[3])
-	return &ret,nil
+	ret = colors.NewColorRGBA(img.Pix[0], img.Pix[1], img.Pix[2], img.Pix[3])
+	return &ret, nil
 }
 
 func (this *App) StopTask(name string) {
 	this.taskMutex.Lock()
 	defer this.taskMutex.Unlock()
 	t := this.tasks[name]
-	if t!=nil {
+	if t != nil {
 		t.TaskOff()
 	}
 }
@@ -230,47 +238,47 @@ func (this *App) StopAllTask() {
 	}
 }
 
-func (this *App) MoveMouseTo(x,y int32){
+func (this *App) MoveMouseTo(x, y int32) {
 	if !this.enabled {
 		return
 	}
-	deltaX :=x-this.mouseX
-	deltaY :=y-this.mouseY
-	this.MoveMouseRelative(deltaX,deltaY)
+	deltaX := x - this.mouseX
+	deltaY := y - this.mouseY
+	this.MoveMouseRelative(deltaX, deltaY)
 }
 
-func (this *App) PressMouseButton(button keys.MOUSE_BUTTON){
+func (this *App) PressMouseButton(button keys.MOUSE_BUTTON) {
 	if !this.enabled {
 		return
 	}
-	e:=keys.NewMouseEvent()
+	e := keys.NewMouseEvent()
 	e.Event = keys.MOUSE_EVENT_TYPE_DOWN
 	e.Button = button
 	this.sendMouseEvent(e)
 }
 
-func (this *App) ReleaseMouseButton(button keys.MOUSE_BUTTON){
+func (this *App) ReleaseMouseButton(button keys.MOUSE_BUTTON) {
 	if !this.enabled {
 		return
 	}
-	e:=keys.NewMouseEvent()
+	e := keys.NewMouseEvent()
 	e.Event = keys.MOUSE_EVENT_TYPE_UP
 	e.Button = button
 	this.sendMouseEvent(e)
 }
 
-func (this *App) ClickMouseButton(button keys.MOUSE_BUTTON){
+func (this *App) ClickMouseButton(button keys.MOUSE_BUTTON) {
 	if !this.enabled {
 		return
 	}
-	e:=keys.NewMouseEvent()
+	e := keys.NewMouseEvent()
 	e.Event = keys.MOUSE_EVENT_TYPE_PRESS
 	e.Button = button
 	this.sendMouseEvent(e)
 }
 
-func (this *App) MoveMouseRelative(x,y int32){
-	e:=keys.NewMouseEvent()
+func (this *App) MoveMouseRelative(x, y int32) {
+	e := keys.NewMouseEvent()
 	e.Event = keys.MOUSE_EVENT_TYPE_MOVE_RELATIVE
 	e.X = x
 	e.Y = y
@@ -281,16 +289,15 @@ func (this *App) HasWindow(str string) bool {
 	return this.hasWindow(str)
 }
 
-func (this *App) IsActiveWindow(str string)bool{
+func (this *App) IsActiveWindow(str string) bool {
 	return this.isForegroundWindow(str)
 }
 
-func (this *App) GetWindowRect(str string) (int32,int32,int32,int32,error) {
+func (this *App) GetWindowRect(str string) (int32, int32, int32, int32, error) {
 	return this.getWindowRect(str)
 }
 
-
-func (this *App) GetDesktopRect() (int32,int32,int32,int32) {
+func (this *App) GetDesktopRect() (int32, int32, int32, int32) {
 	return this.getDesktopRect()
 }
 
@@ -321,16 +328,21 @@ func (this *App) SetOnMouseEvent(f MouseEventHandler) {
 	this.mouseEventHandler = f
 }
 
-func (this *App) GetMouseX()int32 {
+func (this *App) GetMouseX() int32 {
 	return this.mouseX
 }
 
-func (this *App) GetMouseY()int32 {
+func (this *App) GetMouseY() int32 {
 	return this.mouseY
 }
 
 func (this *App) emitMouseEvent(e *keys.MouseEvent) {
-	if e.Event==keys.MOUSE_EVENT_TYPE_MOVE {
+	if e.Event == keys.MOUSE_EVENT_TYPE_UP {
+		this.setMouseStatus(e.Button, false)
+	} else if e.Event == keys.MOUSE_EVENT_TYPE_DOWN  {
+		this.setMouseStatus(e.Button, true)
+	}
+	if e.Event == keys.MOUSE_EVENT_TYPE_MOVE {
 		this.mouseX = e.X
 		this.mouseY = e.Y
 	}
@@ -342,12 +354,26 @@ func (this *App) emitMouseEvent(e *keys.MouseEvent) {
 	}
 }
 
-func (this *App) setKeyStatus(key keys.KEY,v bool){
+func (this *App) setKeyStatus(key keys.KEY, v bool)bool {
 	this.resetMutex.Lock()
 	defer this.resetMutex.Unlock()
-	this.keyStatus[key] = v
+	if this.keyStatus[key] != v {
+		this.keyStatus[key] = v
+		return true
+	}
+	return false
 }
-func (this *App) clearKeyStatus(key keys.KEY,v bool){
+
+func (this *App) setMouseStatus(key keys.MOUSE_BUTTON, v bool)bool {
+	this.resetMutex.Lock()
+	defer this.resetMutex.Unlock()
+	if this.mouseStatus[key] != v {
+		this.mouseStatus[key] = v
+		return true
+	}
+	return false
+}
+func (this *App) clearKeyStatus(key keys.KEY, v bool) {
 	this.resetMutex.Lock()
 	defer this.resetMutex.Unlock()
 	this.keyStatus[key] = v
@@ -355,14 +381,20 @@ func (this *App) clearKeyStatus(key keys.KEY,v bool){
 
 func (this *App) emitKeyEvent(e *keys.KeyEvent) {
 	if e.Event == keys.KEY_EVENT_TYPE_UP {
-		this.setKeyStatus(e.Code,false)
+		if this.setKeyStatus(e.Code, false) {
+			if this.keyEventHandler != nil {
+				this.keyEventHandler(e)
+			}
+		}
 	} else {
-		this.setKeyStatus(e.Code,true)
+		if this.setKeyStatus(e.Code, true) {
+			if !this.enabled {
+				return
+			}
+			if this.keyEventHandler != nil {
+				this.keyEventHandler(e)
+			}
+		}
 	}
-	if !this.enabled {
-		return
-	}
-	if this.keyEventHandler != nil {
-		this.keyEventHandler(e)
-	}
+
 }

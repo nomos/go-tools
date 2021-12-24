@@ -32,13 +32,16 @@ require (
 )
 
 require (
+	github.com/disintegration/imaging v1.6.2
+	github.com/super-l/machine-code v0.0.0-20210720085303-62525d58dab0
+	howett.net/plist v1.0.0
+)
+
+require (
 	github.com/StackExchange/wmi v1.2.1 // indirect
-	github.com/alexflint/go-arg v1.4.2 // indirect
-	github.com/alexflint/go-scalar v1.0.0 // indirect
 	github.com/aws/aws-sdk-go v1.34.28 // indirect
 	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/coreos/go-systemd/v22 v22.3.1 // indirect
-	github.com/disintegration/imaging v1.6.2 // indirect
 	github.com/fsnotify/fsnotify v1.4.7 // indirect
 	github.com/gen2brain/shm v0.0.0-20200228170931-49f9650110c5 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
@@ -85,7 +88,6 @@ require (
 	github.com/spf13/pflag v1.0.3 // indirect
 	github.com/spf13/viper v1.7.1 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
-	github.com/super-l/machine-code v0.0.0-20210720085303-62525d58dab0 // indirect
 	github.com/tklauser/go-sysconf v0.3.9 // indirect
 	github.com/tklauser/numcpus v0.3.0 // indirect
 	github.com/vcaesar/gops v0.21.3 // indirect
@@ -114,5 +116,4 @@ require (
 	gopkg.in/ini.v1 v1.51.0 // indirect
 	gopkg.in/webnice/b64.v1 v1.0.0 // indirect
 	gopkg.in/yaml.v2 v2.2.8 // indirect
-	howett.net/plist v1.0.0 // indirect
 )

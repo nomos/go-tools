@@ -110,7 +110,7 @@ func (this *App) startUseUser32() error {
 		case user32.WMMouseWheel:
 			if event.Struct.MouseData == 4287102976 {
 				this.emitMouseEvent(&keys.MouseEvent{
-					Event:  keys.MOUSE_EVENT_TYPE_SCROLL_UP,
+					Event:  keys.MOUSE_EVENT_TYPE_SCROLL_DOWN,
 					Button: 0,
 					X:      0,
 					Y:      0,
@@ -118,7 +118,7 @@ func (this *App) startUseUser32() error {
 				})
 			} else {
 				this.emitMouseEvent(&keys.MouseEvent{
-					Event:  keys.MOUSE_EVENT_TYPE_SCROLL_DOWN,
+					Event:  keys.MOUSE_EVENT_TYPE_SCROLL_UP,
 					Button: 0,
 					X:      0,
 					Y:      0,
