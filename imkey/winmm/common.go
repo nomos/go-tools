@@ -45,9 +45,9 @@ func (this *WinMMDLL) Release() error {
 }
 
 func (this *WinMMDLL) TimeBeginPeriod(millie uintptr){
-
+	this.timeBeginPeriod.Call(millie)
 }
 
 func (this *WinMMDLL) TimeEndPeriod(millie uintptr){
-
+	this.timeEndPeriod.Call(millie)
 }
