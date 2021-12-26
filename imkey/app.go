@@ -10,7 +10,6 @@ import (
 	"image"
 	"sync"
 	"syscall"
-	"time"
 )
 
 var instance *App
@@ -67,10 +66,10 @@ func NewTask(name string, app *App, taskFunc TaskFunc) *Task {
 	return ret
 }
 
-func (this *Task) Sleep(duration int) bool {
+func (this *Task) Sleep(duration int64) bool {
 	var tv syscall.Timeval
 	_ = syscall.Gettimeofday(&tv)
-	util.SleepUtil(int64(duration), func() bool {
+	util.SleepUtil(duration, func() bool {
 		return !this.taskOn
 	})
 	startTick := int64(tv.Sec)*int64(1000000) + int64(tv.Usec) + int64(duration)*1000
@@ -157,7 +156,7 @@ func (this *App) ClickKey(key keys.KEY) {
 	}
 	go func() {
 		go this.sendKeyEvent(key, keys.KEY_EVENT_TYPE_DOWN)
-		util.Sleep(10)
+		util.Sleep(50)
 		this.sendKeyEvent(key, keys.KEY_EVENT_TYPE_UP)
 	}()
 }

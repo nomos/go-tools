@@ -1,7 +1,7 @@
 package imkey
 
 type ITask interface {
-	Sleep(duration int)bool
+	Sleep(duration int64)bool
 	Run()
 	TaskOff()
 }
