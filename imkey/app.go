@@ -316,6 +316,12 @@ func (this *App) RemoveTask(name string) {
 	delete(this.tasks, name)
 }
 
+func (this *App) HasTask(name string) bool {
+	this.taskMutex.Lock()
+	defer this.taskMutex.Unlock()
+	return this.tasks[name]!=nil
+}
+
 func (this *App) GetTask(name string) ITask {
 	this.taskMutex.Lock()
 	defer this.taskMutex.Unlock()
