@@ -6,6 +6,7 @@ import (
 	"github.com/nomos/go-lokas/util/keys"
 	"golang.org/x/sys/windows"
 	"runtime"
+	"syscall"
 	"unsafe"
 )
 
@@ -27,6 +28,7 @@ const (
 	setCursorPosName        = "SetCursorPos"
 	getKeyState				= "GetKeyState"
 	switchToThisWindow = "SwitchToThisWindow"
+	getWindowTextW = "GetWindowTextW"
 )
 
 // LoadUser32DLL loads the user32 DLL into memory.
@@ -88,6 +90,10 @@ func LoadUser32DLL() (*User32DLL, error) {
 	if err != nil {
 		return nil, err
 	}
+	getWindowTextW, err := user32.FindProc(getWindowTextW)
+	if err != nil {
+		return nil, err
+	}
 	return &User32DLL{
 		user32:              user32,
 		setWindowsHookExW:   setWindowsHookExW,
@@ -99,6 +105,7 @@ func LoadUser32DLL() (*User32DLL, error) {
 		setCursorPos:        setCursorPos,
 		switchToThisWindow:  switchToThisWindow,
 		getKeyState:	getKeyState,
+		getWindowTextW:getWindowTextW,
 	}, nil
 }
 
@@ -115,6 +122,7 @@ type User32DLL struct {
 	setCursorPos        *windows.Proc
 	switchToThisWindow  *windows.Proc
 	getKeyState			*windows.Proc
+	getWindowTextW		*windows.Proc
 }
 
 // Release releases the underlying DLL.
@@ -139,6 +147,15 @@ func (o *User32DLL) KeyReleased(code keys.KEY) bool {
 	return !o.KeyPressed(code)
 }
 
+
+
+func (o *User32DLL) GetWindowText(hwnd win.HWND) string {
+	buf := make([]uint16, win.MAX_PATH)
+	_,_,err:=o.getWindowTextW.Call(uintptr(hwnd), uintptr(unsafe.Pointer(&buf[0])),uintptr(int32(400)))
+	log.Errorf(err.Error())
+	path := syscall.UTF16ToString(buf)
+	return path
+}
 
 func (o *User32DLL) SwitchToThisWindow(hwnd win.HWND, fAttach bool) bool {
 	_,_,err:=o.switchToThisWindow.Call(uintptr(hwnd), uintptr(win.BoolToBOOL(fAttach)))

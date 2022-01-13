@@ -206,6 +206,11 @@ func (this *App) startUseUser32() error {
 	return nil
 }
 
+func (this *App) getWindowText(hwnd win.HWND) string {
+	return this.user32.GetWindowText(hwnd)
+}
+
+
 func (this *App) getWindow(str string) win.HWND {
 	hwnd := win.FindWindow(nil, syscall.StringToUTF16Ptr(str))
 	return hwnd

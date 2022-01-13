@@ -2,6 +2,7 @@ package imkey
 
 import (
 	"github.com/kbinani/screenshot"
+	"github.com/lxn/win"
 	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-lokas/util"
 	"github.com/nomos/go-lokas/util/colors"
@@ -296,6 +297,10 @@ func (this *App) MoveMouseRelative(x, y int32) {
 
 func (this *App) HasWindow(str string) bool {
 	return this.hasWindow(str)
+}
+
+func (this *App) GetWindowText(hwnd win.HWND) string {
+	return this.getWindowText(hwnd)
 }
 
 func (this *App) IsActiveWindow(str string) bool {
