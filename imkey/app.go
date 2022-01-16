@@ -96,6 +96,10 @@ func (this *Task) TaskOff() {
 	this.taskOn = false
 }
 
+func (this *Task) TaskOn() {
+	this.taskOn = true
+}
+
 type TaskFunc func(task *Task)
 
 func (this *App) Init() {
@@ -198,13 +202,13 @@ func (this *App) AddTask(name string, task ITask) {
 		return
 	}
 	this.taskMutex.Lock()
+	defer this.taskMutex.Unlock()
 	t := this.tasks[name]
 	if t != nil {
-		this.taskMutex.Unlock()
+		t.TaskOn()
 		return
 	}
 	this.tasks[name] = task
-	this.taskMutex.Unlock()
 	go task.Run()
 }
 
