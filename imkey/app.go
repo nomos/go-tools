@@ -205,11 +205,20 @@ func (this *App) AddTask(name string, task ITask) {
 	defer this.taskMutex.Unlock()
 	t := this.tasks[name]
 	if t != nil {
-		t.TaskOn()
+		go t.TaskOn()
 		return
 	}
 	this.tasks[name] = task
 	go task.Run()
+}
+
+func (this *App) StopTask(name string) {
+	this.taskMutex.Lock()
+	defer this.taskMutex.Unlock()
+	t := this.tasks[name]
+	if t != nil {
+		go t.TaskOff()
+	}
 }
 
 func (this *App) ScreenShot() (*image.RGBA, error) {
@@ -228,15 +237,6 @@ func (this *App) ScreenPixel(x, y int32) (*colors.Color, error) {
 	}
 	ret = colors.NewColorRGBA(img.Pix[0], img.Pix[1], img.Pix[2], img.Pix[3])
 	return &ret, nil
-}
-
-func (this *App) StopTask(name string) {
-	this.taskMutex.Lock()
-	defer this.taskMutex.Unlock()
-	t := this.tasks[name]
-	if t != nil {
-		t.TaskOff()
-	}
 }
 
 func (this *App) StopAllTask() {
