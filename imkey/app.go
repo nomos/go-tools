@@ -86,10 +86,7 @@ func (this *Task) Sleep(duration int64) bool {
 }
 
 func (this *Task) Run() {
-	this.taskOn = false
 	this.taskFunc(this)
-	this.taskOn = true
-	this.App.RemoveTask(this.Name)
 }
 
 func (this *Task) TaskOff() {
@@ -189,12 +186,20 @@ func (this *App) RunTask(name string, taskFunc TaskFunc) {
 	this.taskMutex.Lock()
 	t := this.tasks[name]
 	if t != nil {
-		this.taskMutex.Unlock()
-		return
+		t.TaskOff()
+		delete(this.tasks,name)
 	}
 	t = NewTask(name, this, taskFunc)
 	this.tasks[name] = t
-	go t.Run()
+	go func() {
+		t.TaskOn()
+		t.Run()
+		defer this.taskMutex.Unlock()
+		this.taskMutex.Lock()
+		if this.tasks[name] == t {
+			delete(this.tasks,name)
+		}
+	}()
 }
 
 func (this *App) AddTask(name string, task ITask) {
@@ -205,11 +210,19 @@ func (this *App) AddTask(name string, task ITask) {
 	defer this.taskMutex.Unlock()
 	t := this.tasks[name]
 	if t != nil {
-		go t.TaskOn()
-		return
+		t.TaskOff()
+		delete(this.tasks,name)
 	}
 	this.tasks[name] = task
-	go task.Run()
+	go func() {
+		task.TaskOn()
+		task.Run()
+		defer this.taskMutex.Unlock()
+		this.taskMutex.Lock()
+		if this.tasks[name] == task {
+			delete(this.tasks,name)
+		}
+	}()
 }
 
 func (this *App) StopTask(name string) {
@@ -217,7 +230,7 @@ func (this *App) StopTask(name string) {
 	defer this.taskMutex.Unlock()
 	t := this.tasks[name]
 	if t != nil {
-		go t.TaskOff()
+		t.TaskOff()
 	}
 }
 
