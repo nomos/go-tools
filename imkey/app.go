@@ -163,6 +163,17 @@ func (this *App) ClickKey(key keys.KEY) {
 	}()
 }
 
+func (this *App)  ClickKeyDuration(key keys.KEY,t int64) {
+	if !this.enabled {
+		return
+	}
+	go func() {
+		go this.sendKeyEvent(key, keys.KEY_EVENT_TYPE_DOWN)
+		util.Sleep(t)
+		this.sendKeyEvent(key, keys.KEY_EVENT_TYPE_UP)
+	}()
+}
+
 func (this *App) IsKeyPressed(key keys.KEY) bool {
 	this.resetMutex.Lock()
 	defer this.resetMutex.Unlock()
