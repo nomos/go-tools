@@ -9,6 +9,7 @@ import (
 	"github.com/nomos/go-lokas/util/gzip"
 	"image"
 	_ "image/jpeg"
+	"image/png"
 	_ "image/png"
 	"io/ioutil"
 	"strconv"
@@ -38,57 +39,74 @@ func rgb2hex(color []uint32) string {
 	return r + g + b + a
 }
 
-func Png2ByteArray(path string) (*ImageRGBAMap,error) {
-	img, err := readImageFile(path)
+func Png2ByteArray(path string) (*ImageRGBAMap, error) {
+	img, err := ReadImageFile(path)
 	if err != nil {
 		log.Error(err.Error())
-		return nil,err
+		return nil, err
 	}
-	ret := decodeRGBA(img)
-	return ret,nil
+	ret := DecodeRGBA(img)
+	return ret, nil
 }
 
-func Png2Base64(path string) (int,int,string,error) {
-	img, err := readImageFile(path)
+func Png2Base64(path string) (int, int, string, error) {
+	img, err := ReadImageFile(path)
 	if err != nil {
 		log.Error(err.Error())
-		return 0,0,"",err
+		return 0, 0, "", err
 	}
-	width,height,arr := DecodeImgData(img)
+	width, height, arr := DecodeImgData(img)
 	ret := base64.StdEncoding.EncodeToString(arr)
-	return width,height,ret,nil
+	return width, height, ret, nil
 }
 
-func Png2CompressedBase64(path string) (int,int,string,error) {
-	img, err := readImageFile(path)
+func Png2CompressedBase64(path string) (int, int, string, error) {
+	img, err := ReadImageFile(path)
 	if err != nil {
 		log.Error(err.Error())
-		return 0,0,"",err
+		return 0, 0, "", err
 	}
-	width,height,arr := DecodeImgData(img)
-	if width>255||height>255 {
-		return 0,0,"",errors.New("width or height must <=255")
+	width, height, arr := DecodeImgData(img)
+	if width > 255 || height > 255 {
+		return 0, 0, "", errors.New("width or height must <=255")
 	}
-	arr2:=make([]byte,len(arr)+2)
+	arr2 := make([]byte, len(arr)+2)
 	arr2[0] = uint8(width)
 	arr2[1] = uint8(height)
-	arr3:=arr2[2:]
-	copy(arr3,arr)
-	ret,_:=gzip.CompressBytes2Base64(arr2)
-	return width,height,ret,nil
+	arr3 := arr2[2:]
+	copy(arr3, arr)
+	ret, _ := gzip.CompressBytes2Base64(arr2)
+	return width, height, ret, nil
 }
 
-func Png2ImageMap(path string) (int,int,[]byte,error) {
-	img, err := readImageFile(path)
+func Png2ImageMap(path string) (int, int, []byte, error) {
+	img, err := ReadImageFile(path)
 	if err != nil {
 		log.Error(err.Error())
-		return 0,0,nil,err
+		return 0, 0, nil, err
 	}
-	width,height,arr := DecodeImgData(img)
-	return width,height,arr,nil
+	width, height, arr := DecodeImgData(img)
+	return width, height, arr, nil
 }
 
-func readImageFile(path string) (img image.Image, err error) {
+func ReadPngFile(path string) (img image.Image, err error) {
+	fmt.Println("读取图片中....")
+	fileByte, err := ioutil.ReadFile(path)
+	if err != nil {
+		fmt.Println("读取文件失败....")
+		return img, err
+	}
+	img, err = png.Decode(bytes.NewBuffer(fileByte))
+	if err != nil {
+		log.Error(err.Error())
+		fmt.Println("图片解码失败....")
+		return img, err
+	}
+	fmt.Println("读取图片完成....")
+	return img, err
+}
+
+func ReadImageFile(path string) (img image.Image, err error) {
 	fmt.Println("读取图片中....")
 	fileByte, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -120,16 +138,33 @@ type ImageRGBAMap struct {
 	Data   []ColorPoint
 }
 
-func DecodeImgData(img image.Image) (int,int,[]byte) {
+func (this *ImageRGBAMap) GetData() []byte {
+	ret := make([]byte, this.Width*this.Height*4)
+	for y := 0; y < this.Height; y++ {
+		for x := 0; x < this.Width; x++ {
+			ret[x*4+y*this.Width*4+0] = byte(this.At(x, y).R)
+			ret[x*4+y*this.Width*4+1] = byte(this.At(x, y).G)
+			ret[x*4+y*this.Width*4+2] = byte(this.At(x, y).B)
+			ret[x*4+y*this.Width*4+3] = byte(this.At(x, y).A)
+		}
+	}
+	return ret
+}
+
+func (this *ImageRGBAMap) At(x int, y int) ColorPoint {
+	return this.Data[x+y*this.Width]
+}
+
+func DecodeImgData(img image.Image) (int, int, []byte) {
 	log.Info("读取图片数据中....")
 	rectangle := img.Bounds()
-	width:=rectangle.Max.X-rectangle.Min.X
-	height:=rectangle.Max.Y-rectangle.Min.Y
-	arr:=make([]byte,height*width*4)
+	width := rectangle.Max.X - rectangle.Min.X
+	height := rectangle.Max.Y - rectangle.Min.Y
+	arr := make([]byte, height*width*4)
 	for yindex := rectangle.Min.Y; yindex < rectangle.Max.Y; yindex++ {
 		for xindex := rectangle.Min.X; xindex < rectangle.Max.X; xindex++ {
-			x:=xindex-rectangle.Min.X
-			y:=yindex-rectangle.Min.Y
+			x := xindex - rectangle.Min.X
+			y := yindex - rectangle.Min.Y
 			r, g, b, a := img.At(xindex, yindex).RGBA()
 			arr[y*width*4+x*4] = byte(r >> 8)
 			arr[y*width*4+x*4+1] = byte(g >> 8)
@@ -138,10 +173,10 @@ func DecodeImgData(img image.Image) (int,int,[]byte) {
 		}
 	}
 	log.Info("读取图片数据完成")
-	return width,height,arr
+	return width, height, arr
 }
 
-func decodeRGBA(img image.Image) *ImageRGBAMap {
+func DecodeRGBA(img image.Image) *ImageRGBAMap {
 	log.Info("读取图片RGBA中....")
 	imageMap := &ImageRGBAMap{}
 	rectangle := img.Bounds()
