@@ -94,8 +94,10 @@ func WithElectron(name string, defaultUrl string) Option {
 	return func(a *App) {
 		pwd := filepath.Dir(os.Args[0])
 		a.electronApp, _ = astilectron.New(log.NewAstilecTronLogger(false), astilectron.Options{
-			AppName:           name,
-			BaseDirectoryPath: pwd + "/astiletron/",
+			AppName:            name,
+			BaseDirectoryPath:  pwd + "/astiletron/",
+			VersionAstilectron: "0.49",
+			VersionElectron:    "11.4.3",
 		})
 		a.url = defaultUrl
 	}
