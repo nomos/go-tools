@@ -112,9 +112,9 @@ func (this *InterceptionDLL) SendMouseMoveRelative(x, y int32) error {
 	this.interception_send.Call(this.context, MOUSE, uintptr(unsafe.Pointer(stroke)), 1)
 	return nil
 }
-func (this *InterceptionDLL) SetFilter(){
-	this.interception_set_filter.Call(this.context,this.interception_is_keyboard.Addr())
-	this.interception_set_filter.Call(this.context,this.interception_is_mouse.Addr())
+func (this *InterceptionDLL) SetFilter() {
+	this.interception_set_filter.Call(this.context, this.interception_is_keyboard.Addr())
+	this.interception_set_filter.Call(this.context, this.interception_is_mouse.Addr())
 }
 
 func (this *InterceptionDLL) SendMouseMoveTo(x, y int32) error {
@@ -133,7 +133,7 @@ func (this *InterceptionDLL) SendMouseMoveTo(x, y int32) error {
 func (this *InterceptionDLL) SendMouseButtonPress(button keys.MOUSE_BUTTON) error {
 	stroke := &InterceptionMouseStroke{
 		Code:        0,
-		State: uint16(INTERCEPTION_MOUSE_CUSTOM),
+		State:       uint16(INTERCEPTION_MOUSE_CUSTOM),
 		Rolling:     0,
 		X:           0,
 		Y:           0,
@@ -158,7 +158,7 @@ func (this *InterceptionDLL) SendMouseButtonPress(button keys.MOUSE_BUTTON) erro
 func (this *InterceptionDLL) SendMouseButtonRelease(button keys.MOUSE_BUTTON) error {
 	stroke := &InterceptionMouseStroke{
 		Code:        0,
-		State: uint16(INTERCEPTION_MOUSE_CUSTOM),
+		State:       uint16(INTERCEPTION_MOUSE_CUSTOM),
 		Rolling:     0,
 		X:           0,
 		Y:           0,
