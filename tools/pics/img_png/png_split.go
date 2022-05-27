@@ -34,8 +34,8 @@ func splitImage(img image.Image, width, height int) []image.Image {
 	}
 	for y := 0; y < ySplit; y++ {
 		for x := 0; x < xSplit; x++ {
-			x1 := util.Ternary((x+1)*width > imgWidth, imgWidth, (x+1)*width).(int)
-			y1 := util.Ternary((y+1)*height > imgHeight, imgHeight, (y+1)*height).(int)
+			x1 := util.Ternary((x+1)*width > imgWidth, imgWidth, (x+1)*width)
+			y1 := util.Ternary((y+1)*height > imgHeight, imgHeight, (y+1)*height)
 			if (x+1)*width > imgWidth {
 				continue
 			}
