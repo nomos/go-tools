@@ -107,7 +107,7 @@ func (this *Client) SendPackage(packetlen uint32, magic uint16, ver uint16, type
 
 func (this *Client) ReceiveMsg() {
 	this.Pool = NewPool()
-	go this.Pool.Handle()
+	go this.Handle()
 	defer func() {
 		r := recover()
 		if r != nil {
