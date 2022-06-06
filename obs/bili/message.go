@@ -8,8 +8,8 @@ import (
 	"time"
 )
 
-type DanMuMsg struct {
-	UID        uint32 `json:"uid"`
+type Danmu struct {
+	Uid        uint32 `json:"uid"`
 	Uname      string `json:"uname"`
 	Ulevel     uint32 `json:"ulevel"`
 	Text       string `json:"text"`
@@ -17,23 +17,12 @@ type DanMuMsg struct {
 	MedalName  string `json:"medal_name"`
 }
 
-type InteractWord struct {
-	UID        uint32 `json:"uid"`
+type EnterMessage struct {
+	Uid        uint32 `json:"uid"`
 	Uname      string `json:"uname"`
 	Ulevel     uint32 `json:"ulevel"`
 	MedalLevel uint32 `json:"medal_level"`
 	MedalName  string `json:"medal_name"`
-}
-
-func NewDanmu() *DanMuMsg {
-	return &DanMuMsg{
-		UID:        0,
-		Uname:      "",
-		Ulevel:     0,
-		Text:       "",
-		MedalLevel: 0,
-		MedalName:  "无勋章",
-	}
 }
 
 type Gift struct {
@@ -41,6 +30,17 @@ type Gift struct {
 	Action   string `json:"action"`
 	Price    uint32 `json:"price"`
 	GiftName string `json:"gift_name"`
+}
+
+func NewDanmu() *Danmu {
+	return &Danmu{
+		Uid:        0,
+		Uname:      "",
+		Ulevel:     0,
+		Text:       "",
+		MedalLevel: 0,
+		MedalName:  "无勋章",
+	}
 }
 
 func NewGift() *Gift {
@@ -70,7 +70,7 @@ var (
 	CMD_ROOM_REAL_TIME_MESSAGE_UPDATE CMD = "ROOM_REAL_TIME_MESSAGE_UPDATE" // 房间关注数变动
 )
 
-func (c *Client) SendPackage(packetlen uint32, magic uint16, ver uint16, typeID uint32, param uint32, data []byte) (err error) {
+func (this *Client) SendPackage(packetlen uint32, magic uint16, ver uint16, typeID uint32, param uint32, data []byte) (err error) {
 	packetHead := new(bytes.Buffer)
 
 	if packetlen == 0 {
@@ -97,7 +97,7 @@ func (c *Client) SendPackage(packetlen uint32, magic uint16, ver uint16, typeID 
 
 	// log.Info("本次发包消息为：", sendData)
 
-	if err = c.conn.WriteMessage(websocket.BinaryMessage, sendData); err != nil {
+	if err = this.conn.WriteMessage(websocket.BinaryMessage, sendData); err != nil {
 		log.Infof("c.conn.Write err: ", err)
 		return
 	}
@@ -105,9 +105,9 @@ func (c *Client) SendPackage(packetlen uint32, magic uint16, ver uint16, typeID 
 	return
 }
 
-func (c *Client) ReceiveMsg() {
-	pool := NewPool()
-	go pool.Handle()
+func (this *Client) ReceiveMsg() {
+	this.Pool = NewPool()
+	go this.Pool.Handle()
 	defer func() {
 		r := recover()
 		if r != nil {
@@ -118,35 +118,35 @@ func (c *Client) ReceiveMsg() {
 		}
 	}()
 	for {
-		if !c.Connecting && !c.Connected {
+		if !this.Connecting && !this.Connected {
 			continue
 		}
-		err := c.conn.SetReadDeadline(time.Now().Add(time.Millisecond * 15000))
+		err := this.conn.SetReadDeadline(time.Now().Add(time.Millisecond * 15000))
 		if err != nil {
 			log.Error(err.Error())
 		}
-		_, msg, err := c.conn.ReadMessage()
+		_, msg, err := this.conn.ReadMessage()
 		if err != nil {
 			log.Infof("ReadMsg err :", err.Error())
-			c.Reconnect()
+			this.Reconnect()
 			continue
 		}
 
 		switch msg[11] {
 		case 8:
 			log.Info("握手包收发完毕，连接成功")
-			c.Connected = true
-			c.Connecting = false
+			this.Connected = true
+			this.Connecting = false
 		case 3:
 			onlineNow := ByteArrToDecimal(msg[16:])
-			if uint32(onlineNow) != c.Room.Online {
-				c.Room.Online = uint32(onlineNow)
+			if uint32(onlineNow) != this.Room.Online {
+				this.Room.Online = uint32(onlineNow)
 				log.Infof("当前房间人气变动：", uint32(onlineNow))
 			}
 		case 5:
 			if inflated, err := ZlibInflate(msg[16:]); err != nil {
 				// 代表是未压缩数据
-				pool.MsgUncompressed <- string(msg[16:])
+				this.Pool.MsgUncompressed <- string(msg[16:])
 			} else {
 				for len(inflated) > 0 {
 					l := ByteArrToDecimal(inflated[:4])
@@ -155,20 +155,20 @@ func (c *Client) ReceiveMsg() {
 					copy(data, inflated[16:l])
 					switch CMD(m) {
 					case CMD_DANMU_MSG:
-						pool.UserMsg <- string(data)
+						this.Pool.UserMsg <- string(data)
 					case CMD_SEND_GIFT:
-						pool.UserGift <- string(data)
+						this.Pool.UserGift <- string(data)
 					case CMD_WELCOME:
-						pool.UserEnter <- string(data)
+						this.Pool.VipEnter <- string(data)
 					case CMD_WELCOME_GUARD:
-						pool.UserGuard <- string(data)
+						this.Pool.GuardEnter <- string(data)
 					case CMD_ENTRY_EFFECT:
-						pool.UserEntry <- string(data)
+						this.Pool.UserEntry <- string(data)
 					case CMD_INTERACT_WORD:
-						pool.UserInteractWord <- string(data)
+						this.Pool.UserEnter <- string(data)
 					default:
-						log.Infof(json.Get(inflated[16:l]).ToString())
 					}
+					log.Infof(json.Get(inflated[16:l]).ToString())
 					inflated = inflated[l:]
 				}
 			}
@@ -179,11 +179,11 @@ func (c *Client) ReceiveMsg() {
 	}
 }
 
-func (c *Client) HeartBeat() {
+func (this *Client) HeartBeat() {
 	for {
-		if c.Connected && !c.Connecting {
+		if this.Connected && !this.Connecting {
 			obj := []byte("5b6f626a656374204f626a6563745d")
-			err := c.SendPackage(0, 16, 1, 2, 1, obj)
+			err := this.SendPackage(0, 16, 1, 2, 1, obj)
 			if err != nil {
 				log.Errorf("heart beat err: ", err)
 			}
@@ -192,15 +192,15 @@ func (c *Client) HeartBeat() {
 	}
 }
 
-func (c *Client) Reconnect() {
+func (this *Client) Reconnect() {
 	log.Infof("Reconnect")
-	c.rcMutex.Lock()
-	defer c.rcMutex.Unlock()
-	c.Connected = false
-	c.Connecting = true
-	if c.conn != nil {
+	this.rcMutex.Lock()
+	defer this.rcMutex.Unlock()
+	this.Connected = false
+	this.Connecting = true
+	if this.conn != nil {
 
-		c.conn = nil
+		this.conn = nil
 	}
-	c.connect()
+	this.connect()
 }

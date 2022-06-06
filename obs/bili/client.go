@@ -4,6 +4,7 @@ import (
 	"github.com/gorilla/websocket"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/nomos/go-lokas/log"
+	"github.com/nomos/go-lokas/util/events"
 	"net/url"
 	"sync"
 )
@@ -18,6 +19,8 @@ var (
 
 // Client instance
 type Client struct {
+	events.EventEmmiter
+	*Pool
 	Room       RoomInfo     `json:"room"`
 	Request    *RequestInfo `json:"request"`
 	conn       *websocket.Conn
@@ -65,21 +68,22 @@ func NewRequestInfo(roomid uint32) *RequestInfo {
 // new websocket("wss)
 func NewClient(roomid uint32) (c *Client, err error) {
 	return &Client{
-		Room:      GetRoomInfo(roomid),
-		Request:   NewRequestInfo(roomid),
-		conn:      nil,
-		Connected: false,
+		EventEmmiter: events.New(),
+		Room:         GetRoomInfo(roomid),
+		Request:      NewRequestInfo(roomid),
+		conn:         nil,
+		Connected:    false,
 	}, nil
 }
 
-func (c *Client) Start() (err error) {
-	c.Reconnect()
-	go c.ReceiveMsg()
-	go c.HeartBeat()
+func (this *Client) Start() (err error) {
+	this.Reconnect()
+	go this.ReceiveMsg()
+	go this.HeartBeat()
 	return
 }
 
-func (c *Client) connect() (err error) {
+func (this *Client) connect() (err error) {
 	u := url.URL{Scheme: "wss", Host: DanMuServer, Path: "/sub"}
 
 	conn, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
@@ -87,18 +91,18 @@ func (c *Client) connect() (err error) {
 		log.Error(err.Error())
 		return err
 	}
-	c.conn = conn
+	this.conn = conn
 
-	log.Infof("当前直播间状态：", c.Room.LiveStatus)
+	log.Infof("当前直播间状态：", this.Room.LiveStatus)
 
 	log.Infof("连接弹幕服务器 ", DanMuServer, " 成功，正在发送握手包...")
-	r, err := json.Marshal(c.Request)
+	r, err := json.Marshal(this.Request)
 
 	if err != nil {
 		log.Errorf("marshal err ,", err)
 		return err
 	}
-	if err = c.SendPackage(0, 16, 1, 7, 1, r); err != nil {
+	if err = this.SendPackage(0, 16, 1, 7, 1, r); err != nil {
 		log.Errorf("SendPackage err,", err)
 		return err
 	}

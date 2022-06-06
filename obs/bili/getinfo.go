@@ -95,8 +95,8 @@ func ZlibInflate(compress []byte) ([]byte, error) {
 	return nil, err
 }
 
-func (d *DanMuMsg) GetDanmuMsg(source []byte) {
-	d.UID = json.Get(source, "info", 2, 0).ToUint32()
+func (d *Danmu) GetDanmuMsg(source []byte) {
+	d.Uid = json.Get(source, "info", 2, 0).ToUint32()
 	d.Uname = json.Get(source, "info", 2, 1).ToString()
 	d.Ulevel = json.Get(source, "info", 4, 0).ToUint32()
 	d.Text = json.Get(source, "info", 1).ToString()

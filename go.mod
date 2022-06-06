@@ -33,6 +33,8 @@ require (
 
 require (
 	github.com/disintegration/imaging v1.6.2
+	github.com/gorilla/websocket v1.4.2
+	github.com/json-iterator/go v1.1.9
 	github.com/super-l/machine-code v0.0.0-20210720085303-62525d58dab0
 	howett.net/plist v1.0.0
 )
@@ -55,7 +57,6 @@ require (
 	github.com/gomodule/redigo v1.8.4 // indirect
 	github.com/gorilla/securecookie v1.1.1 // indirect
 	github.com/gorilla/sessions v1.2.1 // indirect
-	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/jezek/xgb v0.0.0-20210312150743-0e0f116e1240 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
@@ -67,6 +68,8 @@ require (
 	github.com/magiconair/properties v1.8.1 // indirect
 	github.com/mitchellh/go-ps v1.0.0 // indirect
 	github.com/mitchellh/mapstructure v1.1.2 // indirect
+	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
+	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/noaway/dateparse v0.0.0-20171117034806-ad2b19d7b298 // indirect
 	github.com/nomos/jwt-go v3.2.0+incompatible // indirect
