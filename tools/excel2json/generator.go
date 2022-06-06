@@ -186,7 +186,7 @@ func (this *Generator) GenerateGo(gopath string) error {
 			sheetArr = append(sheetArr, s)
 			goFilePath := path.Join(gopath, stringutil.SplitCamelCaseLowerSnake(s.Name)) + ".go"
 			log.Warnf(goFilePath)
-			err := ioutil.WriteFile(goFilePath, []byte(s.GenerateGoString()), 0644)
+			err := ioutil.WriteFile(goFilePath, []byte(s.GenerateGoString(gopath)), 0644)
 			if err != nil {
 				log.Errorf(err.Error())
 			}
@@ -206,7 +206,7 @@ func (this *Generator) GenerateGo(gopath string) error {
 	}
 	initFieldStr = strings.TrimRight(initFieldStr, "\n")
 	dataFieldStr = strings.TrimRight(dataFieldStr, "\n")
-	dataStr := `package gamedata
+	dataStr := `package {Package}
 
 type DataMap struct {
 {DataFields}
@@ -215,7 +215,7 @@ type DataMap struct {
 func (this *DataMap) Clear() {
 {InitFields}
 }`
-
+	dataStr = strings.Replace(dataStr, "{Package}", path.Base(gopath), -1)
 	dataStr = strings.Replace(dataStr, "{InitFields}", initFieldStr, -1)
 	dataStr = strings.Replace(dataStr, "{DataFields}", dataFieldStr, -1)
 	dataPath := path.Join(gopath, "data.go")
@@ -227,7 +227,7 @@ func (this *DataMap) Clear() {
 }
 
 func generatePropEnum(p string, lines []*DataLine) {
-	str := `package gamedata
+	str := `package {Package}
 
 import "github.com/nomos/go-lokas/protocol"
 
@@ -281,6 +281,7 @@ func (this PROP_ENUM) ToString()string{
 	str2enum = strings.TrimRight(str2enum, "\n")
 	enum2str = strings.TrimRight(enum2str, "\n")
 	allenums = strings.TrimRight(allenums, ",")
+	str = strings.ReplaceAll(str, "{Package}", path.Base(p))
 	str = strings.ReplaceAll(str, "{enumline}", lineStr)
 	str = strings.ReplaceAll(str, "{str2enum}", str2enum)
 	str = strings.ReplaceAll(str, "{enum2str}", enum2str)

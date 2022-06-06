@@ -8,6 +8,7 @@ import (
 	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-lokas/util/slice"
 	"github.com/nomos/go-lokas/util/stringutil"
+	"path"
 	"regexp"
 	"sort"
 	"strconv"
@@ -233,15 +234,16 @@ func (this *SheetSource) readLine(row *RowSource) error {
 	return nil
 }
 
-const __gostr = `package gamedata
+const __gostr = `package {Package}
 
 type {ClassName} struct {
 {ClassFields}
 }
 `
 
-func (this *SheetSource) GenerateGoString() string {
+func (this *SheetSource) GenerateGoString(gopath string) string {
 	ret := __gostr
+	ret = strings.Replace(ret, "{Package}", path.Base(gopath), -1)
 	ret = strings.Replace(ret, "{ClassName}", strings.Join(stringutil.SplitCamelCaseCapitalize(this.Name), ""), -1)
 	ret = strings.Replace(ret, "{ClassFields}", this.generateGoFields(), -1)
 	log.Warnf("generateGoFields", ret)
