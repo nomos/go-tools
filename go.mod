@@ -11,7 +11,7 @@ require (
 	github.com/kr/text v0.2.0 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/nomos/clipboard v0.5.7
-	github.com/nomos/go-lokas v0.2.20
+	github.com/nomos/go-lokas v0.2.21
 	github.com/tyler-smith/go-bip39 v1.1.0
 	github.com/ying32/dylib v0.0.0-20210414124638-bf395b2d391a // indirect
 	github.com/ying32/govcl v2.0.10+incompatible
@@ -33,6 +33,7 @@ require (
 
 require (
 	github.com/disintegration/imaging v1.6.2
+	github.com/nomos/qmgo v1.9.7
 	github.com/super-l/machine-code v0.0.0-20210720085303-62525d58dab0
 	howett.net/plist v1.0.0
 )
@@ -86,7 +87,6 @@ require (
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/noaway/dateparse v0.0.0-20171117034806-ad2b19d7b298 // indirect
 	github.com/nomos/jwt-go v3.2.0+incompatible // indirect
-	github.com/nomos/qmgo v1.9.7 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.0.2 // indirect
 	github.com/otiai10/gosseract v2.2.1+incompatible // indirect

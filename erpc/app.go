@@ -179,11 +179,15 @@ type App struct {
 }
 
 func NewApp(opts ...Option) *App {
+	c, cancel := context.WithCancel(context.Background())
 	ret := &App{
 		EventEmmiter: events.New(),
 		Gate: &lox.Gate{
 			Actor:           lox.NewActor(),
 			ISessionManager: network.NewDefaultSessionManager(true),
+			Ctx:             c,
+
+			Cancel: cancel,
 		},
 	}
 	for _, o := range opts {
@@ -345,6 +349,7 @@ func (this *App) SessionCreator(conn lokas.IConn) lokas.ISession {
 
 func (this *App) Start() {
 	this.Gate.LoadCustom("0.0.0.0", this.Port, protocol.BINARY, lox.Websocket)
+	this.Gate.SetProcess(GetFakeProcess())
 	this.Gate.Start()
 	this.Emit("start")
 	this.start()
