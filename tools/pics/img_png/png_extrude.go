@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-func UnExtrudeImage(imgPath string, width, height int, logger log.ILogger) error {
+func UnExtrudeImage(imgPath string, exportPath string, width, height int, logger log.ILogger) error {
 	if logger == nil {
 		logger = log.DefaultLogger()
 	}
@@ -24,6 +24,9 @@ func UnExtrudeImage(imgPath string, width, height int, logger log.ILogger) error
 	path1 := strings.Replace(imgPath, ext, "", 1)
 
 	path2 := path.Join(path1 + "_unbleed.png")
+	if exportPath != "" {
+		path2 = exportPath
+	}
 
 	exist, err := util.PathExists(path2)
 	if err != nil {
@@ -45,7 +48,7 @@ func UnExtrudeImage(imgPath string, width, height int, logger log.ILogger) error
 	return nil
 }
 
-func ExtrudeImage(imgPath string, width, height int, logger log.ILogger) error {
+func ExtrudeImage(imgPath string, exportPath string, width, height int, logger log.ILogger) error {
 	if logger == nil {
 		logger = log.DefaultLogger()
 	}
@@ -59,6 +62,9 @@ func ExtrudeImage(imgPath string, width, height int, logger log.ILogger) error {
 	path1 := strings.Replace(imgPath, ext, "", 1)
 
 	path2 := path.Join(path1 + "_bleed.png")
+	if exportPath != "" {
+		path2 = exportPath
+	}
 
 	exist, err := util.PathExists(path2)
 	if err != nil {
