@@ -23,7 +23,7 @@ func Instance() *App {
 				EventEmmiter: events.New(),
 				tasks:        map[string]ITask{},
 				keyStatus:    map[keys.KEY]bool{},
-				mouseStatus: map[keys.MOUSE_BUTTON]bool{},
+				mouseStatus:  map[keys.MOUSE_BUTTON]bool{},
 				app:          &app{},
 			}
 			instance.Init()
@@ -135,7 +135,11 @@ func (this *App) Stop() error {
 	this.enabled = false
 	this.StopAllTask()
 	this.ResetAllKeys()
-	return this.stop()
+	return nil
+}
+
+func (this *App) Terimnate() {
+	this.stop()
 }
 
 func (this *App) PressKey(key keys.KEY) {
@@ -163,7 +167,7 @@ func (this *App) ClickKey(key keys.KEY) {
 	}()
 }
 
-func (this *App)  ClickKeyDuration(key keys.KEY,t int64) {
+func (this *App) ClickKeyDuration(key keys.KEY, t int64) {
 	if !this.enabled {
 		return
 	}
@@ -198,7 +202,7 @@ func (this *App) RunTask(name string, taskFunc TaskFunc) {
 	t := this.tasks[name]
 	if t != nil {
 		t.TaskOff()
-		delete(this.tasks,name)
+		delete(this.tasks, name)
 	}
 	t = NewTask(name, this, taskFunc)
 	this.tasks[name] = t
@@ -208,7 +212,7 @@ func (this *App) RunTask(name string, taskFunc TaskFunc) {
 		defer this.taskMutex.Unlock()
 		this.taskMutex.Lock()
 		if this.tasks[name] == t {
-			delete(this.tasks,name)
+			delete(this.tasks, name)
 		}
 	}()
 }
@@ -222,7 +226,7 @@ func (this *App) AddTask(name string, task ITask) {
 	t := this.tasks[name]
 	if t != nil {
 		t.TaskOff()
-		delete(this.tasks,name)
+		delete(this.tasks, name)
 	}
 	this.tasks[name] = task
 	go func() {
@@ -231,7 +235,7 @@ func (this *App) AddTask(name string, task ITask) {
 		defer this.taskMutex.Unlock()
 		this.taskMutex.Lock()
 		if this.tasks[name] == task {
-			delete(this.tasks,name)
+			delete(this.tasks, name)
 		}
 	}()
 }
@@ -352,7 +356,7 @@ func (this *App) RemoveTask(name string) {
 func (this *App) HasTask(name string) bool {
 	this.taskMutex.Lock()
 	defer this.taskMutex.Unlock()
-	return this.tasks[name]!=nil
+	return this.tasks[name] != nil
 }
 
 func (this *App) GetTask(name string) ITask {
@@ -387,7 +391,7 @@ func (this *App) GetMouseY() int32 {
 func (this *App) emitMouseEvent(e *keys.MouseEvent) {
 	if e.Event == keys.MOUSE_EVENT_TYPE_UP {
 		this.setMouseStatus(e.Button, false)
-	} else if e.Event == keys.MOUSE_EVENT_TYPE_DOWN  {
+	} else if e.Event == keys.MOUSE_EVENT_TYPE_DOWN {
 		this.setMouseStatus(e.Button, true)
 	}
 	if e.Event == keys.MOUSE_EVENT_TYPE_MOVE {
@@ -402,7 +406,7 @@ func (this *App) emitMouseEvent(e *keys.MouseEvent) {
 	}
 }
 
-func (this *App) setKeyStatus(key keys.KEY, v bool)bool {
+func (this *App) setKeyStatus(key keys.KEY, v bool) bool {
 	this.resetMutex.Lock()
 	defer this.resetMutex.Unlock()
 	if this.keyStatus[key] != v {
@@ -412,7 +416,7 @@ func (this *App) setKeyStatus(key keys.KEY, v bool)bool {
 	return false
 }
 
-func (this *App) setMouseStatus(key keys.MOUSE_BUTTON, v bool)bool {
+func (this *App) setMouseStatus(key keys.MOUSE_BUTTON, v bool) bool {
 	this.resetMutex.Lock()
 	defer this.resetMutex.Unlock()
 	if this.mouseStatus[key] != v {

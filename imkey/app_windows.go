@@ -30,7 +30,7 @@ func (this *App) start() error {
 	return this.startUseUser32()
 }
 
-func (this *App) startUseInterception()error {
+func (this *App) startUseInterception() error {
 	var err error
 	this.k32, err = kernel32.LoadKernel32Dll()
 	if err != nil {
@@ -47,6 +47,9 @@ func (this *App) startUseInterception()error {
 
 func (this *App) startUseUser32() error {
 	var err error
+	if this.mouseListener != nil {
+		return nil
+	}
 	this.k32, err = kernel32.LoadKernel32Dll()
 	if err != nil {
 		log.Error("load kernel32.dll error", flog.Error(err))
@@ -210,37 +213,36 @@ func (this *App) getWindowText(hwnd win.HWND) string {
 	return this.user32.GetWindowText(hwnd)
 }
 
-
 func (this *App) getWindow(str string) win.HWND {
 	hwnd := win.FindWindow(nil, syscall.StringToUTF16Ptr(str))
 	return hwnd
 }
 
-func (this *App) getDesktopRect() (int32,int32,int32,int32){
-	left,top,right,bottom,_:= this.getWindowRectHwnd(win.GetDesktopWindow())
-	return left,top,right,bottom
+func (this *App) getDesktopRect() (int32, int32, int32, int32) {
+	left, top, right, bottom, _ := this.getWindowRectHwnd(win.GetDesktopWindow())
+	return left, top, right, bottom
 }
 
-func (this *App) isForegroundWindow(str string)bool{
-	hwnd:=this.getWindow(str)
-	activeHwnd:=win.GetForegroundWindow()
-	return hwnd!=0&&activeHwnd==hwnd
+func (this *App) isForegroundWindow(str string) bool {
+	hwnd := this.getWindow(str)
+	activeHwnd := win.GetForegroundWindow()
+	return hwnd != 0 && activeHwnd == hwnd
 }
 
-func (this *App) getWindowRectHwnd(hwnd win.HWND) (int32,int32,int32,int32,error) {
+func (this *App) getWindowRectHwnd(hwnd win.HWND) (int32, int32, int32, int32, error) {
 
 	var rect win.RECT
-	ret:=win.GetWindowRect(hwnd,&rect)
+	ret := win.GetWindowRect(hwnd, &rect)
 	if !ret {
-		return 0,0,0,0,errors.New("windows not found")
+		return 0, 0, 0, 0, errors.New("windows not found")
 	}
-	return rect.Left,rect.Top,rect.Right,rect.Bottom,nil
+	return rect.Left, rect.Top, rect.Right, rect.Bottom, nil
 }
 
-func (this *App) getWindowRect(str string) (int32,int32,int32,int32,error) {
-	hwnd:=this.getWindow(str)
-	if hwnd==0 {
-		return 0,0,0,0,errors.New("windows not found")
+func (this *App) getWindowRect(str string) (int32, int32, int32, int32, error) {
+	hwnd := this.getWindow(str)
+	if hwnd == 0 {
+		return 0, 0, 0, 0, errors.New("windows not found")
 	}
 	return this.getWindowRectHwnd(hwnd)
 }
@@ -253,6 +255,7 @@ func (this *App) stop() error {
 	this.keyboardListener.Release()
 	this.mouseListener.Release()
 	this.k32.Release()
+	this.interception.Wait()
 	this.interception.Release()
 	return nil
 }
@@ -264,9 +267,9 @@ func (this *App) sendKeyboardEvent(key keys.KEY, event_type keys.KEY_EVENT_TYPE)
 func (this *App) sendMouseEvent(event *keys.MouseEvent) {
 
 	if event.Event == keys.MOUSE_EVENT_TYPE_MOVE {
-		this.interception.SendMouseMoveTo(event.X,event.Y)
+		this.interception.SendMouseMoveTo(event.X, event.Y)
 	} else if event.Event == keys.MOUSE_EVENT_TYPE_MOVE_RELATIVE {
-		this.interception.SendMouseMoveRelative(event.X,event.Y)
+		this.interception.SendMouseMoveRelative(event.X, event.Y)
 	} else if event.Event == keys.MOUSE_EVENT_TYPE_UP {
 
 		this.interception.SendMouseButtonRelease(event.Button)
@@ -274,7 +277,7 @@ func (this *App) sendMouseEvent(event *keys.MouseEvent) {
 		this.interception.SendMouseButtonPress(event.Button)
 	} else if event.Event == keys.MOUSE_EVENT_TYPE_PRESS {
 		this.interception.SendMouseButtonPress(event.Button)
-		time.Sleep(time.Millisecond*10)
+		time.Sleep(time.Millisecond * 10)
 		this.interception.SendMouseButtonRelease(event.Button)
 	}
 }
