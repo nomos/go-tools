@@ -17,13 +17,13 @@ import (
 )
 
 const (
-	TimeOut            = time.Second * 15
-	UpdateTime = time.Second*15
+	TimeOut    = time.Second * 15
+	UpdateTime = time.Second * 15
 )
 
 type SessionOption func(*Session)
 
-func WithSessionHandler(handler func(msg *protocol.BinaryMessage,session *Session))SessionOption{
+func WithSessionHandler(handler func(msg *protocol.BinaryMessage, session *Session)) SessionOption {
 	return func(session *Session) {
 		session.ClientMsgHandler = handler
 	}
@@ -44,7 +44,7 @@ func NewSession(conn lokas.IConn, id util.ID, manager lokas.ISessionManager, opt
 	for _, o := range opts {
 		o(s)
 	}
-	s.ComposeLogger = log.NewComposeLogger(true,log.ConsoleConfig(""),1)
+	s.ComposeLogger = log.NewComposeLogger(true, log.ConsoleConfig(""), 1)
 	s.ComposeLogger.SetConsoleWriter(s)
 	s.SetType("ErpcSession")
 	s.SetId(id)
@@ -60,10 +60,10 @@ type Session struct {
 	done             chan struct{}
 	OnCloseFunc      func(conn lokas.IConn)
 	OnOpenFunc       func(conn lokas.IConn)
-	ClientMsgHandler func(msg *protocol.BinaryMessage,session *Session)
+	ClientMsgHandler func(msg *protocol.BinaryMessage, session *Session)
 	timeout          time.Duration
 	ticker           *time.Ticker
-	outchan			chan[]byte
+	outchan          chan []byte
 }
 
 func (this *Session) WriteString(s string) {
@@ -71,33 +71,33 @@ func (this *Session) WriteString(s string) {
 }
 
 func (this *Session) Write(p []byte) (int, error) {
-	err:=this.SendMessage(0,0,lox.NewConsoleEvent(string(p)))
-	return 0,err
+	err := this.SendMessage(0, 0, lox.NewConsoleEvent(string(p)))
+	return 0, err
 }
 
-func (this *Session)WriteConsole(e zapcore.Entry, p []byte) error {
+func (this *Session) WriteConsole(e zapcore.Entry, p []byte) error {
 	return nil
 }
-func (this *Session)WriteJson(e zapcore.Entry, p []byte) error {
+func (this *Session) WriteJson(e zapcore.Entry, p []byte) error {
 	var j map[string]interface{}
-	json.Unmarshal(p,&j)
-	level:=j["level"].(string)
-	time:=j["time"].(string)
-	caller:=j["caller"].(string)
-	msg:=j["msg"].(string)
-	o:=make(map[string]interface{})
-	for k,v:=range j {
-		if k!="level"&&k!="time"&&k!="caller"&&k!="msg" {
+	json.Unmarshal(p, &j)
+	level := j["level"].(string)
+	time := j["time"].(string)
+	caller := j["caller"].(string)
+	msg := j["msg"].(string)
+	o := make(map[string]interface{})
+	for k, v := range j {
+		if k != "level" && k != "time" && k != "caller" && k != "msg" {
 			o[k] = v
 		}
 	}
 	level = regexp.MustCompile(`[[][A-Z]+[]][A-z]*`).FindString(level)
-	jstr,_:=json.Marshal(o)
-	str := time+" "+level+"   "+caller+" "+msg+" "+string(jstr)
+	jstr, _ := json.Marshal(o)
+	str := time + " " + level + "   " + caller + " " + msg + " " + string(jstr)
 	this.Write([]byte(str))
 	return nil
 }
-func (this *Session)WriteObject(e zapcore.Entry, o map[string]interface{}) error {
+func (this *Session) WriteObject(e zapcore.Entry, o map[string]interface{}) error {
 	return nil
 }
 
@@ -129,31 +129,31 @@ func (this *Session) Stop() error {
 	return nil
 }
 
-func (this *Session) CallAdminCommand(command *lox.AdminCommand)([]byte,error){
-	res,err:=this.Call(0,command)
+func (this *Session) CallAdminCommand(command *lox.AdminCommand) ([]byte, error) {
+	res, err := this.Call(0, command)
 	if err != nil {
 		log.Error(err.Error())
-		return nil,err
+		return nil, err
 	}
-	cmd:=res.(*lox.AdminCommandResult)
+	cmd := res.(*lox.AdminCommandResult)
 	if !cmd.Success {
-		return nil,errors.New(string(cmd.Data))
+		return nil, errors.New(string(cmd.Data))
 	}
-	return cmd.Data,nil
+	return cmd.Data, nil
 }
 
 func (this *Session) SendMessage(actorId util.ID, transId uint32, msg protocol.ISerializable) error {
-	_,err:=msg.GetId()
+	_, err := msg.GetId()
 	if err != nil {
 		log.Error(err.Error())
 		return err
 	}
-	data,err:=protocol.MarshalMessage(transId,msg,protocol.BINARY)
+	data, err := protocol.MarshalMessage(transId, msg, protocol.BINARY)
 	if err != nil {
 		log.Error(err.Error())
 		return err
 	}
-	this.outchan<-data
+	this.outchan <- data
 	return nil
 }
 
@@ -168,11 +168,11 @@ func (this *Session) GetConn() lokas.IConn {
 func (this *Session) StartMessagePump() {
 
 	this.done = make(chan struct{})
-	this.outchan =make(chan []byte,100)
+	this.outchan = make(chan []byte, 100)
 	go func() {
 		defer func() {
 			if r := recover(); r != nil {
-				util.Recover(r,false)
+				util.Recover(r, false)
 			}
 		}()
 	Loop:
@@ -197,9 +197,9 @@ func (this *Session) StartMessagePump() {
 				if msg.CmdId == lox.TAG_ADMIN_CMD {
 					this.handAdminCommand(msg)
 				} else if this.ClientMsgHandler != nil {
-					this.ClientMsgHandler(msg,this)
+					this.ClientMsgHandler(msg, this)
 				} else {
-					log.Errorf("no msg handler found",msg.CmdId)
+					log.Errorf("no msg handler found", msg.CmdId)
 				}
 			case <-this.done:
 				this.closeSession()
@@ -212,13 +212,13 @@ func (this *Session) StartMessagePump() {
 	go func() {
 		defer func() {
 			if r := recover(); r != nil {
-				util.Recover(r,false)
+				util.Recover(r, false)
 			}
 		}()
-	WRITE_LOOP :
+	WRITE_LOOP:
 		for {
 			select {
-			case msg:= <-this.outchan :
+			case msg := <-this.outchan:
 				this.Conn.Write(msg)
 			case <-this.done:
 				break WRITE_LOOP
@@ -228,23 +228,26 @@ func (this *Session) StartMessagePump() {
 	}()
 }
 
-func (this *Session) handAdminCommand(msg *protocol.BinaryMessage){
-	cmd:=msg.Body.(*lox.AdminCommand)
-	log.Info("adminCmd",zap.String("cmd",cmd.Command),zap.Any("values",cmd.Params))
+func (this *Session) handAdminCommand(msg *protocol.BinaryMessage) {
+	cmd := msg.Body.(*lox.AdminCommand)
+	log.Info("adminCmd", zap.String("cmd", cmd.Command), zap.Any("values", cmd.Params))
 	if handler, ok := rpc.GetRpcHandlers()[cmd.Command]; ok {
-		res,err:=handler(cmd,cmd.ParamsValue(),this)
-		if err!=nil {
+		res, err := handler(cmd, cmd.ParamsValue(), this)
+		if err != nil {
 			log.Error(err.Error())
-			ret:=lox.NewAdminCommandResult(cmd,false,[]byte(err.Error()))
-			this.SendMessage(0,msg.TransId,ret)
+			ret := lox.NewAdminCommandResult(cmd, false, []byte(err.Error()))
+			this.SendMessage(0, msg.TransId, ret)
 			return
 		}
-		ret:=lox.NewAdminCommandResult(cmd,true,res)
-		this.SendMessage(0,msg.TransId,ret)
+		if res == nil {
+			res = []byte("")
+		}
+		ret := lox.NewAdminCommandResult(cmd, true, res)
+		this.SendMessage(0, msg.TransId, ret)
 	} else {
-		log.Errorf("Admin Command not found",cmd.Command)
-		ret:=lox.NewAdminCommandResult(cmd,false,[]byte("admin cmd not found"))
-		this.SendMessage(0,msg.TransId,ret)
+		log.Errorf("Admin Command not found", cmd.Command)
+		ret := lox.NewAdminCommandResult(cmd, false, []byte("admin cmd not found"))
+		this.SendMessage(0, msg.TransId, ret)
 	}
 }
 
@@ -255,7 +258,7 @@ func (this *Session) closeSession() {
 }
 
 func (this *Session) stop() {
-	this.done<- struct{}{}
+	this.done <- struct{}{}
 }
 
 func (this *Session) OnOpen(conn lokas.IConn) {
