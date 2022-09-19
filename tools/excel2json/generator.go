@@ -117,7 +117,7 @@ func (this *Generator) GenerateTs(tsPath string, embed bool) error {
 		return sheetArr[i].Name < sheetArr[j].Name
 	})
 	for _, s := range sheetArr {
-		sourceFieldStr += s.GetTsSourceFieldString()
+		sourceFieldStr += s.GetTsDataFieldString()
 		sourceFieldStr += "\n"
 		importFieldStr += s.GetTsImportFieldString(dirName)
 		importFieldStr += "\n"
@@ -219,6 +219,59 @@ func (this *DataMap) Clear() {
 	dataStr = strings.Replace(dataStr, "{InitFields}", initFieldStr, -1)
 	dataStr = strings.Replace(dataStr, "{DataFields}", dataFieldStr, -1)
 	dataPath := path.Join(gopath, "data.go")
+	err = ioutil.WriteFile(dataPath, []byte(dataStr), 0644)
+	if err != nil {
+		log.Errorf(err.Error())
+	}
+	return nil
+}
+
+func (this *Generator) GenerateCs(csPath string, namespace string) error {
+	this.dirSource = newDirSource(this.dirSource.dir)
+	err := this.dirSource.Load()
+	if err != nil {
+		log.Error(err.Error())
+		return err
+	}
+	sheetArr := []*SheetSource{}
+	sourceFieldStr := ""
+	dirName := path.Base(csPath)
+	log.Infof("baseName", dirName)
+	for _, f := range this.dirSource.files {
+		for _, s := range f.sheets {
+			sheetArr = append(sheetArr, s)
+			csFilePath := path.Join(csPath, s.Name+"Source.ts")
+			log.Info(csFilePath)
+			err := ioutil.WriteFile(csFilePath, []byte(s.GenerateCsString()), 0644)
+			if err != nil {
+				log.Errorf(err.Error())
+			}
+		}
+	}
+	sort.Slice(sheetArr, func(i, j int) bool {
+		return sheetArr[i].Name < sheetArr[j].Name
+	})
+	for _, s := range sheetArr {
+		sourceFieldStr += s.GetCsDataFieldString()
+		sourceFieldStr += "\n"
+	}
+	sourceFieldStr = strings.TrimRight(sourceFieldStr, "\n")
+	dataStr := `using Newtonsoft.Json;
+
+namespace {NameSpace}
+
+[JsonObject(MemberSerialization.OptIn)]
+public class DataSource {
+{SourceFields}
+    public void LoadData(string data)
+    {
+        JsonConvert.PopulateObject(data,this);
+    }
+}`
+
+	dataStr = strings.Replace(dataStr, "{NameSpace}", namespace, -1)
+	dataStr = strings.Replace(dataStr, "{SourceFields}", sourceFieldStr, -1)
+	dataPath := path.Join(csPath, "DataSource.ts")
 	err = ioutil.WriteFile(dataPath, []byte(dataStr), 0644)
 	if err != nil {
 		log.Errorf(err.Error())

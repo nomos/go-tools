@@ -347,9 +347,79 @@ func (this *SheetSource) GenerateTsString() string {
 	return ret
 }
 
-func (this *SheetSource) GetMainFieldType() string {
+const __csstr = `
+using Newtonsoft.Json
+
+namespace ${namespace}
+
+[JsonObject(MemberSerialization.OptIn)]
+public class ${class}Source {
+${fields}
+}
+`
+
+func (this *SheetSource) generateCsEnums() string {
+	out := "export enum " + this.Name + "Enum {\n"
+	enumsArr := make([]slice.KVIntString, 0)
+
+	for k, v := range this.enums {
+		descStr := ""
+		value := "\t" + k + " = " + strconv.Itoa(int(v)) + ","
+		if descStr != "" {
+			value += " //" + descStr
+		}
+		value += "\n"
+		enumsArr = append(enumsArr, slice.KVIntString{
+			K: int(v),
+			V: value,
+		})
+	}
+	sort.Slice(enumsArr, func(i, j int) bool {
+		return enumsArr[i].K < enumsArr[j].K
+	})
+	for _, v := range enumsArr {
+		out += v.V
+	}
+	out += "}\n"
+	return out
+}
+
+func (this *SheetSource) generateCsEnumGetter() string {
+	out := ""
+	enumsArr := make([]slice.KVIntString, 0)
+	for k, v := range this.enums {
+		enumsArr = append(enumsArr, slice.KVIntString{
+			K: int(v),
+			V: "\t" + `get ` + k + `():I` + this.Name + `Data{
+		return this.getById(` + strconv.Itoa(int(v)) + `)
+	}
+`,
+		})
+	}
+	sort.Slice(enumsArr, func(i, j int) bool {
+		return enumsArr[i].K < enumsArr[j].K
+	})
+	for _, v := range enumsArr {
+		out += v.V
+	}
+	return out
+}
+
+func (this *SheetSource) GenerateCsString() string {
+	ret := __csstr
+	ret = strings.Replace(ret, `${class}`, this.Name, -1)
+	ret = strings.Replace(ret, `${fields}`, this.generateCsFields(), -1)
+	return ret
+}
+
+func (this *SheetSource) GetGoMainFieldType() string {
 	f := this.DataFields[0]
 	return f.Typ.GoString()
+}
+
+func (this *SheetSource) GetCsMainFieldType() string {
+	f := this.DataFields[0]
+	return f.Typ.CsString()
 }
 
 func (this *SheetSource) GetTsImportFieldString(dirName string) string {
@@ -362,16 +432,20 @@ func (this *SheetSource) GetTsLoadFieldString() string {
 	return "\t\t" + `this.` + this.Name + `.load(objs["` + this.Name + `"])`
 }
 
-func (this *SheetSource) GetTsSourceFieldString() string {
+func (this *SheetSource) GetTsDataFieldString() string {
 	return "\t" + this.Name + `:` + this.Name + "DataSource = new " + this.Name + "DataSource()"
 }
 
+func (this *SheetSource) GetCsDataFieldString() string {
+	return "\t[JsonProperty]\n\tpublic " + "Dictionary<" + this.GetCsMainFieldType() + "," + this.Name + "Source> " + this.Name + " World { get; set; }"
+}
+
 func (this *SheetSource) GetGoDataFieldString() string {
-	return "\t" + this.Name + " map[" + this.GetMainFieldType() + "]*" + this.Name
+	return "\t" + this.Name + " map[" + this.GetGoMainFieldType() + "]*" + this.Name
 }
 
 func (this *SheetSource) GetGoInitFieldString() string {
-	return "\tthis." + this.Name + "=make(map[" + this.GetMainFieldType() + "]*" + this.Name + ")"
+	return "\tthis." + this.Name + "=make(map[" + this.GetGoMainFieldType() + "]*" + this.Name + ")"
 }
 
 func (this *SheetSource) generateTsFields() string {
@@ -393,6 +467,22 @@ func (this *SheetSource) generateGoFields() string {
 		ret += f.Name
 		ret += " "
 		ret += f.Typ.GoString()
+		ret += " //"
+		ret += f.Desc
+		ret += "\n"
+	}
+	ret = strings.TrimRight(ret, "\n")
+	return ret
+}
+
+func (this *SheetSource) generateCsFields() string {
+	ret := ""
+	for _, f := range this.DataFields {
+		ret += "\t[JsonProperty]\n\t public"
+		ret += f.Typ.CsString()
+		ret += " "
+		ret += f.Name
+		ret += " { get; set; }"
 		ret += " //"
 		ret += f.Desc
 		ret += "\n"

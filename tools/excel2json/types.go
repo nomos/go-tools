@@ -10,15 +10,14 @@ import (
 
 const MappingTag = "Mapping"
 
-
 const (
 	ERR_CELL_NOT_EXIST = "cell not exist"
 )
 
 const (
-	EXCEL_TYPE_LINE  = 0
-	EXCEL_DESC_LINE  = 1
-	EXCEL_NAME_LINE  = 2
+	EXCEL_TYPE_LINE = 0
+	EXCEL_DESC_LINE = 1
+	EXCEL_NAME_LINE = 2
 )
 
 //type ExportType string
@@ -60,12 +59,10 @@ const (
 //	}
 //}
 
-
-
 type fieldType int
 
 const (
-	type_tag = iota+1
+	type_tag = iota + 1
 	type_string
 	type_bool
 	type_int
@@ -81,11 +78,11 @@ const (
 	type_int_string_map
 )
 
-func IsCapitalWord(s string)bool{
+func IsCapitalWord(s string) bool {
 	return regexp.MustCompile(`^[A-Z]\w+`).FindString(s) == s
 }
 
-func (this fieldType) TsString()string{
+func (this fieldType) TsString() string {
 	switch this {
 	case type_string:
 		return "string"
@@ -118,256 +115,256 @@ func (this fieldType) TsString()string{
 	}
 }
 
-func (this fieldType) check(s string)(string,error) {
+func (this fieldType) check(s string) (string, error) {
 	switch this {
 	case type_int_arr:
-		reg:=regexp.MustCompile(`(([0-9]+)([,]([0-9]+))*)?`)
-		if reg.FindString(s)!=s {
-			return "",errors.New("check []int error")
+		reg := regexp.MustCompile(`(([0-9]+)([,]([0-9]+))*)?`)
+		if reg.FindString(s) != s {
+			return "", errors.New("check []int error")
 		}
-		return s,nil
+		return s, nil
 	case type_float_arr:
-		reg:=regexp.MustCompile(`((([0-9]|[.])+)([,](([0-9]|[.])+))*)?`)
-		if reg.FindString(s)!=s {
-			return "",errors.New("check []float error")
+		reg := regexp.MustCompile(`((([0-9]|[.])+)([,](([0-9]|[.])+))*)?`)
+		if reg.FindString(s) != s {
+			return "", errors.New("check []float error")
 		}
-		return s,nil
+		return s, nil
 	case type_string_arr:
-		reg:=regexp.MustCompile(`((\w+)([,](\w+))*)?`)
-		if reg.FindString(s)!=s {
-			return "",errors.New("check []string error")
+		reg := regexp.MustCompile(`((\w+)([,](\w+))*)?`)
+		if reg.FindString(s) != s {
+			return "", errors.New("check []string error")
 		}
-		return s,nil
+		return s, nil
 	case type_string_string_map:
-		reg:=regexp.MustCompile(`((\w+\s*[:]\s*\w+)([,](\w+\s*[:]\s*\w+))*)?`)
-		if reg.FindString(s)!=s {
-			return "",errors.New("check [string]string error")
+		reg := regexp.MustCompile(`((\w+\s*[:]\s*\w+)([,](\w+\s*[:]\s*\w+))*)?`)
+		if reg.FindString(s) != s {
+			return "", errors.New("check [string]string error")
 		}
-		return s,nil
+		return s, nil
 	case type_string_int_map:
-		reg:=regexp.MustCompile(`((\w+\s*[:]\s*[0-9]+)([,](\w+\s*[:]\s*[0-9]+))*)?`)
-		if reg.FindString(s)!=s {
-			return "",errors.New("check [string]int error")
+		reg := regexp.MustCompile(`((\w+\s*[:]\s*[0-9]+)([,](\w+\s*[:]\s*[0-9]+))*)?`)
+		if reg.FindString(s) != s {
+			return "", errors.New("check [string]int error")
 		}
-		return s,nil
+		return s, nil
 	case type_string_float_map:
-		reg:=regexp.MustCompile(`((\w+\s*[:]\s*([0-9]|[.])+)([,](\w+\s*[:]\s*([0-9]|[.])+))*)?`)
-		if reg.FindString(s)!=s {
-			return "",errors.New("check [string]float error")
+		reg := regexp.MustCompile(`((\w+\s*[:]\s*([0-9]|[.])+)([,](\w+\s*[:]\s*([0-9]|[.])+))*)?`)
+		if reg.FindString(s) != s {
+			return "", errors.New("check [string]float error")
 		}
-		return s,nil
+		return s, nil
 	case type_int_string_map:
-		reg:=regexp.MustCompile(`(([0-9]+\s*[:]\s*\w+)([,]([0-9]+\s*[:]\s*\w+))*)?`)
-		if reg.FindString(s)!=s {
-			return "",errors.New("check [int]string error")
+		reg := regexp.MustCompile(`(([0-9]+\s*[:]\s*\w+)([,]([0-9]+\s*[:]\s*\w+))*)?`)
+		if reg.FindString(s) != s {
+			return "", errors.New("check [int]string error")
 		}
-		return s,nil
+		return s, nil
 	case type_int_int_map:
-		reg:=regexp.MustCompile(`(([0-9]+\s*[:]\s*[0-9]+)([,]([0-9]+\s*[:]\s*[0-9]+))*)?`)
-		if reg.FindString(s)!=s {
-			return "",errors.New("check [int]int error")
+		reg := regexp.MustCompile(`(([0-9]+\s*[:]\s*[0-9]+)([,]([0-9]+\s*[:]\s*[0-9]+))*)?`)
+		if reg.FindString(s) != s {
+			return "", errors.New("check [int]int error")
 		}
-		return s,nil
+		return s, nil
 	case type_int_float_map:
-		reg:=regexp.MustCompile(`(([0-9]+\s*[:]\s*([0-9]|[.])+)([,]([0-9]+\s*[:]\s*([0-9]|[.])+))*)?`)
-		if reg.FindString(s)!=s {
-			return "",errors.New("check [int]float error")
+		reg := regexp.MustCompile(`(([0-9]+\s*[:]\s*([0-9]|[.])+)([,]([0-9]+\s*[:]\s*([0-9]|[.])+))*)?`)
+		if reg.FindString(s) != s {
+			return "", errors.New("check [int]float error")
 		}
-		return s,nil
+		return s, nil
 	default:
-		return s,nil
+		return s, nil
 	}
 }
 
-func trimLR(s string)[]string{
-	s = strings.TrimRight(s,"]")
-	s = strings.TrimLeft(s,"[")
-	return strings.Split(s,",")
+func trimLR(s string) []string {
+	s = strings.TrimRight(s, "]")
+	s = strings.TrimLeft(s, "[")
+	return strings.Split(s, ",")
 }
 
 var errIgnore = errors.New("ignore")
 
-func (this fieldType) decode(s string) (interface{},error){
+func (this fieldType) decode(s string) (interface{}, error) {
 	switch this {
 	case type_string:
-		return s,nil
+		return s, nil
 	case type_bool:
-		if s=="1" {
-			return true,nil
-		} else if s=="0" {
-			return false,nil
+		if s == "1" {
+			return true, nil
+		} else if s == "0" {
+			return false, nil
 		} else {
-			return nil,errors.New("wrong bool format:"+s)
+			return nil, errors.New("wrong bool format:" + s)
 		}
 	case type_int:
-		if s=="#" {
-			return 0,errIgnore
+		if s == "#" {
+			return 0, errIgnore
 		}
-		if s =="" {
-			return 0,nil
+		if s == "" {
+			return 0, nil
 		}
-		ret,err:=strconv.Atoi(s)
+		ret, err := strconv.Atoi(s)
 		if err != nil {
-			return nil,err
+			return nil, err
 		}
-		return ret,nil
+		return ret, nil
 	case type_float:
-		if s =="" {
-			return 0.0,nil
+		if s == "" {
+			return 0.0, nil
 		}
-		ret,err:=strconv.ParseFloat(s, 64)
+		ret, err := strconv.ParseFloat(s, 64)
 		if err != nil {
-			return nil,err
+			return nil, err
 		}
-		return ret,nil
+		return ret, nil
 	case type_int_arr:
-		ret:= make([]float64,0)
-		s ="["+s+"]"
-		err:=json.Unmarshal([]byte(s),&ret)
+		ret := make([]float64, 0)
+		s = "[" + s + "]"
+		err := json.Unmarshal([]byte(s), &ret)
 		if err != nil {
-			return nil,err
+			return nil, err
 		}
-		return ret,nil
+		return ret, nil
 	case type_float_arr:
-		s ="["+s+"]"
-		ret:= make([]float64,0)
-		err:=json.Unmarshal([]byte(s),&ret)
+		s = "[" + s + "]"
+		ret := make([]float64, 0)
+		err := json.Unmarshal([]byte(s), &ret)
 		if err != nil {
-			return nil,err
+			return nil, err
 		}
-		return ret,nil
+		return ret, nil
 	case type_string_arr:
-		ret:=trimLR(s)
-		return ret,nil
+		ret := trimLR(s)
+		return ret, nil
 	case type_string_int_map:
-		arr:=trimLR(s)
+		arr := trimLR(s)
 		ret := make(map[string]int)
-		for _,iter:=range arr {
-			iterArr:=strings.Split(iter,":")
-			if len(iterArr)!=2 {
-				return nil,errors.New("unmarshal error")
+		for _, iter := range arr {
+			iterArr := strings.Split(iter, ":")
+			if len(iterArr) != 2 {
+				return nil, errors.New("unmarshal error")
 			}
-			key:=iterArr[0]
-			value,err:=strconv.Atoi(iterArr[1])
+			key := iterArr[0]
+			value, err := strconv.Atoi(iterArr[1])
 			if err != nil {
-				return nil,err
+				return nil, err
 			}
 			ret[key] = value
 		}
-		return ret,nil
+		return ret, nil
 	case type_string_float_map:
-		arr:=trimLR(s)
+		arr := trimLR(s)
 		ret := make(map[string]float64)
-		for _,iter:=range arr {
-			iterArr:=strings.Split(iter,":")
-			if len(iterArr)!=2 {
-				return nil,errors.New("unmarshal error")
+		for _, iter := range arr {
+			iterArr := strings.Split(iter, ":")
+			if len(iterArr) != 2 {
+				return nil, errors.New("unmarshal error")
 			}
-			key:=iterArr[0]
-			value,err:=strconv.ParseFloat(iterArr[1], 64)
+			key := iterArr[0]
+			value, err := strconv.ParseFloat(iterArr[1], 64)
 			if err != nil {
-				return nil,err
+				return nil, err
 			}
 			ret[key] = value
 		}
-		return ret,nil
+		return ret, nil
 	case type_string_string_map:
-		arr:=trimLR(s)
+		arr := trimLR(s)
 		ret := make(map[string]string)
-		for _,iter:=range arr {
-			iterArr:=strings.Split(iter,":")
-			if len(iterArr)!=2 {
-				return nil,errors.New("unmarshal error")
+		for _, iter := range arr {
+			iterArr := strings.Split(iter, ":")
+			if len(iterArr) != 2 {
+				return nil, errors.New("unmarshal error")
 			}
-			key:=iterArr[0]
+			key := iterArr[0]
 			ret[key] = iterArr[1]
 		}
-		return ret,nil
+		return ret, nil
 	case type_int_int_map:
-		arr:=trimLR(s)
+		arr := trimLR(s)
 		ret := make(map[int]int)
-		for _,iter:=range arr {
-			iterArr:=strings.Split(iter,":")
-			if len(iterArr)!=2 {
-				return nil,errors.New("unmarshal error")
+		for _, iter := range arr {
+			iterArr := strings.Split(iter, ":")
+			if len(iterArr) != 2 {
+				return nil, errors.New("unmarshal error")
 			}
-			key,err:=strconv.Atoi(iterArr[0])
+			key, err := strconv.Atoi(iterArr[0])
 			if err != nil {
-				return nil,err
+				return nil, err
 			}
-			value,err:=strconv.Atoi(iterArr[1])
+			value, err := strconv.Atoi(iterArr[1])
 			if err != nil {
-				return nil,err
+				return nil, err
 			}
 			ret[key] = value
 		}
-		return ret,nil
+		return ret, nil
 	case type_int_float_map:
-		arr:=trimLR(s)
+		arr := trimLR(s)
 		ret := make(map[int]float64)
-		for _,iter:=range arr {
-			iterArr:=strings.Split(iter,":")
-			if len(iterArr)!=2 {
-				return nil,errors.New("unmarshal error")
+		for _, iter := range arr {
+			iterArr := strings.Split(iter, ":")
+			if len(iterArr) != 2 {
+				return nil, errors.New("unmarshal error")
 			}
-			key,err:=strconv.Atoi(iterArr[0])
+			key, err := strconv.Atoi(iterArr[0])
 			if err != nil {
-				return nil,err
+				return nil, err
 			}
-			value,err:=strconv.ParseFloat(iterArr[1], 64)
+			value, err := strconv.ParseFloat(iterArr[1], 64)
 			if err != nil {
-				return nil,err
+				return nil, err
 			}
 			ret[key] = value
 		}
-		return ret,nil
+		return ret, nil
 	case type_int_string_map:
-		arr:=trimLR(s)
+		arr := trimLR(s)
 		ret := make(map[int]string)
-		for _,iter:=range arr {
-			iterArr:=strings.Split(iter,":")
-			if len(iterArr)!=2 {
-				return nil,errors.New("unmarshal error")
+		for _, iter := range arr {
+			iterArr := strings.Split(iter, ":")
+			if len(iterArr) != 2 {
+				return nil, errors.New("unmarshal error")
 			}
-			key,err:=strconv.Atoi(iterArr[0])
+			key, err := strconv.Atoi(iterArr[0])
 			if err != nil {
-				return nil,err
+				return nil, err
 			}
 			ret[key] = iterArr[1]
 		}
-		return ret,nil
+		return ret, nil
 	default:
-		return 0,errors.New("unrecognized type:"+s)
+		return 0, errors.New("unrecognized type:" + s)
 	}
-	return 0,errors.New("unrecognized type:"+s)
+	return 0, errors.New("unrecognized type:" + s)
 }
 
-func getFieldType(s string)(fieldType,error) {
+func getFieldType(s string) (fieldType, error) {
 	switch s {
 	case "#":
-		return type_tag,nil
+		return type_tag, nil
 	case "string":
-		return type_string,nil
+		return type_string, nil
 	case "bool":
-		return type_bool,nil
+		return type_bool, nil
 	case "int":
-		return type_int,nil
+		return type_int, nil
 	case "float":
-		return type_float,nil
+		return type_float, nil
 	case "[]int":
-		return type_int_arr,nil
+		return type_int_arr, nil
 	case "[]float":
-		return type_float_arr,nil
+		return type_float_arr, nil
 	case "[]string":
-		return type_string_arr,nil
+		return type_string_arr, nil
 	case "[string]int":
-		return type_string_int_map,nil
+		return type_string_int_map, nil
 	case "[string]string":
-		return type_string_string_map,nil
+		return type_string_string_map, nil
 	case "[string]float":
-		return type_string_float_map,nil
+		return type_string_float_map, nil
 	default:
-		return 0,errors.New("unrecognized type:"+s)
+		return 0, errors.New("unrecognized type:" + s)
 	}
 }
 
@@ -399,6 +396,39 @@ func (this fieldType) GoString() string {
 		return "map[int32]float64"
 	case type_int_string_map:
 		return "map[int32]string"
+	default:
+		return ""
+	}
+}
+
+func (this fieldType) CsString() string {
+	switch this {
+	case type_string:
+		return "string"
+	case type_bool:
+		return "bool"
+	case type_int:
+		return "int"
+	case type_float:
+		return "double"
+	case type_int_arr:
+		return "List<int>"
+	case type_float_arr:
+		return "List<double>"
+	case type_string_arr:
+		return "List<string>"
+	case type_string_int_map:
+		return "Dictionary<string,int>"
+	case type_string_float_map:
+		return "Dictionary<string,double>"
+	case type_string_string_map:
+		return "Dictionary<string,string>"
+	case type_int_int_map:
+		return "Dictionary<int,int>"
+	case type_int_float_map:
+		return "Dictionary<int,double>"
+	case type_int_string_map:
+		return "Dictionary<int,string>"
 	default:
 		return ""
 	}
