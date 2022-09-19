@@ -267,6 +267,13 @@ public class DataSource {
     {
         JsonConvert.PopulateObject(data,this);
     }
+
+    public static DataSource Create(string data)
+    {
+        var ret = new DataSource();
+        ret.LoadData(data);
+        return ret;
+    }
 }`
 
 	dataStr = strings.Replace(dataStr, "{NameSpace}", namespace, -1)
