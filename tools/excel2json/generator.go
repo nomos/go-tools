@@ -22,6 +22,7 @@ func New(source string) *Generator {
 
 type Generator struct {
 	*dirSource
+	CsPackage string
 }
 
 func (this *Generator) Load() error {
@@ -228,6 +229,7 @@ func (this *DataMap) Clear() {
 
 func (this *Generator) GenerateCs(csPath string, namespace string) error {
 	this.dirSource = newDirSource(this.dirSource.dir)
+	this.CsPackage = namespace
 	err := this.dirSource.Load()
 	if err != nil {
 		log.Error(err.Error())
@@ -242,7 +244,7 @@ func (this *Generator) GenerateCs(csPath string, namespace string) error {
 			sheetArr = append(sheetArr, s)
 			csFilePath := path.Join(csPath, s.Name+"Source.cs")
 			log.Info(csFilePath)
-			err := ioutil.WriteFile(csFilePath, []byte(s.GenerateCsString()), 0644)
+			err := ioutil.WriteFile(csFilePath, []byte(s.GenerateCsString(this)), 0644)
 			if err != nil {
 				log.Errorf(err.Error())
 			}
@@ -256,29 +258,32 @@ func (this *Generator) GenerateCs(csPath string, namespace string) error {
 		sourceFieldStr += "\n"
 	}
 	sourceFieldStr = strings.TrimRight(sourceFieldStr, "\n")
-	dataStr := `using Newtonsoft.Json;
+	dataStr := `using System.Collections.Generic;
+using Newtonsoft.Json;
 
-namespace {NameSpace}
-
-[JsonObject(MemberSerialization.OptIn)]
-public class DataSource {
+namespace {NameSpace} {
+	[JsonObject(MemberSerialization.OptIn)]
+	public class DataSource {
 {SourceFields}
-    public void LoadData(string data)
-    {
-        JsonConvert.PopulateObject(data,this);
-    }
+    	public void LoadData(string data)
+    	{
+        	JsonConvert.PopulateObject(data,this);
+    	}
 
-    public static DataSource Create(string data)
-    {
-        var ret = new DataSource();
-        ret.LoadData(data);
-        return ret;
-    }
-}`
+    	public static DataSource Create(string data)
+    	{
+        	var ret = new DataSource();
+        	ret.LoadData(data);
+        	return ret;
+    	}
+	}
+}
+
+`
 
 	dataStr = strings.Replace(dataStr, "{NameSpace}", namespace, -1)
 	dataStr = strings.Replace(dataStr, "{SourceFields}", sourceFieldStr, -1)
-	dataPath := path.Join(csPath, "DataSource.ts")
+	dataPath := path.Join(csPath, "DataSource.cs")
 	err = ioutil.WriteFile(dataPath, []byte(dataStr), 0644)
 	if err != nil {
 		log.Errorf(err.Error())

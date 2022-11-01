@@ -347,14 +347,15 @@ func (this *SheetSource) GenerateTsString() string {
 	return ret
 }
 
-const __csstr = `
-using Newtonsoft.Json
+const __csstr = `using System.Collections.Generic;
+using Newtonsoft.Json;
 
-namespace ${namespace}
+namespace ${namespace} {
 
-[JsonObject(MemberSerialization.OptIn)]
-public class ${class}Source {
+	[JsonObject(MemberSerialization.OptIn)]
+	public class ${class}Source {
 ${fields}
+	}
 }
 `
 
@@ -405,9 +406,10 @@ func (this *SheetSource) generateCsEnumGetter() string {
 	return out
 }
 
-func (this *SheetSource) GenerateCsString() string {
+func (this *SheetSource) GenerateCsString(generator *Generator) string {
 	ret := __csstr
 	ret = strings.Replace(ret, `${class}`, this.Name, -1)
+	ret = strings.Replace(ret, `${namespace}`, generator.CsPackage, -1)
 	ret = strings.Replace(ret, `${fields}`, this.generateCsFields(), -1)
 	return ret
 }
@@ -437,7 +439,7 @@ func (this *SheetSource) GetTsDataFieldString() string {
 }
 
 func (this *SheetSource) GetCsDataFieldString() string {
-	return "\t[JsonProperty]\n\tpublic " + "Dictionary<" + this.GetCsMainFieldType() + "," + this.Name + "Source> " + this.Name + " World { get; set; }"
+	return "\t\t[JsonProperty]\n\t\tpublic " + "Dictionary<" + this.GetCsMainFieldType() + "," + this.Name + "Source> " + this.Name + " { get; set; }"
 }
 
 func (this *SheetSource) GetGoDataFieldString() string {
@@ -478,13 +480,15 @@ func (this *SheetSource) generateGoFields() string {
 func (this *SheetSource) generateCsFields() string {
 	ret := ""
 	for _, f := range this.DataFields {
-		ret += "\t[JsonProperty]\n\t public"
+		ret += "\t\t[JsonProperty]\n\t\tpublic "
 		ret += f.Typ.CsString()
 		ret += " "
 		ret += f.Name
 		ret += " { get; set; }"
-		ret += " //"
-		ret += f.Desc
+		if f.Desc != "" {
+			ret += " //"
+			ret += f.Desc
+		}
 		ret += "\n"
 	}
 	ret = strings.TrimRight(ret, "\n")
