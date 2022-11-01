@@ -240,7 +240,7 @@ func (this *Generator) GenerateCs(csPath string, namespace string) error {
 	for _, f := range this.dirSource.files {
 		for _, s := range f.sheets {
 			sheetArr = append(sheetArr, s)
-			csFilePath := path.Join(csPath, s.Name+"Source.ts")
+			csFilePath := path.Join(csPath, s.Name+"Source.cs")
 			log.Info(csFilePath)
 			err := ioutil.WriteFile(csFilePath, []byte(s.GenerateCsString()), 0644)
 			if err != nil {
