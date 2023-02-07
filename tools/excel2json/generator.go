@@ -264,16 +264,29 @@ using Newtonsoft.Json;
 namespace {NameSpace} {
 	[JsonObject(MemberSerialization.OptIn)]
 	public class DataSource {
+		protected static DataSource _instance;
 {SourceFields}
-    	public void LoadData(string data)
+    	protected DataSource()
+        {
+	        
+        }
+		
+        public static DataSource Instance(string data = "")
+        {
+	        if (_instance == null)
+	        {
+		        _instance = new DataSource();
+		        if (data != "")
+		        {
+			        Load(data);
+		        }
+	        }
+	        return _instance;
+        }
+    	public static DataSource Load(string data)
     	{
-        	JsonConvert.PopulateObject(data,this);
-    	}
-
-    	public static DataSource Create(string data)
-    	{
-        	var ret = new DataSource();
-        	ret.LoadData(data);
+        	var ret = Instance();
+            JsonConvert.PopulateObject(data,ret);
         	return ret;
     	}
 	}

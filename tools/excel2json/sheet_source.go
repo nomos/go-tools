@@ -355,6 +355,7 @@ namespace ${namespace} {
 	[JsonObject(MemberSerialization.OptIn)]
 	public class ${class}Source {
 ${fields}
+${enumfields}
 	}
 }
 `
@@ -391,9 +392,7 @@ func (this *SheetSource) generateCsEnumGetter() string {
 	for k, v := range this.enums {
 		enumsArr = append(enumsArr, slice.KVIntString{
 			K: int(v),
-			V: "\t" + `get ` + k + `():I` + this.Name + `Data{
-		return this.getById(` + strconv.Itoa(int(v)) + `)
-	}
+			V: "\t\t" + `public static  ` + this.Name + "Source " + k + `=> DataSource.Instance().` + this.Name + `[` + strconv.Itoa(int(v)) + `];
 `,
 		})
 	}
@@ -411,6 +410,7 @@ func (this *SheetSource) GenerateCsString(generator *Generator) string {
 	ret = strings.Replace(ret, `${class}`, this.Name, -1)
 	ret = strings.Replace(ret, `${namespace}`, generator.CsPackage, -1)
 	ret = strings.Replace(ret, `${fields}`, this.generateCsFields(), -1)
+	ret = strings.Replace(ret, `${enumfields}`, this.generateCsEnumGetter(), -1)
 	return ret
 }
 
