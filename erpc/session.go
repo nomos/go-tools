@@ -6,7 +6,6 @@ import (
 	"github.com/nomos/go-lokas"
 	"github.com/nomos/go-lokas/log"
 	"github.com/nomos/go-lokas/lox"
-	"github.com/nomos/go-lokas/lox/flog"
 	"github.com/nomos/go-lokas/protocol"
 	"github.com/nomos/go-lokas/rpc"
 	"github.com/nomos/go-lokas/util"
@@ -263,7 +262,7 @@ func (this *Session) stop() {
 
 func (this *Session) OnOpen(conn lokas.IConn) {
 	this.StartMessagePump()
-	log.Info("ErpcSession:OnOpen", flog.ActorInfo(this)...)
+	log.Info("ErpcSession:OnOpen", this.LogInfo()...)
 	if this.manager != nil {
 		this.manager.AddSession(this.GetId(), this)
 	}
@@ -276,7 +275,7 @@ func (this *Session) OnClose(conn lokas.IConn) {
 	if this.manager != nil {
 		this.manager.RemoveSession(this.GetId())
 	}
-	log.Info("ErpcSession:OnClose", flog.ActorInfo(this)...)
+	log.Info("ErpcSession:OnClose", this.LogInfo()...)
 	if this.OnCloseFunc != nil {
 		this.OnCloseFunc(conn)
 	}
